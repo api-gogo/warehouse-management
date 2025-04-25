@@ -22,6 +22,7 @@ public class InspectionService {
         this.inspectionRepository = inspectionRepository;
     }
 
+    @Transactional
     public InspectionResponseDTO createInspection(InspectionRequestDTO requestDTO) {
         Optional<Inspection> findInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
                 requestDTO.getTransactionType(), requestDTO.getTransactionId()
