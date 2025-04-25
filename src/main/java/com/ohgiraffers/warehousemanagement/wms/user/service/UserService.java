@@ -3,6 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.user.service;
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
 import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -61,5 +63,37 @@ public class UserService {
                 u.getUserRole().getRole(),
                 u.getUserStatus().getStatus()
         )).orElse(null);
+    }
+
+    public UserDTO getUserByUserId(Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        return user.map(u -> new UserDTO(
+                u.getUserId(),
+                u.getUserCode(),
+                u.getUserPass(),
+                u.getUserName(),
+                u.getUserEmail(),
+                u.getUserPhone(),
+                u.getUserPart().getPart(),
+                u.getUserRole().getRole(),
+                u.getUserStatus().getStatus(),
+                u.getUserCreatedAt(),
+                u.getUserUpdatedAt(),
+                u.getUserDeletedAt()
+        )).orElse(null);
+    }
+
+    public boolean updateUser(UserDTO userDTO) {
+        User user = userRepository.findById(userDTO.getUserId()).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserEmail(userDTO.getUserEmail());
+        user.setUserPhone(userDTO.getUserPhone());
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
     }
 }

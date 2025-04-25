@@ -67,4 +67,29 @@ public class AuthDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    // id 반환
+    public Integer getUserId() {
+        return loginUserDTO.getUserId();
+    }
+
+    // 이름(실제이름) 반환
+    public String getUserRealName() {
+        return loginUserDTO.getUserName();
+    }
+
+    // 직책 반환
+    public String getUserRole() {
+        return loginUserDTO.getUserRole();
+    }
+
+    // 부서 반환
+    public String getUserPart() {
+        return loginUserDTO.getUserPart();
+    }
+
+    // 상태 반환
+    public String getUserStatus() {
+        return loginUserDTO.getUserStatus();
+    }
 }

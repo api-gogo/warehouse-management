@@ -50,9 +50,52 @@
         <!-- 로그인한 경우 -->
         <th:block th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
           <h1 class="welcome-title">
-            안녕하세요, <span th:text="${#authentication.principal.username}">사용자</span>님!
+            안녕하세요, <span th:text="${#authentication.principal.userRealName}" class="user-name">사용자</span>님!
           </h1>
-          <p class="welcome-subtitle">오늘도 활발한 활동 기대합니다.</p>
+          
+          <div class="user-info-container">
+            <div class="user-profile">
+              <div class="avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="user-details">
+                <div class="info-item">
+                  <span class="info-label"><i class="fas fa-id-badge me-2"></i>직책:</span>
+                  <span class="info-value" th:text="${#authentication.principal.userRole}"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label"><i class="fas fa-users me-2"></i>부서:</span>
+                  <span class="info-value" th:text="${#authentication.principal.userPart}"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label"><i class="fas fa-toggle-on me-2"></i>상태:</span>
+                  <span class="info-value status" th:text="${#authentication.principal.userStatus}"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dashboard-shortcuts">
+            <h3 class="shortcuts-title">자주 사용하는 기능</h3>
+            <div class="shortcuts-grid">
+              <a href="#" class="shortcut-card">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>대시보드</span>
+              </a>
+              <a href="#" class="shortcut-card">
+                <i class="fas fa-chart-bar"></i>
+                <span>보고서</span>
+              </a>
+              <a href="#" class="shortcut-card">
+                <i class="fas fa-bell"></i>
+                <span>알림</span>
+              </a>
+              <a href="#" class="shortcut-card">
+                <i class="fas fa-cog"></i>
+                <span>설정</span>
+              </a>
+            </div>
+          </div>
         </th:block>
       </div>
     </main>

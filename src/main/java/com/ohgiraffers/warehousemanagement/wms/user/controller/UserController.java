@@ -1,8 +1,12 @@
 package com.ohgiraffers.warehousemanagement.wms.user.controller;
 
+import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +45,20 @@ public class UserController {
 
         model.addAttribute("message", message);
         return view;
+    }
+
+    @GetMapping("/profile")
+    public String getProfile(Authentication authentication, Model model) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication.getPrincipal() instanceof AuthDetails) {
+                AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+                Integer userId = authDetails.getUserId();
+                UserDTO user = userService.getUserByUserId(userId);
+
+                model.addAttribute("user", user);
+            }
+        }
+
+        return "user/profile";
     }
 }

@@ -2,7 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.user.model.dto;
 
 import java.time.LocalDateTime;
 
-public class ProfileUserDTO {
+public class UserDTO {
 
     private Integer userId;
     private String userCode;
@@ -17,9 +17,9 @@ public class ProfileUserDTO {
     private LocalDateTime userUpdatedAt;
     private LocalDateTime userDeletedAt;
 
-    public ProfileUserDTO() {}
+    public UserDTO() {}
 
-    public ProfileUserDTO(Integer userId, String userCode, String userPass, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
+    public UserDTO(Integer userId, String userCode, String userPass, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
         this.userId = userId;
         this.userCode = userCode;
         this.userPass = userPass;
