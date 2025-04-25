@@ -45,7 +45,6 @@ public class Sales {
         this.shippingDueDate = builder.shippingDueDate;
         this.salesStatus = builder.salesStatus;
         this.salesCreatedAt = builder.salesCreatedAt;
-        this.salesUpdatedAt = builder.salesUpdatedAt;
     }
 
     public static class Builder {
@@ -55,7 +54,6 @@ public class Sales {
         private LocalDate shippingDueDate;
         private SalesStatus salesStatus;
         private LocalDateTime salesCreatedAt;
-        private LocalDateTime salesUpdatedAt;
 
         public Builder() {}
 
@@ -83,12 +81,17 @@ public class Sales {
             this.salesCreatedAt = salesCreatedAt;
             return this;
         }
-        public Builder salesUpdatedAt(LocalDateTime salesUpdatedAt) {
-            this.salesUpdatedAt = salesUpdatedAt;
-            return this;
-        }
+
         public Sales build() {
-            return new Sales(this);
+            Sales sales = new Sales();
+            sales.storeId = storeId;
+            sales.userId = userId;
+            sales.salesDate = salesDate;
+            sales.shippingDueDate = shippingDueDate;
+            sales.salesStatus = this.salesStatus != null ? this.salesStatus : SalesStatus.PENDING;
+            sales.salesCreatedAt = this.salesCreatedAt != null? this.salesCreatedAt : LocalDateTime.now();
+
+            return sales;
         }
     }
 

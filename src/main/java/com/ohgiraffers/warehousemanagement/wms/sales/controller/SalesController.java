@@ -35,4 +35,9 @@ public class SalesController {
         }
         return mv;
     }
+
+    @PostMapping("/create")
+    public ModelAndView createSales(ModelAndView mv, SalesDTO salesDTO) {
+        salesServiceImpl.createSales(salesDTO);
+    }
 }

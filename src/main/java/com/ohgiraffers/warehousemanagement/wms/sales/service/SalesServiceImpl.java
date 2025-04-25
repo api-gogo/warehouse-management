@@ -40,6 +40,18 @@ public class SalesServiceImpl implements SalesService {
         return salesLists;
     }
 
+    @Transactional
+    public SalesDTO createSales(SalesDTO salesDTO) {
+        Sales salesEntity = new Sales.Builder()
+                .storeId(salesDTO.getStoreId())
+                .userId(salesDTO.getUserId())
+                .salesDate(salesDTO.getSalesDate())
+                .shippingDueDate(salesDTO.getSalesDate().plusDays(3))
+                .salesStatus(SalesStatus.PENDING)
+                .salesCreatedAt(LocalDateTime.now())
+                .build();
+    }
+
     @Override
     public Integer getSalesById(Integer salesId) {
         return salesRepository.findById(salesId).get().getSalesId();
