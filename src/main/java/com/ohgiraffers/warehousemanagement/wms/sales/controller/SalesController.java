@@ -6,10 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -50,18 +47,18 @@ public class SalesController {
     @PostMapping("/create")
     public String createSales(@Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
         SalesDTO savedDTO = salesServiceImpl.createSales(salesDTO);
-        String result = null;
+        String resultUrl = null;
 
         if (savedDTO != null) {
             rdtat.addFlashAttribute("salesDTO", savedDTO);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
-            result = "redirect:/sales" + salesDTO.getSalesId();
+            resultUrl = "redirect:/sales" + salesDTO.getSalesId();
         } else {
             rdtat.addFlashAttribute("message","수주서 등록에 실패하였습니다. 다시 시도해주세요.");
-            result = "redirect:/sales";
+            resultUrl = "redirect:/sales";
         }
 
-        return result;
+        return resultUrl;
     }
 
     @GetMapping("/{salesId}")
@@ -75,6 +72,22 @@ public class SalesController {
             mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감
         }
         return mv;
+    }
+
+    @PatchMapping("/update/{salesId}")
+    public String updateSales(Integer salesId, @Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
+        SalesDTO updatedDTO = salesServiceImpl.updateSales(salesId, salesDTO);
+        String resultUrl = null;
+
+        if (updatedDTO != null) {
+            rdtat.addFlashAttribute("salesDTO", updatedDTO);
+            rdtat.addFlashAttribute("message","수주서를 수정했습니다.");
+            resultUrl = "redirect:/sales" + salesId;
+        } else {
+           rdtat.addFlashAttribute("message", "수주서 수정에 실패했습니다. 다시 시도해주세요.");
+           resultUrl = "redirect:/sales/" + salesId;
+        }
+        return resultUrl;
     }
 
 

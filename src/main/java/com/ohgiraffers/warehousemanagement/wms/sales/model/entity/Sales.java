@@ -127,6 +127,30 @@ public class Sales {
         return salesUpdatedAt;
     }
 
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public void setSalesDate(LocalDate salesDate) {
+        this.salesDate = salesDate;
+    }
+
+    public void setShippingDueDate(LocalDate shippingDueDate) {
+        this.shippingDueDate = shippingDueDate;
+    }
+
+    public void setSalesStatus(SalesStatus salesStatus) {
+        this.salesStatus = salesStatus;
+    }
+
+    public void setSalesUpdatedAt(LocalDateTime salesUpdatedAt) {
+        this.salesUpdatedAt = salesUpdatedAt;
+    }
+
     @Override
     public String toString() {
         return "Sales{" +
