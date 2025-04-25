@@ -40,6 +40,11 @@ public class SalesController {
         }
         return mv;
     }
+    
+    @GetMapping("/create")
+    public String createSales() {
+        return "sales/create"; // view 부분 만들고 수정필요
+    }
 
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
     @PostMapping("/create")
@@ -71,4 +76,6 @@ public class SalesController {
         }
         return mv;
     }
+
+
 }
