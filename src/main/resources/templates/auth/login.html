@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>WMS - 로그인</title>
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/common.css">
+  <!-- 네비게이션 CSS -->
+  <link rel="stylesheet" href="/css/navigation.css">
+  <!-- 페이지 CSS -->
+  <link rel="stylesheet" href="/css/login.css">
+  <!-- 폰트어썸 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="layout" th:with="activeMenu='login'">
+  <!-- 네비게이션 사이드바 포함 -->
+  <div th:replace="~{navigation :: aside}"></div>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="main-content">
+    <!-- 헤더 포함 -->
+    <div th:replace="~{navigation :: header}"></div>
+
+    <!-- 페이지 콘텐츠 영역 -->
+    <main class="page-content">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="login-form">
+            <h2 class="login-title">로그인</h2>
+
+            <!-- 알림 메시지 -->
+            <div th:if="${param.error}" class="alert alert-danger" role="alert">
+              <i class="fas fa-exclamation-circle me-2"></i>사원번호 또는 비밀번호가 올바르지 않습니다.
+            </div>
+            
+            <div th:if="${param.logout}" class="alert alert-info" role="alert">
+              <i class="fas fa-info-circle me-2"></i>로그아웃 되었습니다.
+            </div>
+            
+            <div th:if="${message != null}" class="alert alert-info" role="alert">
+              <i class="fas fa-info-circle me-2"></i><span th:text="${message}">알림 메시지</span>
+            </div>
+
+            <form th:action="@{/auth/login}" method="post">
+              <div class="mb-3">
+                <label for="userCode" class="form-label">
+                  <i class="fas fa-id-card me-2"></i>사원번호
+                </label>
+                <input type="text" class="form-control" id="userCode" name="userCode" placeholder="사원번호를 입력하세요" required autofocus>
+              </div>
+
+              <div class="mb-3">
+                <label for="userPass" class="form-label">
+                  <i class="fas fa-lock me-2"></i>비밀번호
+                </label>
+                <input type="password" class="form-control" id="userPass" name="userPass" placeholder="비밀번호를 입력하세요" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i>로그인
+              </button>
+            </form>
+
+            <div class="login-footer">
+              <p>계정이 없으신가요? <a th:href="@{/user/signup}" class="text-decoration-none">회원가입</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 스크립트 포함 -->
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>
