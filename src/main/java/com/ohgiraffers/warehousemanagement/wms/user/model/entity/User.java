@@ -1,6 +1,6 @@
-package com.ohgiraffers.warehousemanagement.user.model.entity;
+package com.ohgiraffers.warehousemanagement.wms.user.model.entity;
 
-import com.ohgiraffers.warehousemanagement.user.model.common.UserRole;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserRole;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
