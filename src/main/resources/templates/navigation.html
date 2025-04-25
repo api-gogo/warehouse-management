@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>WMS - 네비게이션</title>
+  <link rel="stylesheet" href="../static/css/navigation.css">
+  <!-- 폰트어썸 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+</head>
+<body>
+<div class="layout">
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="logo">WMS System</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <!--   li에다가 class="active" 주면 강조표시 됩니다      -->
+        <li>
+          <a href="index.html">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>대시보드</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-box"></i>
+            <span>재고 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-truck-loading"></i>
+            <span>입고 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-shopping-cart"></i>
+            <span>수주 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-clipboard-check"></i>
+            <span>검수 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-building"></i>
+            <span>공급업체 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-folder-tree"></i>
+            <span>카테고리 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-truck"></i>
+            <span>출고 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-undo"></i>
+            <span>반품 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-users"></i>
+            <span>사용자 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-store"></i>
+            <span>매장 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-chart-bar"></i>
+            <span>보고서</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="main-content">
+    <!-- 헤더 -->
+    <header class="header">
+      <div class="header-left">
+        <button id="sidebar-toggle" class="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input type="search" placeholder="검색..." class="search-input">
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="header-button">
+          <i class="fas fa-bell"></i>
+        </button>
+        <button id="theme-toggle" class="header-button">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="user-dropdown">
+          <button class="header-button">
+            <i class="fas fa-user"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a href="#">프로필</a>
+            <a href="#">설정</a>
+            <a href="#">로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 페이지 콘텐츠 영역 (비어있음) -->
+    <main class="page-content">
+      <!-- 여기에 페이지 콘텐츠가 들어갑니다 -->
+    </main>
+  </div>
+</div>
+
+<script>
+  // 사이드바 토글
+  document.getElementById('sidebar-toggle').addEventListener('click', function() {
+    document.querySelector('.layout').classList.toggle('sidebar-collapsed');
+  });
+
+  // 다크 모드 토글
+  document.getElementById('theme-toggle').addEventListener('click', function() {
+    document.body.classList.toggle('dark-mode');
+
+    // 아이콘 변경
+    const icon = this.querySelector('i');
+    if (document.body.classList.contains('dark-mode')) {
+      icon.classList.remove('fa-moon');
+      icon.classList.add('fa-sun');
+    } else {
+      icon.classList.remove('fa-sun');
+      icon.classList.add('fa-moon');
+    }
+  });
+
+  // 사용자 드롭다운
+  document.querySelector('.user-dropdown button').addEventListener('click', function() {
+    document.querySelector('.dropdown-menu').classList.toggle('show');
+  });
+
+  // 드롭다운 외부 클릭 시 닫기
+  window.addEventListener('click', function(event) {
+    if (!event.target.matches('.user-dropdown button') && !event.target.matches('.user-dropdown i')) {
+      const dropdowns = document.querySelectorAll('.dropdown-menu');
+      dropdowns.forEach(dropdown => {
+        if (dropdown.classList.contains('show')) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+  });
+
+  // 모바일 화면에서 사이드바 자동 접기
+  function checkScreenSize() {
+    if (window.innerWidth < 768) {
+      document.querySelector('.layout').classList.add('sidebar-collapsed');
+    } else {
+      document.querySelector('.layout').classList.remove('sidebar-collapsed');
+    }
+  }
+
+  // 초기 로드 및 화면 크기 변경 시 체크
+  window.addEventListener('load', checkScreenSize);
+  window.addEventListener('resize', checkScreenSize);
+</script>
+</body>
+</html>
