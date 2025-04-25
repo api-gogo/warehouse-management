@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SalesServiceImpl implements SalesService {
@@ -84,6 +85,41 @@ public class SalesServiceImpl implements SalesService {
                 findSales.getSalesUpdatedAt() == null ? null : findSales.getSalesUpdatedAt()
         );
         return findDTO;
+    }
+
+    @Transactional
+    public SalesDTO updateSales(Integer salesId, SalesDTO salesDTO) {
+        Sales findSales = salesRepository.findById(salesId).orElseThrow(
+                () -> new NullPointerException("수정할 수주 데이터 없음"));
+
+        // 사용자가 수정한값과 기존값이 다를때만 수정함!
+        if (!Objects.equals(salesDTO.getStoreId(), findSales.getStoreId())) {
+            findSales.setStoreId(salesDTO.getStoreId());
+        }
+        
+        if (!Objects.equals(salesDTO.getUserId(), findSales.getUserId())) {
+            findSales.setUserId(salesDTO.getUserId());
+        }
+        
+        if (!Objects.equals(salesDTO.getSalesDate(), findSales.getSalesDate())) {
+            findSales.setSalesDate(salesDTO.getSalesDate());
+        }
+        
+        if (!Objects.equals(salesDTO.getShippingDueDate(), findSales.getShippingDueDate())) {
+            findSales.setShippingDueDate(salesDTO.getShippingDueDate());
+        }
+        
+        if (!Objects.equals(salesDTO.getSalesStatus(), findSales.getSalesStatus())) {
+            findSales.setSalesStatus(salesDTO.getSalesStatus());
+        }
+
+        // 수정이 일어났으니 무조건 업데이트시킴
+        findSales.setSalesUpdatedAt(LocalDateTime.now());
+
+        Sales savedEntity = salesRepository.save(findSales);
+
+        salesDTO.setSalesUpdatedAt(savedEntity.getSalesUpdatedAt());
+        return salesDTO;
     }
 
     @Override
