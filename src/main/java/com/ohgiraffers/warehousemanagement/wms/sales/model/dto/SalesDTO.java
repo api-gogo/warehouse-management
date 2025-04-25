@@ -13,11 +13,12 @@ public class SalesDTO {
     private LocalDate shippingDueDate;
     private SalesStatus salesStatus;
     private LocalDateTime salesCreatedAt;
+    private LocalDateTime salesUpdatedAt;
 
     public SalesDTO() {
     }
 
-    public SalesDTO(Integer salesId, Integer storeId, Integer userId, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt) {
+    public SalesDTO(Integer salesId, Integer storeId, Integer userId, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
         this.salesId = salesId;
         this.storeId = storeId;
         this.userId = userId;
@@ -25,6 +26,7 @@ public class SalesDTO {
         this.shippingDueDate = shippingDueDate;
         this.salesStatus = salesStatus;
         this.salesCreatedAt = salesCreatedAt;
+        this.salesUpdatedAt = salesUpdatedAt;
     }
 
     public Integer getSalesId() {
@@ -83,6 +85,14 @@ public class SalesDTO {
         this.salesCreatedAt = salesCreatedAt;
     }
 
+    public LocalDateTime getSalesUpdatedAt() {
+        return salesUpdatedAt;
+    }
+
+    public void setSalesUpdatedAt(LocalDateTime salesUpdatedAt) {
+        this.salesUpdatedAt = salesUpdatedAt;
+    }
+
     @Override
     public String toString() {
         return "SalesDTO{" +
@@ -93,6 +103,7 @@ public class SalesDTO {
                 ", shippingDueDate=" + shippingDueDate +
                 ", salesStatus=" + salesStatus +
                 ", salesCreatedAt=" + salesCreatedAt +
+                ", salesUpdatedAt=" + salesUpdatedAt +
                 '}';
     }
 }

@@ -33,7 +33,8 @@ public class SalesServiceImpl implements SalesService {
                     salesEntity.getSalesDate(),
                     salesEntity.getShippingDueDate(),
                     salesEntity.getSalesStatus(),
-                    salesEntity.getSalesCreatedAt()
+                    salesEntity.getSalesCreatedAt(),
+                    salesEntity.getSalesUpdatedAt()
             );
             salesLists.add(salesDTO);
         }
@@ -50,6 +51,21 @@ public class SalesServiceImpl implements SalesService {
                 .salesStatus(SalesStatus.PENDING)
                 .salesCreatedAt(LocalDateTime.now())
                 .build();
+        salesRepository.save(salesEntity);
+
+        // 저장 후 상세페이지로 보여주기 때문에 dto로 다시 바꿔줬음
+        SalesDTO savedDTO = new SalesDTO(
+                salesEntity.getSalesId(),
+                salesEntity.getStoreId(),
+                salesEntity.getUserId(),
+                salesEntity.getSalesDate(),
+                salesEntity.getShippingDueDate(),
+                salesEntity.getSalesStatus(),
+                salesEntity.getSalesCreatedAt(),
+                salesEntity.getSalesUpdatedAt() == null ? null : salesEntity.getSalesUpdatedAt()
+        );
+
+        return savedDTO;
     }
 
     @Override
