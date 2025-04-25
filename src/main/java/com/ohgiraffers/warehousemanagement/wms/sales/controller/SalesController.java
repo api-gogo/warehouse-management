@@ -85,6 +85,8 @@ public class SalesController {
             rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
             mv.setViewName("redirect:/sales");
         }
+
+        return mv;
     }
 
     @PatchMapping("/update/{salesId}")
