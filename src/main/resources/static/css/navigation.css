@@ -1,124 +1,34 @@
-
-/* 변수 정의 */
-:root {
-    /* 색상 */
-    --color-primary: #3b82f6;
-    --color-primary-hover: #2563eb;
-    --color-secondary: #f3f4f6;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-info: #6366f1;
-
-    /* 배경 */
-    --bg-main: #ffffff;
-    --bg-secondary: #f9fafb;
-    --bg-sidebar: #ffffff;
-    --bg-card: #ffffff;
-    --bg-header: #ffffff;
-
-    /* 텍스트 */
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    --text-sidebar: #4b5563;
-    --text-sidebar-active: #111827;
-
-    /* 테두리 */
-    --border-color: #e5e7eb;
-
-    /* 그림자 */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-    /* 크기 */
-    --sidebar-width: 250px;
-    --sidebar-collapsed-width: 70px;
-    --header-height: 60px;
-    --border-radius: 0.5rem;
-}
-
-/* 다크 모드 */
-body.dark-mode {
-    --bg-main: #111827;
-    --bg-secondary: #1f2937;
-    --bg-sidebar: #1f2937;
-    --bg-card: #1f2937;
-    --bg-header: #1f2937;
-
-    --text-primary: #f9fafb;
-    --text-secondary: #e5e7eb;
-    --text-muted: #9ca3af;
-    --text-sidebar: #d1d5db;
-    --text-sidebar-active: #f9fafb;
-
-    --border-color: #374151;
-}
-
-/* 기본 스타일 */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    line-height: 1.5;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-ul {
-    list-style: none;
-}
-
-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-}
-
-/* 레이아웃 */
-.layout {
-    display: flex;
-    min-height: 100vh;
-}
-
 /* 사이드바 */
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--bg-sidebar);
     border-right: 1px solid var(--border-color);
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, transform 0.3s ease;
     position: fixed;
     height: 100vh;
     z-index: 100;
     overflow-y: auto;
+    overflow-x: hidden; /* 추가: 가로 스크롤 방지 */
+    box-shadow: var(--shadow); /* 추가: 그림자 효과 */
 }
 
 .sidebar-header {
     height: var(--header-height);
     display: flex;
     align-items: center;
+    justify-content: center; /* 변경: 가운데 정렬 */
     padding: 0 1rem;
     border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-sidebar); /* 추가: 명시적 배경색 */
 }
 
 .logo {
     font-size: 1.25rem;
     font-weight: bold;
     color: var(--text-primary);
+    white-space: nowrap; /* 추가: 텍스트 줄바꿈 방지 */
+    overflow: hidden; /* 추가: 넘치는 텍스트 숨김 */
+    text-overflow: ellipsis; /* 추가: 넘치는 텍스트를 말줄임표로 표시 */
 }
 
 .sidebar-nav {
@@ -127,6 +37,12 @@ button {
 
 .sidebar-nav ul li {
     margin-bottom: 0.25rem;
+    position: relative; /* 추가: 액티브 표시를 위한 포지셔닝 */
+    border-bottom: 1px solid rgba(209, 213, 219, 0.2); /* 메뉴 항목 간에 연한 구분선 추가 */
+}
+
+.sidebar-nav ul li:last-child {
+    border-bottom: none; /* 마지막 항목에는 구분선 제거 */
 }
 
 .sidebar-nav ul li a {
@@ -135,18 +51,20 @@ button {
     padding: 0.75rem 1rem;
     color: var(--text-sidebar);
     border-radius: 0.25rem;
-    margin: 0 0.5rem;
+    margin: 0 0.5rem 0.5rem 0.5rem; /* 아래쪽 여백 추가 */
     transition: all 0.2s;
 }
 
 .sidebar-nav ul li a:hover {
     background-color: var(--bg-secondary);
+    color: var(--color-primary); /* 추가: 호버 시 텍스트 색상 변경 */
 }
 
 .sidebar-nav ul li.active a {
     background-color: var(--bg-secondary);
-    color: var(--text-sidebar-active);
+    color: var(--color-primary); /* 변경: 액티브 메뉴 색상을 프라이머리 색상으로 */
     font-weight: 500;
+    box-shadow: var(--shadow-sm); /* 추가: 약간의 그림자 효과 */
 }
 
 .sidebar-nav ul li a i {
@@ -154,13 +72,6 @@ button {
     font-size: 1rem;
     width: 1.25rem;
     text-align: center;
-}
-
-/* 메인 콘텐츠 */
-.main-content {
-    flex: 1;
-    margin-left: var(--sidebar-width);
-    transition: margin-left 0.3s ease;
 }
 
 /* 헤더 */
@@ -175,22 +86,25 @@ button {
     position: sticky;
     top: 0;
     z-index: 50;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* 헤더에 미세한 그림자 추가 */
 }
 
 .header-left {
     display: flex;
     align-items: center;
+    flex: 1; /* 추가: 헤더 왼쪽 영역을 확장시켜 균형 맞추기 */
 }
 
 .sidebar-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 0.25rem;
     margin-right: 1rem;
     color: var(--text-secondary);
+    flex-shrink: 0; /* 추가: 크기 유지 */
 }
 
 .sidebar-toggle:hover {
@@ -200,6 +114,7 @@ button {
 .search-container {
     position: relative;
     width: 300px;
+    margin-left: 0.5rem; /* 추가: 간격 확보 */
 }
 
 .search-container i {
@@ -208,6 +123,7 @@ button {
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
+    z-index: 1; /* 추가: 아이콘이 입력 필드 위에 표시되도록 */
 }
 
 .search-input {
@@ -280,13 +196,6 @@ button {
     background-color: var(--bg-secondary);
 }
 
-/* 페이지 콘텐츠 영역 (비어있음) */
-.page-content {
-    padding: 1.5rem;
-    min-height: calc(100vh - var(--header-height));
-    background-color: var(--bg-secondary);
-}
-
 /* 사이드바 접힘 상태 */
 .sidebar-collapsed .sidebar {
     width: var(--sidebar-collapsed-width);
@@ -308,21 +217,23 @@ button {
     display: none;
 }
 
-.sidebar-collapsed .main-content {
-    margin-left: var(--sidebar-collapsed-width);
-}
-
 /* 반응형 */
 @media (max-width: 768px) {
     .sidebar {
         width: var(--sidebar-width);
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 1000; /* 상단에 표시되도록 */
+    }
+
+    .main-content {
+        margin-left: 0 !important; /* 모바일에서는 무조건 마진 제거 */
     }
 
     .sidebar-collapsed .sidebar {
         transform: translateX(0);
         width: var(--sidebar-width);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* 열렸을 때 그림자 추가 */
     }
 
     .sidebar-collapsed .sidebar-nav ul li a span {
@@ -341,16 +252,22 @@ button {
         display: block;
     }
 
-    .main-content {
-        margin-left: 0;
-    }
-
-    .sidebar-collapsed .main-content {
-        margin-left: 0;
-    }
-
     .search-container {
         width: 200px;
+        max-width: 50%; /* 뷰포트에 맞게 조정 */
+    }
+    
+    /* 모바일 메뉴 열렸을 때 배경 어둡게 처리 */
+    .sidebar-collapsed::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 99;
+        pointer-events: none; /* 클릭 이벤트는 배경 뒤로 전달 */
     }
 }
 
@@ -361,10 +278,6 @@ button {
 
     .search-container {
         width: 150px;
-    }
-
-    .page-content {
-        padding: 1rem;
     }
 }
 
