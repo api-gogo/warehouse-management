@@ -74,8 +74,21 @@ public class SalesController {
         return mv;
     }
 
+    @GetMapping("/update/{salesId}")
+    public ModelAndView updateSales(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
+        SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
+
+        if (findDTO != null) {
+            mv.addObject("salesDTO", findDTO);
+            mv.setViewName("sales/update"); // view url 확인필요
+        } else {
+            rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
+            mv.setViewName("redirect:/sales");
+        }
+    }
+
     @PatchMapping("/update/{salesId}")
-    public String updateSales(Integer salesId, @Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
+    public String updateSales(@PathVariable Integer salesId, @Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
         SalesDTO updatedDTO = salesServiceImpl.updateSales(salesId, salesDTO);
         String resultUrl = null;
 
