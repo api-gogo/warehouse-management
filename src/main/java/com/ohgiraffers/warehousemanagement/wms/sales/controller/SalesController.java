@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -44,14 +45,30 @@ public class SalesController {
     @PostMapping("/create")
     public String createSales(@Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
         SalesDTO savedDTO = salesServiceImpl.createSales(salesDTO);
+        String result = null;
 
         if (savedDTO != null) {
             rdtat.addFlashAttribute("salesDTO", savedDTO);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
-            return "redirect:/sales" + salesDTO.getSalesId();
+            result = "redirect:/sales" + salesDTO.getSalesId();
         } else {
             rdtat.addFlashAttribute("message","수주서 등록에 실패하였습니다. 다시 시도해주세요.");
-            return "redirect:/sales";
+            result = "redirect:/sales";
         }
+
+        return result;
+    }
+
+    @GetMapping("/{salesId}")
+    public ModelAndView getSalesById(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
+        SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
+        if (findDTO != null) {
+            mv.addObject("salesDTO", findDTO);
+            mv.setViewName("sales"); // view 수정필요 상세페이지로 가야됨
+        } else {
+            rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
+            mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감
+        }
+        return mv;
     }
 }

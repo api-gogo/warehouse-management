@@ -68,8 +68,26 @@ public class SalesServiceImpl implements SalesService {
         return savedDTO;
     }
 
+    public SalesDTO getSalesById(Integer salesId) {
+        // 익셉션 전역 핸들러 짜야됨
+        Sales findSales = salesRepository.findById(salesId).orElseThrow(
+                () -> new NullPointerException("수주 데이터 없음"));
+
+        SalesDTO findDTO = new SalesDTO(
+                findSales.getSalesId(),
+                findSales.getStoreId(),
+                findSales.getUserId(),
+                findSales.getSalesDate(),
+                findSales.getShippingDueDate(),
+                findSales.getSalesStatus(),
+                findSales.getSalesCreatedAt(),
+                findSales.getSalesUpdatedAt() == null ? null : findSales.getSalesUpdatedAt()
+        );
+        return findDTO;
+    }
+
     @Override
-    public Integer getSalesById(Integer salesId) {
+    public Integer getSalesBySalesId(Integer salesId) {
         return salesRepository.findById(salesId).get().getSalesId();
     }
 }
