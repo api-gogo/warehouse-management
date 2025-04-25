@@ -45,7 +45,7 @@ public class SalesController {
 
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
     @PostMapping("/create")
-    public String createSales(@Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
+    public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
         SalesDTO savedDTO = salesServiceImpl.createSales(salesDTO);
         String resultUrl = null;
 
@@ -88,7 +88,7 @@ public class SalesController {
     }
 
     @PatchMapping("/update/{salesId}")
-    public String updateSales(@PathVariable Integer salesId, @Valid SalesDTO salesDTO, RedirectAttributes rdtat) {
+    public String updateSales(@PathVariable Integer salesId, @Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
         SalesDTO updatedDTO = salesServiceImpl.updateSales(salesId, salesDTO);
         String resultUrl = null;
 
