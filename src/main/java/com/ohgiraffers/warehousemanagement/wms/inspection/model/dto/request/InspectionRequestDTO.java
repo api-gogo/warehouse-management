@@ -1,7 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request;
 
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.InspectionStatus;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.InspectionTransactionType;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.InspectionStatus;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.InspectionTransactionType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,6 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.controller;
 
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.Inspection;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionService;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;

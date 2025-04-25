@@ -1,7 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.service;
 
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.Inspection;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.InspectionTransactionType;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.repository.InspectionRepository;

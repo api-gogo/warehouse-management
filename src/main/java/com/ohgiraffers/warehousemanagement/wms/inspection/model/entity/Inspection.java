@@ -1,6 +1,5 @@
-package com.ohgiraffers.warehousemanagement.wms.inspection.model;
+package com.ohgiraffers.warehousemanagement.wms.inspection.model.entity;
 
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Comment;
 
