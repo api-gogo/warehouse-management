@@ -109,7 +109,7 @@ public class UserController {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
                 Integer userId = authDetails.getUserId();
                 
-                boolean result = userService.updateUser(userId, updateUser);
+                boolean result = userService.updateProfile(userId, updateUser);
 
                 if (!result) {
                     message = "회원 정보를 찾을 수 없습니다.";

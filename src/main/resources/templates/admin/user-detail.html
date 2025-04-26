@@ -55,8 +55,8 @@
               <i class="fas fa-user-circle"></i>
             </div>
             <div class="user-basic-info">
-              <h2 class="user-name" th:text="${user.userName}">홍길동</h2>
-              <p class="user-code" th:text="${user.userCode}">WMS001</p>
+              <h2 class="user-name" th:text="${user.userName}"></h2>
+              <p class="user-code" th:text="${user.userCode}"></p>
               <div class="user-status">
                 <span class="status-badge" 
                       th:classappend="${user.userStatus == '재직중' ? 'status-active' : 
@@ -96,9 +96,10 @@
                   <div class="form-group">
                     <label class="form-label">부서</label>
                     <select class="form-select" name="userPart" th:disabled="${user.userStatus == '승인대기'}">
-                      <option value="재고" th:selected="${user.userPart == '재고'}">재고</option>
+                      <option value="통합" th:selected="${user.userPart == '통합'}">통합</option>
                       <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
                       <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
+                      <option value="재고" th:selected="${user.userPart == '재고'}">재고</option>
                       <option value="반품" th:selected="${user.userPart == '반품'}">반품</option>
                       <option value="발주" th:selected="${user.userPart == '발주'}">발주</option>
                       <option value="수주" th:selected="${user.userPart == '수주'}">수주</option>
@@ -118,6 +119,7 @@
                   <div class="form-group">
                     <label class="form-label">상태</label>
                     <select class="form-select" name="userStatus" th:disabled="${user.userStatus == '승인대기'}">
+                      <option value="승인대기" th:selected="${user.userStatus == '승인대기'}">승인대기</option>
                       <option value="재직중" th:selected="${user.userStatus == '재직중'}">재직중</option>
                       <option value="휴직중" th:selected="${user.userStatus == '휴직중'}">휴직중</option>
                       <option value="퇴사" th:selected="${user.userStatus == '퇴사'}">퇴사</option>
@@ -137,9 +139,10 @@
                   <div class="form-group">
                     <label class="form-label">승인 시 부서</label>
                     <select class="form-select" name="approvalPart">
-                      <option value="재고" selected>재고</option>
-                      <option value="입고">입고</option>
+                      <option value="통합">통합</option>
+                      <option value="입고" selected>입고</option>
                       <option value="출고">출고</option>
+                      <option value="재고">재고</option>
                       <option value="반품">반품</option>
                       <option value="발주">발주</option>
                       <option value="수주">수주</option>

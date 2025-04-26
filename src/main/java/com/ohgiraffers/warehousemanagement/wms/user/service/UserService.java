@@ -1,6 +1,8 @@
 package com.ohgiraffers.warehousemanagement.wms.user.service;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserRole;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
@@ -110,6 +112,24 @@ public class UserService {
     }
 
     @Transactional
+    public boolean updateProfile(Integer userId,UserDTO userDTO) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        if (userDTO.getUserPass() != null && !userDTO.getUserPass().trim().isEmpty()) {
+            user.setUserPass(passwordEncoder.encode(userDTO.getUserPass()));
+        }
+
+        user.setUserEmail(userDTO.getUserEmail());
+        user.setUserPhone(userDTO.getUserPhone());
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
     public boolean updateUser(Integer userId,UserDTO userDTO) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -122,6 +142,9 @@ public class UserService {
 
         user.setUserEmail(userDTO.getUserEmail());
         user.setUserPhone(userDTO.getUserPhone());
+        user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
+        user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
+        user.setUserStatus(UserStatus.valueOf(userDTO.getUserStatus()));
         user.setUserUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
