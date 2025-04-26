@@ -59,9 +59,9 @@ public class UserController {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-                UserDTO user = userService.getUserByUserId(authDetails.getUserId());
+                UserDTO userDTO = userService.getUserByUserId(authDetails.getUserId());
 
-                model.addAttribute("user", user);
+                model.addAttribute("user", userDTO);
                 return "user/profile";
             }
         }
@@ -90,8 +90,8 @@ public class UserController {
                     return "user/password-verify";
                 }
 
-                UserDTO user = userService.getUserByUserId(authDetails.getUserId());
-                model.addAttribute("user", user);
+                UserDTO userDTO = userService.getUserByUserId(authDetails.getUserId());
+                model.addAttribute("user", userDTO);
                 return "user/update";
             }
         }

@@ -29,7 +29,7 @@
       <div th:if="${message != null}" class="alert alert-info" role="alert">
         <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
       </div>
-      
+
       <div class="admin-container">
         <div class="admin-header">
           <h1 class="admin-title">사용자 관리</h1>
@@ -51,70 +51,70 @@
             </a>
           </div>
         </div>
-        
+
         <div class="admin-tabs">
           <button class="tab-button active" data-status="all">전체</button>
           <button class="tab-button" data-status="pending">승인 대기 <span class="badge" th:text="${pendingCount}">5</span></button>
           <button class="tab-button" data-status="active">활성</button>
           <button class="tab-button" data-status="inactive">비활성</button>
         </div>
-        
+
         <div class="admin-content">
           <div class="table-responsive">
             <table class="data-table">
               <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>사번</th>
-                  <th>전화번호</th>
-                  <th>부서</th>
-                  <th>직책</th>
-                  <th>가입일</th>
-                  <th>상태</th>
-                  <th>액션</th>
-                </tr>
+              <tr>
+                <th>이름</th>
+                <th>사번</th>
+                <th>전화번호</th>
+                <th>부서</th>
+                <th>직책</th>
+                <th>가입일</th>
+                <th>상태</th>
+                <th>액션</th>
+              </tr>
               </thead>
               <tbody>
-                <tr th:each="user : ${users}">
-                  <td th:text="${user.userName}"></td>
-                  <td th:text="${user.userCode}"></td>
-                  <td th:text="${user.userPhone}"></td>
-                  <td th:text="${user.userPart}"></td>
-                  <td th:text="${user.userRole}"></td>
-                  <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd hh:mm')}"></td>
-                  <td>
-                    <span class="status-badge" 
-                          th:classappend="${user.userStatus == '재직중' ? 'status-active' : 
-                                          (user.userStatus == '승인대기' ? 'status-pending' : 
+              <tr th:each="user : ${users}">
+                <td th:text="${user.userName}"></td>
+                <td th:text="${user.userCode}"></td>
+                <td th:text="${user.userPhone}"></td>
+                <td th:text="${user.userPart}"></td>
+                <td th:text="${user.userRole}"></td>
+                <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd hh:mm')}"></td>
+                <td>
+                    <span class="status-badge"
+                          th:classappend="${user.userStatus == '재직중' ? 'status-active' :
+                                          (user.userStatus == '승인대기' ? 'status-pending' :
                                           (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger'))}"
                           th:text="${user.userStatus}">재직중</span>
-                  </td>
-                  <td class="actions">
-                    <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
-                      <i class="fas fa-eye"></i>
-                    </a>
-                    <button th:if="${user.userStatus == '승인대기'}" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
-                      <i class="fas fa-check"></i>
-                    </button>
-                    <button th:if="${user.userStatus == '재직중'}" class="action-button disable-button" th:data-id="${user.userId}" title="휴직">
-                      <i class="fas fa-ban"></i>
-                    </button>
-                    <button th:if="${user.userStatus == '휴직중'}" class="action-button enable-button" th:data-id="${user.userId}" title="복직">
-                      <i class="fas fa-check-circle"></i>
-                    </button>
-                    <button th:if="${user.userStatus == '휴직중' || user.userStatus == '재직중'}" class="action-button danger-button" th:data-id="${user.userId}" title="퇴사">
-                      <i class="fas fa-times-circle"></i>
-                    </button>
-                  </td>
-                </tr>
-                <!-- 데이터가 없을 경우 -->
-                <tr th:if="${#lists.isEmpty(users)}">
-                  <td colspan="8" class="no-data">조회된 사용자가 없습니다.</td>
-                </tr>
+                </td>
+                <td class="actions">
+                  <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <button th:if="${user.userStatus == '승인대기'}" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button th:if="${user.userStatus == '재직중'}" class="action-button disable-button" th:data-id="${user.userId}" title="휴직">
+                    <i class="fas fa-ban"></i>
+                  </button>
+                  <button th:if="${user.userStatus == '휴직중'}" class="action-button enable-button" th:data-id="${user.userId}" title="복직">
+                    <i class="fas fa-check-circle"></i>
+                  </button>
+                  <button th:if="${user.userStatus == '휴직중' || user.userStatus == '재직중'}" class="action-button danger-button" th:data-id="${user.userId}" title="퇴사">
+                    <i class="fas fa-times-circle"></i>
+                  </button>
+                </td>
+              </tr>
+              <!-- 데이터가 없을 경우 -->
+              <tr th:if="${#lists.isEmpty(users)}">
+                <td colspan="8" class="no-data">조회된 사용자가 없습니다.</td>
+              </tr>
               </tbody>
             </table>
           </div>
-          
+
           <!-- 페이지네이션 -->
           <div class="pagination" th:if="${totalPages > 1}">
             <a th:href="@{/admin/users(page=0, size=${size}, status=${param.status})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
@@ -123,14 +123,14 @@
             <a th:href="@{/admin/users(page=${currentPage - 1}, size=${size}, status=${param.status})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
               <i class="fas fa-angle-left"></i>
             </a>
-            
+
             <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-              <a th:href="@{/admin/users(page=${i}, size=${size}, status=${param.status})}" 
-                 class="page-link" 
-                 th:text="${i + 1}" 
+              <a th:href="@{/admin/users(page=${i}, size=${size}, status=${param.status})}"
+                 class="page-link"
+                 th:text="${i + 1}"
                  th:classappend="${currentPage == i ? 'active' : ''}">1</a>
             </th:block>
-            
+
             <a th:href="@{/admin/users(page=${currentPage + 1}, size=${size}, status=${param.status})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
               <i class="fas fa-angle-right"></i>
             </a>
@@ -158,35 +158,35 @@
         tabButtons.forEach(btn => btn.classList.remove('active'));
         // 클릭된 버튼에 활성 클래스 추가
         this.classList.add('active');
-        
+
         // 상태값 가져오기
         const status = this.dataset.status;
         // 상태 필터 업데이트
         document.getElementById('statusFilter').value = status;
-        
+
         // 페이지 이동 (실제 구현에서는 AJAX 호출이나 페이지 리로드 처리)
         window.location.href = `/admin/users?status=${status}`;
       });
     });
-    
+
     // 상태 필터 변경 이벤트
     document.getElementById('statusFilter').addEventListener('change', function() {
       const status = this.value;
       window.location.href = `/admin/users?status=${status}`;
     });
-    
+
     // 검색 기능
     const searchBox = document.querySelector('.search-box');
     const searchInput = document.getElementById('userSearch');
     const searchButton = document.querySelector('.search-button');
-    
+
     searchButton.addEventListener('click', function() {
       const searchTerm = searchInput.value.trim();
       if (searchTerm) {
         window.location.href = `/admin/users?search=${searchTerm}`;
       }
     });
-    
+
     searchInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         const searchTerm = searchInput.value.trim();
@@ -195,12 +195,12 @@
         }
       }
     });
-    
+
     // 사용자 상태 변경 버튼 이벤트
     const approveButtons = document.querySelectorAll('.approve-button');
     const disableButtons = document.querySelectorAll('.disable-button');
     const enableButtons = document.querySelectorAll('.enable-button');
-    
+
     approveButtons.forEach(button => {
       button.addEventListener('click', function() {
         const userId = this.dataset.id;
@@ -210,7 +210,7 @@
         }
       });
     });
-    
+
     disableButtons.forEach(button => {
       button.addEventListener('click', function() {
         const userId = this.dataset.id;
@@ -220,7 +220,7 @@
         }
       });
     });
-    
+
     enableButtons.forEach(button => {
       button.addEventListener('click', function() {
         const userId = this.dataset.id;
