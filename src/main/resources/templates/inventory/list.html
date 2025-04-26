@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>WMS - 재고 관리</title>
+  <!-- 폰트어썸 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* 전체 레이아웃 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* 사이드바 스타일 */
+    .sidebar {
+      width: 250px;
+      background-color: #fff;
+      border-right: 1px solid #e0e0e0;
+      transition: width 0.3s ease;
+      z-index: 10;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #0d6efd;
+    }
+    
+    .sidebar-nav ul {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin: 5px 0;
+    }
+    
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: #555;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+      margin: 0 5px;
+    }
+    
+    .sidebar-nav a:hover {
+      background-color: #f0f7ff;
+      color: #0d6efd;
+    }
+    
+    .sidebar-nav li.active a {
+      background-color: #e9f2ff;
+      color: #0d6efd;
+      font-weight: 500;
+    }
+    
+    .sidebar-nav i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    /* 메인 콘텐츠 영역 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #f5f5f5;
+    }
+    
+    /* 헤더 스타일 */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+    
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      font-size: 18px;
+      margin-right: 15px;
+      cursor: pointer;
+      color: #555;
+      display: none;
+    }
+    
+    .search-container {
+      position: relative;
+    }
+    
+    .search-input {
+      padding: 8px 15px 8px 35px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      width: 300px;
+      font-size: 14px;
+    }
+    
+    .search-container i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    .header-button {
+      background: none;
+      border: none;
+      font-size: 16px;
+      margin-left: 15px;
+      cursor: pointer;
+      color: #555;
+      position: relative;
+    }
+    
+    /* 사용자 드롭다운 */
+    .user-dropdown {
+      position: relative;
+    }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      width: 150px;
+      display: none;
+      z-index: 100;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    
+    .dropdown-menu.show {
+      display: block;
+    }
+    
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 15px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    
+    .dropdown-menu a:hover {
+      background-color: #f5f5f5;
+    }
+    
+    /* 페이지 콘텐츠 */
+    .page-content {
+      padding: 20px;
+      flex: 1;
+    }
+    
+    /* 반응형 */
+    .layout.sidebar-collapsed .sidebar {
+      width: 60px;
+    }
+    
+    .layout.sidebar-collapsed .logo {
+      display: none;
+    }
+    
+    .layout.sidebar-collapsed .sidebar-nav span {
+      display: none;
+    }
+    
+    .layout.sidebar-collapsed .sidebar-nav a {
+      justify-content: center;
+      padding: 12px;
+    }
+    
+    .layout.sidebar-collapsed .sidebar-nav i {
+      margin-right: 0;
+    }
+    
+    /* 다크 모드 */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    
+    body.dark-mode .sidebar,
+    body.dark-mode .header,
+    body.dark-mode .dropdown-menu {
+      background-color: #1e1e1e;
+      border-color: #333;
+    }
+    
+    body.dark-mode .sidebar-nav a {
+      color: #b0b0b0;
+    }
+    
+    body.dark-mode .sidebar-nav a:hover {
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+    
+    body.dark-mode .sidebar-nav li.active a {
+      background-color: #2e4059;
+      color: #90b4f9;
+    }
+    
+    body.dark-mode .search-input {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+    
+    body.dark-mode .header-button,
+    body.dark-mode .search-container i {
+      color: #b0b0b0;
+    }
+    
+    body.dark-mode .dropdown-menu a:hover {
+      background-color: #2a2a2a;
+    }
+    
+    /* 재고 관리 페이지 스타일 */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .btn i {
+      margin-right: 5px;
+    }
+    
+    .btn-outline {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      color: #333;
+    }
+    
+    .btn-outline:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .btn-primary {
+      background-color: #0d6efd;
+      text-decoration: none;
+      color: white;
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0b5ed7;
+      text-decoration: none;
+    }
+    
+    .subtitle {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #777;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    /* 재고 목록 섹션 - 흰색 배경 추가 */
+    .inventory-section {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    /* 검색 필터 */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .filter-input {
+      position: relative;
+      flex: 1;
+    }
+    
+    .filter-input input {
+      padding: 8px 15px 8px 35px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      width: 100%;
+      font-size: 14px;
+    }
+    
+    .filter-input i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+    
+    .filter-dropdown {
+      min-width: 150px;
+    }
+    
+    .filter-dropdown select {
+      padding: 8px 30px 8px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      width: 100%;
+      font-size: 14px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+    
+    /* 테이블 */
+    .data-card {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .data-table th {
+      font-weight: 500;
+      color: #777;
+      background-color: #f9f9f9;
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .status-tag {
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-normal {
+      background-color: #e7f5ea;
+      color: #198754;
+    }
+    
+    .status-low {
+      background-color: #ffe8e8;
+      color: #dc3545;
+    }
+    
+    .action-link {
+      color: #0d6efd;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .action-link:hover {
+      text-decoration: underline;
+    }
+    
+    /* 다크 모드 내 재고 페이지 스타일 */
+    body.dark-mode .btn-outline {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+    
+    body.dark-mode .btn-outline:hover {
+      background-color: #333;
+    }
+    
+    body.dark-mode .inventory-section,
+    body.dark-mode .filter-bar,
+    body.dark-mode .data-card {
+      background-color: #1e1e1e;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    body.dark-mode .filter-input input,
+    body.dark-mode .filter-dropdown select {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+    
+    body.dark-mode .data-table th {
+      background-color: #252525;
+      color: #b0b0b0;
+    }
+    
+    body.dark-mode .data-table td {
+      border-color: #333;
+    }
+    
+    body.dark-mode .description {
+      color: #aaa;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .filter-bar {
+        flex-direction: column;
+      }
+      
+      .filter-dropdown {
+        width: 100%;
+      }
+      
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .button-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="logo">WMS System</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <a href="../index.html">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>대시보드</span>
+          </a>
+        </li>
+        <li class="active">
+          <a href="#">
+            <i class="fas fa-box"></i>
+            <span>재고 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-truck-loading"></i>
+            <span>입고 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-shopping-cart"></i>
+            <span>수주 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-clipboard-check"></i>
+            <span>검수 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-building"></i>
+            <span>공급업체 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-folder-tree"></i>
+            <span>카테고리 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-truck"></i>
+            <span>출고 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-undo"></i>
+            <span>반품 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-users"></i>
+            <span>사용자 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-store"></i>
+            <span>매장 관리</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-chart-bar"></i>
+            <span>보고서</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>설정</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="main-content">
+    <!-- 헤더 -->
+    <header class="header">
+      <div class="header-left">
+        <button id="sidebar-toggle" class="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input type="search" placeholder="검색..." class="search-input">
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="header-button">
+          <i class="fas fa-bell"></i>
+        </button>
+        <button id="theme-toggle" class="header-button">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="user-dropdown">
+          <button class="header-button">
+            <i class="fas fa-user"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a href="#">프로필</a>
+            <a href="#">설정</a>
+            <a href="#">로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 페이지 콘텐츠 영역 - 재고 관리 -->
+    <main class="page-content">
+      <!-- 페이지 헤더 -->
+      <div class="page-header">
+        <h1 class="page-title">재고 관리</h1>
+        <div class="button-group">
+          <button class="btn btn-outline">
+            <i class="fas fa-download"></i> 내보내기
+          </button>
+          <button class="btn btn-outline">
+            <i class="fas fa-upload"></i> 가져오기
+          </button>
+          <a th:href="@{/inventoryAdd}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 상품 추가
+          </a>
+        </div>
+      </div>
+      
+      <!-- 재고 목록 섹션 - 흰색 배경 추가 -->
+      <div class="inventory-section">
+        <h2 class="subtitle">재고 목록</h2>
+        <p class="description">현재 창고에 보관 중인 모든 상품의 재고 현황입니다.</p>
+        
+        <!-- 필터링 영역 -->
+        <div class="filter-input">
+          <form th:action="@{/inventory/list}" method="get">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="상품 ID 검색..." name="searchProductId"
+                   th:value="${searchProductId}" class="form-control" />
+          </form>
+        </div>
+          <div class="filter-dropdown">
+            <select name="searchStorageId">
+              <option value="">전체 창고</option>
+              <option value="1">1번 창고</option>
+              <option value="2">2번 창고</option>
+              <option value="3">3번 창고</option>
+            </select>
+          </div>
+          <div class="filter-dropdown">
+            <select name="searchLocationCode">
+              <option value="">전체 위치</option>
+              <option value="A">A 구역</option>
+              <option value="B">B 구역</option>
+              <option value="C">C 구역</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- 데이터 테이블 -->
+        <div class="data-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>재고 ID</th>
+                <th>상품 ID</th>
+                <th>로트 번호</th>
+                <th>위치 코드</th>
+                <th>가용 재고</th>
+                <th>유통기한</th>
+                <th>상태</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="inventory : ${inventories}">
+                <td th:text="${inventory.inventoryId}"></td>
+                <td th:text="${inventory.productId}"></td>
+                <td th:text="${inventory.lotNumber}"></td>
+                <td th:text="${inventory.locationCode}"></td>
+                <td th:text="${inventory.availableStock}"></td>
+                <td th:text="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}"></td>
+                <td>
+                  <span 
+                    th:class="${inventory.availableStock > 100 ? 'status-tag status-normal' : 'status-tag status-low'}"
+                    th:text="${inventory.availableStock > 100 ? '정상' : '부족'}">
+                  </span>
+                </td>
+                <td>
+                  <a th:href="@{/inventory/detail/{id}(id=${inventory.inventoryId})}" class="action-link">상세</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  // 사이드바 토글
+  document.getElementById('sidebar-toggle').addEventListener('click', function() {
+    document.querySelector('.layout').classList.toggle('sidebar-collapsed');
+  });
+
+  // 다크 모드 토글
+  document.getElementById('theme-toggle').addEventListener('click', function() {
+    document.body.classList.toggle('dark-mode');
+
+    // 아이콘 변경
+    const icon = this.querySelector('i');
+    if (document.body.classList.contains('dark-mode')) {
+      icon.classList.remove('fa-moon');
+      icon.classList.add('fa-sun');
+    } else {
+      icon.classList.remove('fa-sun');
+      icon.classList.add('fa-moon');
+    }
+  });
+
+  // 사용자 드롭다운
+  document.querySelector('.user-dropdown button').addEventListener('click', function() {
+    document.querySelector('.dropdown-menu').classList.toggle('show');
+  });
+
+  // 드롭다운 외부 클릭 시 닫기
+  window.addEventListener('click', function(event) {
+    if (!event.target.matches('.user-dropdown button') && !event.target.matches('.user-dropdown i')) {
+      const dropdowns = document.querySelectorAll('.dropdown-menu');
+      dropdowns.forEach(dropdown => {
+        if (dropdown.classList.contains('show')) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+  });
+
+  // 모바일 화면에서 사이드바 자동 접기
+  function checkScreenSize() {
+    if (window.innerWidth < 768) {
+      document.querySelector('.layout').classList.add('sidebar-collapsed');
+    } else {
+      document.querySelector('.layout').classList.remove('sidebar-collapsed');
+    }
+  }
+
+  // 초기 로드 및 화면 크기 변경 시 체크
+  window.addEventListener('load', checkScreenSize);
+  window.addEventListener('resize', checkScreenSize);
+
+  /*]]>*/
+</script>
+</body>
+</html>
