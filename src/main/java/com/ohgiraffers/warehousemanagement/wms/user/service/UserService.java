@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,29 +28,27 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
-    public Integer registerUser(SignupUserDTO signupUserDTO) {
+    public List<UserDTO> getAllUsers() {
+        List<UserDTO> users = new ArrayList<>();
 
-        if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
-            return null;
-        }
-
-        try {
-            User user = new User(
-                    signupUserDTO.getUserCode(),
-                    passwordEncoder.encode(signupUserDTO.getUserPass()),
-                    signupUserDTO.getUserName(),
-                    signupUserDTO.getUserEmail(),
-                    signupUserDTO.getUserPhone(),
-                    UserPart.valueOf(signupUserDTO.getUserPart())
+        for (User user : userRepository.findAll()) {
+            UserDTO userDTO = new UserDTO(
+                    user.getUserId(),
+                    user.getUserCode(),
+                    user.getUserName(),
+                    user.getUserEmail(),
+                    user.getUserPhone(),
+                    user.getUserPart().getPart(),
+                    user.getUserRole().getRole(),
+                    user.getUserStatus().getStatus(),
+                    user.getUserCreatedAt(),
+                    user.getUserUpdatedAt(),
+                    user.getUserDeletedAt()
             );
-
-            User savedUser = userRepository.save(user);
-            return savedUser.getUserId();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
+            users.add(userDTO);
         }
+
+        return users;
     }
 
     public LoginUserDTO findbyUserCode(String userCode) {
@@ -82,6 +82,31 @@ public class UserService {
                 u.getUserUpdatedAt(),
                 u.getUserDeletedAt()
         )).orElse(null);
+    }
+
+    @Transactional
+    public Integer registerUser(SignupUserDTO signupUserDTO) {
+
+        if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
+            return null;
+        }
+
+        try {
+            User user = new User(
+                    signupUserDTO.getUserCode(),
+                    passwordEncoder.encode(signupUserDTO.getUserPass()),
+                    signupUserDTO.getUserName(),
+                    signupUserDTO.getUserEmail(),
+                    signupUserDTO.getUserPhone(),
+                    UserPart.valueOf(signupUserDTO.getUserPart())
+            );
+
+            User savedUser = userRepository.save(user);
+            return savedUser.getUserId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Transactional

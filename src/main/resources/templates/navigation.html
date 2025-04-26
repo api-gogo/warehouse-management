@@ -59,8 +59,8 @@
           <span>반품 관리</span>
         </a>
       </li>
-      <li th:class="${activeMenu == 'user' ? 'active' : ''}">
-        <a href="#">
+      <li th:class="${activeMenu == 'user' ? 'active' : ''}" th:if="${#authorization.expression('hasAuthority(''관리자'')')}">
+        <a th:href="@{/admin/users}">
           <i class="fas fa-users"></i>
           <span>사용자 관리</span>
         </a>

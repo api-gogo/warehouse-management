@@ -54,7 +54,7 @@
                   <i class="fas fa-id-card"></i>
                   <span>사원번호</span>
                 </div>
-                <div class="info-value" th:text="${user.userCode}">WMS001</div>
+                <div class="info-value" th:text="${user.userCode}"></div>
               </div>
               
               <div class="info-item">
@@ -62,7 +62,7 @@
                   <i class="fas fa-envelope"></i>
                   <span>이메일</span>
                 </div>
-                <div class="info-value" th:text="${user.userEmail}">user@example.com</div>
+                <div class="info-value" th:text="${user.userEmail}"></div>
               </div>
               
               <div class="info-item">
@@ -70,7 +70,7 @@
                   <i class="fas fa-phone"></i>
                   <span>전화번호</span>
                 </div>
-                <div class="info-value" th:text="${user.userPhone}">010-1234-5678</div>
+                <div class="info-value" th:text="${user.userPhone}"></div>
               </div>
               
               <div class="info-item">
@@ -78,7 +78,7 @@
                   <i class="fas fa-users"></i>
                   <span>부서</span>
                 </div>
-                <div class="info-value" th:text="${user.userPart}">재고</div>
+                <div class="info-value" th:text="${user.userPart}"></div>
               </div>
               
               <div class="info-item">
@@ -86,7 +86,7 @@
                   <i class="fas fa-user-tag"></i>
                   <span>직책</span>
                 </div>
-                <div class="info-value" th:text="${user.userRole}">사원</div>
+                <div class="info-value" th:text="${user.userRole}"></div>
               </div>
               
               <div class="info-item">
@@ -94,7 +94,7 @@
                   <i class="fas fa-toggle-on"></i>
                   <span>상태</span>
                 </div>
-                <div class="info-value status-badge" th:text="${user.userStatus}" th:classappend="${user.userStatus == '활성화' ? 'status-active' : 'status-inactive'}">활성화</div>
+                <div class="info-value status-badge" th:text="${user.userStatus}"></div>
               </div>
               
               <div class="info-item">
@@ -102,7 +102,7 @@
                   <i class="fas fa-calendar-alt"></i>
                   <span>가입일</span>
                 </div>
-                <div class="info-value" th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd')}">2023-01-01</div>
+                <div class="info-value" th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd hh:mm')}">2023-01-01</div>
               </div>
             </div>
           </div>

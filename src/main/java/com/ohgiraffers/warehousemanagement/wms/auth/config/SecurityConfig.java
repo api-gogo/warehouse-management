@@ -59,6 +59,8 @@ public class SecurityConfig {
         }).sessionManagement(session -> {
             session.maximumSessions(1);
             session.invalidSessionUrl("/");
+        }).exceptionHandling(exception -> {
+            exception.accessDeniedPage("/");  // 권한이 없을 때 메인 페이지로 리다이렉트
         }).csrf(csrf -> csrf.disable());
 
         return http.build();

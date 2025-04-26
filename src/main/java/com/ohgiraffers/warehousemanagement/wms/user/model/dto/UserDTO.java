@@ -34,6 +34,20 @@ public class UserDTO {
         this.userDeletedAt = userDeletedAt;
     }
 
+    public UserDTO(Integer userId, String userCode, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
+        this.userId = userId;
+        this.userCode = userCode;
+        this.userName = userName;
+        this.userEmail = userEmail;
+        this.userPhone = userPhone;
+        this.userPart = userPart;
+        this.userRole = userRole;
+        this.userStatus = userStatus;
+        this.userCreatedAt = userCreatedAt;
+        this.userUpdatedAt = userUpdatedAt;
+        this.userDeletedAt = userDeletedAt;
+    }
+
     public Integer getUserId() {
         return userId;
     }
