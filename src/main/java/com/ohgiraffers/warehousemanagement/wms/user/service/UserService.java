@@ -84,10 +84,15 @@ public class UserService {
         )).orElse(null);
     }
 
-    public boolean updateUser(UserDTO userDTO) {
-        User user = userRepository.findById(userDTO.getUserId()).orElse(null);
+    @Transactional
+    public boolean updateUser(Integer userId,UserDTO userDTO) {
+        User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
+        }
+
+        if (userDTO.getUserPass() != null && !userDTO.getUserPass().trim().isEmpty()) {
+            user.setUserPass(passwordEncoder.encode(userDTO.getUserPass()));
         }
 
         user.setUserEmail(userDTO.getUserEmail());

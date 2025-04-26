@@ -26,6 +26,11 @@
 
     <!-- 페이지 콘텐츠 영역 -->
     <main class="page-content">
+      <!-- 알림 메시지 -->
+      <div th:if="${message != null}" class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+      </div>
+
       <!-- 메인 환영 섹션 -->
       <div class="welcome-container mb-5">
         <div class="welcome-icon">
@@ -78,9 +83,9 @@
           <div class="dashboard-shortcuts">
             <h3 class="shortcuts-title">자주 사용하는 기능</h3>
             <div class="shortcuts-grid">
-              <a href="#" class="shortcut-card">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>대시보드</span>
+              <a th:href="@{/user/profile}" class="shortcut-card">
+                <i class="fas fa-user"></i>
+                <span>프로필</span>
               </a>
               <a href="#" class="shortcut-card">
                 <i class="fas fa-chart-bar"></i>
