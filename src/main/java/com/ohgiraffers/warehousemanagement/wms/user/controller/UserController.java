@@ -66,7 +66,7 @@ public class UserController {
             }
         }
 
-        return "/";
+        return "redirect:/";
     }
 
     @GetMapping("/password-verify")
@@ -96,7 +96,7 @@ public class UserController {
             }
         }
 
-        return "/";
+        return "redirect:/";
     }
 
     @PostMapping("/update")
@@ -108,6 +108,7 @@ public class UserController {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
                 Integer userId = authDetails.getUserId();
+                
                 boolean result = userService.updateUser(userId, updateUser);
 
                 if (!result) {
@@ -142,6 +143,6 @@ public class UserController {
             }
         }
 
-        return "/";
+        return "redirect:/";
     }
 }

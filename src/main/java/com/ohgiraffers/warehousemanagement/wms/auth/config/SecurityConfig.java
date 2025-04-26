@@ -41,9 +41,11 @@ public class SecurityConfig {
     public SecurityFilterChain config(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers("/auth/login", "/user/signup", "/auth/fail", "/").permitAll();
-            auth.requestMatchers("/admin/*").hasAnyAuthority(UserRole.관리자.getRole());
-            auth.requestMatchers("/manage/*").hasAnyAuthority(UserRole.매니저.getRole());
-            auth.requestMatchers("/staff/*").hasAnyAuthority(UserRole.사원.getRole());
+            auth.requestMatchers("/admin/**").hasAnyAuthority(UserRole.관리자.getRole());
+            auth.requestMatchers("/manage/**").hasAnyAuthority(UserRole.매니저.getRole());
+            auth.requestMatchers("/staff/**").hasAnyAuthority(UserRole.사원.getRole());
+            // 사용자 프로필 업데이트는 로그인한 사용자만 가능하도록 설정
+            auth.requestMatchers("/user/update/**", "/user/password-verify/**", "/user/profile/**").authenticated();
             auth.anyRequest().authenticated();
         }).formLogin(login -> {
             login.loginPage("/auth/login");
