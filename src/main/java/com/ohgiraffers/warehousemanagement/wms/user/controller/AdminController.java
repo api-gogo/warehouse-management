@@ -67,4 +67,21 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/admin/users/" + userId;
     }
+
+    @PostMapping("/users/approve/{userId}")
+    public String approveUser(@PathVariable Integer userId, UserDTO updateUserDTO,
+                             RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = userService.approveUser(userId, updateUserDTO);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원이 승인되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users/" + userId;
+    }
 }

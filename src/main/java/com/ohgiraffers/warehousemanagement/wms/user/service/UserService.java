@@ -136,15 +136,26 @@ public class UserService {
             return false;
         }
 
-        if (userDTO.getUserPass() != null && !userDTO.getUserPass().trim().isEmpty()) {
-            user.setUserPass(passwordEncoder.encode(userDTO.getUserPass()));
-        }
-
         user.setUserEmail(userDTO.getUserEmail());
         user.setUserPhone(userDTO.getUserPhone());
         user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
         user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
         user.setUserStatus(UserStatus.valueOf(userDTO.getUserStatus()));
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean approveUser(Integer userId,UserDTO userDTO) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
+        user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
+        user.setUserStatus(UserStatus.재직중);
         user.setUserUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
