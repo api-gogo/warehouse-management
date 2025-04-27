@@ -25,10 +25,10 @@ public class User {
     @Column(name = "user_name", length = 50, nullable = false)
     private String userName;
 
-    @Column(name = "user_email", length = 100, nullable = false)
+    @Column(name = "user_email", length = 100, nullable = false, unique = true)
     private String userEmail;
 
-    @Column(name = "user_phone", length = 50, nullable = false)
+    @Column(name = "user_phone", length = 50, nullable = false, unique = true)
     private String userPhone;
 
     @Enumerated(EnumType.STRING)

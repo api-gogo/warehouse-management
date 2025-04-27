@@ -90,7 +90,13 @@ public class UserService {
     public Integer registerUser(SignupUserDTO signupUserDTO) {
 
         if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
-            return null;
+            return -1;
+        }
+        if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
+            return -2;
+        }
+        if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
+            return -3;
         }
 
         try {
