@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WMS - 신규 상품 등록</title>
+  <!-- 폰트어썸 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Flatpickr 달력 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    :root {
+      --color-primary: #3b82f6;
+      --color-primary-hover: #2563eb;
+      --color-secondary: #f3f4f6;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-info: #6366f1;
+      --bg-main: #ffffff;
+      --bg-secondary: #f9fafb;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-header: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --text-sidebar: #4b5563;
+      --text-sidebar-active: #111827;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --border-radius: 0.5rem;
+    }
+
+    body.dark-mode {
+      --bg-main: #111827;
+      --bg-secondary: #1f2937;
+      --bg-sidebar: #1f2937;
+      --bg-card: #1f2937;
+      --bg-header: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-sidebar: #d1d5db;
+      --text-sidebar-active: #f9fafb;
+      --border-color: #374151;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    .page-content {
+      padding: 1.5rem;
+      min-height: 100vh;
+      background-color: var(--bg-secondary);
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 0.25rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .btn-danger {
+      background-color: var(--color-danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .justify-end {
+      justify-content: flex-end;
+    }
+
+    .space-x-2 > * + * {
+      margin-left: 0.5rem;
+    }
+
+    .font-medium {
+      font-weight: 500;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+    }
+
+    .form-check-input {
+      margin-right: 0.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .form-error {
+      font-size: 0.75rem;
+      color: var(--color-danger);
+      margin-top: 0.25rem;
+    }
+
+    .error-message {
+      color: var(--color-danger);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 576px) {
+      .page-content {
+        padding: 1rem;
+      }
+    }
+
+    .flatpickr-calendar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+    }
+
+    .flatpickr-day.selected {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .flatpickr-day.selected:hover {
+      background: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
+    }
+
+    .flatpickr-day:hover {
+      background: var(--color-secondary);
+    }
+
+    .flatpickr-months .flatpickr-month {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+      color: white;
+    }
+
+    .flatpickr-current-month input.cur-year {
+      color: white;
+    }
+
+    .flatpickr-weekday {
+      color: var(--text-secondary);
+    }
+
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+      fill: white;
+    }
+  </style>
+</head>
+<body>
+<!-- 페이지 콘텐츠 영역 - 상품 추가 페이지 -->
+<main class="page-content">
+  <!-- 페이지 제목과 뒤로가기 버튼 -->
+  <div class="flex items-center justify-between">
+    <h1 class="page-title">신규 상품 등록</h1>
+    <div class="flex items-center space-x-2">
+      <a href="/product" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        목록으로
+      </a>
+    </div>
+  </div>
+
+  <!-- 상품 정보 입력 카드 -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">상품 정보</h2>
+      <p class="card-description">신규 상품의 정보를 입력해주세요.</p>
+    </div>
+    <div class="card-content">
+      <!-- 에러 메시지 표시 -->
+      <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+      <!-- 상품 추가 폼 -->
+      <form th:action="@{/product/add}" method="post" th:object="${product}">
+        <div class="form-grid">
+          <!-- 품명 입력 -->
+          <div class="form-group">
+            <label for="productName" class="form-label">품명 *</label>
+            <input type="text" id="productName" name="productName" th:field="*{productName}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}">품명을 입력해주세요.</div>
+          </div>
+
+          <!-- 카테고리 선택 -->
+          <div class="form-group">
+            <label for="categoryId" class="form-label">카테고리 *</label>
+            <select id="categoryId" name="categoryId" th:field="*{categoryId}" class="form-select" required>
+              <option value="">카테고리 선택</option>
+              <option th:each="cat : ${categories}"
+                      th:value="${cat.id}"
+                      th:text="${cat.name}"></option>
+            </select>
+            <div class="form-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">카테고리를 선택해주세요.</div>
+          </div>
+
+          <!-- 거래처 ID 입력 -->
+          <div class="form-group">
+            <label for="supplierId" class="form-label">거래처 ID *</label>
+            <input type="number" id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('supplierId')}" th:errors="*{supplierId}">거래처 ID를 입력해주세요.</div>
+          </div>
+
+          <!-- 담당자 ID 입력 -->
+          <div class="form-group">
+            <label for="userId" class="form-label">담당자 ID *</label>
+            <input type="number" id="userId" name="userId" th:field="*{userId}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">담당자 ID를 입력해주세요.</div>
+          </div>
+
+          <!-- 보관방법 입력 -->
+          <div class="form-group">
+            <label for="storageMethod" class="form-label">보관방법 *</label>
+            <input type="text" id="storageMethod" name="storageMethod" th:field="*{storageMethod}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('storageMethod')}" th:errors="*{storageMethod}">보관방법을 입력해주세요.</div>
+          </div>
+
+          <!-- 유통기한 선택 -->
+          <div class="form-group">
+            <label for="expirationDatePicker" class="form-label">유통기한 *</label>
+            <input type="text" id="expirationDatePicker" class="form-input" placeholder="유통기한을 선택해주세요" required>
+            <input type="hidden" id="expirationDate" name="expirationDate" th:field="*{expirationDate}">
+            <div class="form-hint">상품의 유통기한을 선택해주세요.</div>
+            <div class="form-error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}">유통기한을 입력해주세요.</div>
+          </div>
+
+          <!-- 박스당 단가 입력 -->
+          <div class="form-group">
+            <label for="pricePerBox" class="form-label">박스당 단가 *</label>
+            <input type="number" id="pricePerBox" name="pricePerBox" th:field="*{pricePerBox}" class="form-input" min="0" step="100" required>
+            <div class="form-hint">박스당 단가를 원 단위로 입력해주세요.</div>
+            <div class="form-error" th:if="${#fields.hasErrors('pricePerBox')}" th:errors="*{pricePerBox}">박스당 단가를 입력해주세요.</div>
+          </div>
+
+          <!-- 박스당 개수 입력 -->
+          <div class="form-group">
+            <label for="quantityPerBox" class="form-label">박스당 개수 *</label>
+            <input type="number" id="quantityPerBox" name="quantityPerBox" th:field="*{quantityPerBox}" class="form-input" min="1" required>
+            <div class="form-hint">박스당 포함된 상품의 수량을 입력해주세요.</div>
+            <div class="form-error" th:if="${#fields.hasErrors('quantityPerBox')}" th:errors="*{quantityPerBox}">박스당 개수를 입력해주세요.</div>
+          </div>
+        </div>
+
+        <!-- 삭제 상태 기본값 설정 -->
+        <input type="hidden" name="isDeleted" th:field="*{isDeleted}" value="false">
+
+        <!-- 폼 제출 버튼 -->
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="btn btn-outline" onclick="history.back()">취소</button>
+          <button type="submit" class="btn btn-primary">등록</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Flatpickr 달력 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+<script>
+  // 달력 초기화 및 유통기한 계산
+  const expirationDatePicker = flatpickr("#expirationDatePicker", {
+    locale: "ko",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    onChange: function(selectedDates, dateStr) {
+      const selectedDate = selectedDates[0];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const diffTime = selectedDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById("expirationDate").value = diffDays;
+    }
+  });
+
+  // 폼 유효성 검사
+  document.querySelector('form').addEventListener('submit', function(event) {
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+        field.classList.add('border-red-500');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error';
+        errorDiv.textContent = '이 필드는 필수입니다.';
+        const existingError = field.parentNode.querySelector('.form-error:not([th\\:errors])');
+        if (existingError) {
+          field.parentNode.removeChild(existingError);
+        }
+        field.parentNode.appendChild(errorDiv);
+      } else {
+        field.classList.remove('border-red-500');
+        const existingError = field.parentNode.querySelector('.form-error:not([th\\:errors])');
+        if (existingError) {
+          field.parentNode.removeChild(existingError);
+        }
+      }
+    });
+
+    if (!document.getElementById("expirationDate").value) {
+      isValid = false;
+      document.getElementById("expirationDatePicker").classList.add('border-red-500');
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'form-error';
+      errorDiv.textContent = '유통기한을 선택해주세요.';
+      const existingError = document.getElementById("expirationDatePicker").parentNode.querySelector('.form-error:not([th\\:errors])');
+      if (existingError) {
+        document.getElementById("expirationDatePicker").parentNode.removeChild(existingError);
+      }
+      document.getElementById("expirationDatePicker").parentNode.appendChild(errorDiv);
+    }
+
+    if (!isValid) {
+      event.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>

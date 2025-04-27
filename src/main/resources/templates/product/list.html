@@ -171,35 +171,6 @@
       gap: 0.5rem;
     }
 
-    .select-container {
-      position: relative;
-      width: 180px;
-    }
-
-    .select {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      font-size: 0.875rem;
-      appearance: none;
-      cursor: pointer;
-    }
-
-    .select-container::after {
-      content: '\f078';
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
-      position: absolute;
-      right: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
     .table-container {
       overflow-x: auto;
       border: 1px solid var(--border-color);
@@ -336,15 +307,12 @@
         flex-direction: column;
         align-items: stretch;
       }
-
-      .select-container {
-        width: 100%;
-      }
     }
   </style>
 </head>
 <body>
 <main class="page-content">
+  <!-- 페이지 제목과 버튼 -->
   <div class="flex items-center justify-between">
     <h1 class="page-title" th:text="${pageTitle}">상품 관리</h1>
     <div class="flex items-center space-x-2">
@@ -359,50 +327,25 @@
     </div>
   </div>
 
+  <!-- 상품 목록 카드 -->
   <div class="card">
     <div class="card-header">
       <h2 class="card-title" th:text="${cardTitle}">상품 목록</h2>
       <p class="card-description" th:text="${cardDescription}">등록된 모든 상품을 확인하고 관리할 수 있습니다.</p>
     </div>
     <div class="card-content">
-      <!-- 필터링 폼 -->
+      <!-- 검색 폼 -->
       <form th:action="@{/product/list}" method="get" class="filter-area">
         <div class="search-container">
           <i class="fas fa-search"></i>
           <input type="search" name="searchKeyword" placeholder="상품명 검색..." class="search-input" th:value="${searchKeyword}" aria-label="상품명 검색">
         </div>
-        <div class="select-container">
-          <select class="select" name="category" onchange="this.form.submit()" aria-label="카테고리 선택">
-            <option value="all">카테고리 전체</option>
-            <option th:each="category : ${categories}"
-                    th:value="${category.id}"
-                    th:text="${category.name}"
-                    th:selected="${selectedCategory == category.id}"></option>
-          </select>
-        </div>
-        <div class="select-container">
-          <select class="select" name="storageType" onchange="this.form.submit()" aria-label="보관방법 선택">
-            <option value="all">보관방법 전체</option>
-            <option th:each="type : ${storageTypes}"
-                    th:value="${type.id}"
-                    th:text="${type.name}"
-                    th:selected="${selectedStorageType == type.id}"></option>
-          </select>
-        </div>
-        <div class="select-container">
-          <select class="select" name="supplier" onchange="this.form.submit()" aria-label="공급업체 선택">
-            <option value="all">공급업체 전체</option>
-            <option th:each="supplier : ${suppliers}"
-                    th:value="${supplier.id}"
-                    th:text="${supplier.name}"
-                    th:selected="${selectedSupplier == supplier.id}"></option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-outline btn-icon" aria-label="필터 적용">
-          <i class="fas fa-filter"></i>
+        <button type="submit" class="btn btn-outline btn-icon" aria-label="검색">
+          <i class="fas fa-search"></i>
         </button>
       </form>
 
+      <!-- 상품 목록 테이블 -->
       <div class="table-container">
         <table class="table">
           <thead>
@@ -432,13 +375,13 @@
             <td th:text="${product.quantityPerBox}"></td>
             <td th:text="${#temporals.format(product.productCreatedAt, 'yyyy-MM-dd')}"></td>
             <td>
-                  <span class="badge badge-outline"
-                        th:classappend="${product.isDeleted == false} ? 'badge-success' : 'badge-danger'"
-                        th:text="${product.isDeleted == false} ? '활성' : '비활성'"></span>
+              <span class="badge badge-outline"
+                    th:classappend="${product.isDeleted == false} ? 'badge-success' : 'badge-danger'"
+                    th:text="${product.isDeleted == false} ? '활성' : '비활성'"></span>
             </td>
             <td class="text-right">
               <a th:href="@{/product/{id}(id=${product.productId})}" class="btn btn-outline btn-sm" aria-label="상품 편집">편집</a>
-              <form th:action="@{/product/{id}/delete(id=${product.productId})}" method="post" style="display:inline;">
+              <form th:action="@{/product/delete/{id}(id=${product.productId})}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-outline btn-sm" aria-label="상품 삭제">삭제</button>
               </form>
             </td>
@@ -456,13 +399,13 @@
           <span th:text="'총 ' + ${totalItems} + '개 항목 중 ' + ${startItem} + '-' + ${endItem} + ' 표시 중'"></span>
         </div>
         <div class="flex space-x-2">
-          <a th:href="@{/product/list(page=${currentPage - 1}, searchKeyword=${searchKeyword}, category=${selectedCategory}, storageType=${selectedStorageType}, supplier=${selectedSupplier})}"
+          <a th:href="@{/product/list(page=${currentPage - 1}, searchKeyword=${searchKeyword})}"
              th:class="'btn btn-outline btn-sm' + (${currentPage == 1} ? ' disabled' : '')"
              aria-label="이전 페이지">
             <i class="fas fa-chevron-left"></i>
           </a>
           <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
-          <a th:href="@{/product/list(page=${currentPage + 1}, searchKeyword=${searchKeyword}, category=${selectedCategory}, for storageType=${selectedStorageType}, supplier=${selectedSupplier})}"
+          <a th:href="@{/product/list(page=${currentPage + 1}, searchKeyword=${searchKeyword})}"
              th:class="'btn btn-outline btn-sm' + (${currentPage == totalPages} ? ' disabled' : '')"
              aria-label="다음 페이지">
             <i class="fas fa-chevron-right"></i>
