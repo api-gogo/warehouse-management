@@ -84,4 +84,20 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/admin/users/" + userId;
     }
+
+    @GetMapping("/users/reject/{userId}")
+    public String rejectUser(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = userService.rejectUser(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "승인이 거부되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users/" + userId;
+    }
 }

@@ -61,7 +61,8 @@
                 <span class="status-badge" 
                       th:classappend="${user.userStatus == '재직중' ? 'status-active' : 
                                       (user.userStatus == '승인대기' ? 'status-pending' : 
-                                      (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger'))}"
+                                      (user.userStatus == '승인거부' ? 'status-rejected' :
+                                      (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger')))}"
                       th:text="${user.userStatus}">재직중</span>
               </div>
             </div>
@@ -74,28 +75,29 @@
                 <div class="info-grid">
                   <div class="form-group">
                     <label class="form-label">이름</label>
-                    <input type="text" class="form-control" th:value="${user.userName}" readonly>
+                    <input type="text" class="form-control readonly-field" th:value="${user.userName}" readonly>
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">사원번호</label>
-                    <input type="text" class="form-control" th:value="${user.userCode}" readonly>
+                    <input type="text" class="form-control readonly-field" th:value="${user.userCode}" readonly>
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">이메일</label>
-                    <input type="email" class="form-control" name="userEmail" th:value="${user.userEmail}">
+                    <input type="email" class="form-control" name="userEmail" th:value="${user.userEmail}" th:readonly="${user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인거부' ? 'readonly-field' : ''}">
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">전화번호</label>
                     <input type="tel" class="form-control" name="userPhone" th:value="${user.userPhone}" 
-                           pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요.">
+                           pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요."
+                           th:readonly="${user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인거부' ? 'readonly-field' : ''}">
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">부서</label>
-                    <select class="form-select" name="userPart" th:disabled="${user.userStatus == '승인대기'}">
+                    <select class="form-select" name="userPart" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' ? 'readonly-field' : ''}">
                       <option value="통합" th:selected="${user.userPart == '통합'}">통합</option>
                       <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
                       <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
@@ -109,7 +111,7 @@
                   
                   <div class="form-group">
                     <label class="form-label">직책</label>
-                    <select class="form-select" name="userRole" th:disabled="${user.userStatus == '승인대기'}">
+                    <select class="form-select" name="userRole" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' ? 'readonly-field' : ''}">
                       <option value="사원" th:selected="${user.userRole == '사원'}">사원</option>
                       <option value="매니저" th:selected="${user.userRole == '매니저'}">매니저</option>
                       <option value="관리자" th:selected="${user.userRole == '관리자'}">관리자</option>
@@ -118,8 +120,9 @@
                   
                   <div class="form-group">
                     <label class="form-label">상태</label>
-                    <select class="form-select" name="userStatus" th:disabled="${user.userStatus == '승인대기'}">
+                    <select class="form-select" name="userStatus" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' ? 'readonly-field' : ''}">
                       <option value="승인대기" th:selected="${user.userStatus == '승인대기'}">승인대기</option>
+                      <option value="승인거부" th:selected="${user.userStatus == '승인거부'}">승인거부</option>
                       <option value="재직중" th:selected="${user.userStatus == '재직중'}">재직중</option>
                       <option value="휴직중" th:selected="${user.userStatus == '휴직중'}">휴직중</option>
                       <option value="퇴사" th:selected="${user.userStatus == '퇴사'}">퇴사</option>
@@ -128,7 +131,17 @@
                   
                   <div class="form-group">
                     <label class="form-label">가입일</label>
-                    <input type="text" class="form-control" th:value="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}" readonly>
+                    <input type="text" class="form-control readonly-field" th:value="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}" readonly>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">최종 수정일</label>
+                    <input type="text" class="form-control readonly-field" th:value="${user.userUpdatedAt != null ? #temporals.format(user.userUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}" readonly>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">삭제일</label>
+                    <input type="text" class="form-control readonly-field" th:value="${user.userDeletedAt != null ? #temporals.format(user.userDeletedAt, 'yyyy-MM-dd HH:mm') : '-'}" readonly>
                   </div>
                 </div>
               </div>
@@ -162,7 +175,7 @@
               </div>
               
               <div class="form-actions">
-                <button type="submit" class="btn btn-primary" th:if="${user.userStatus != '승인대기'}">
+                <button type="submit" class="btn btn-primary" th:if="${user.userStatus != '승인대기' && user.userStatus != '승인거부'}">
                   <i class="fas fa-save me-2"></i>변경사항 저장
                 </button>
               </div>

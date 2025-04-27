@@ -160,4 +160,18 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+
+    @Transactional
+    public boolean rejectUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.승인거부);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
 }

@@ -45,6 +45,7 @@
               <option value="active">활성</option>
               <option value="inactive">비활성</option>
               <option value="pending">승인 대기</option>
+              <option value="rejected">승인 거부</option>
             </select>
             <a th:href="@{/admin/users/approvals}" class="btn btn-primary">
               <i class="fas fa-user-check me-2"></i>승인 관리
@@ -57,6 +58,7 @@
           <button class="tab-button" data-status="pending">승인 대기 <span class="badge" th:text="${pendingCount}">5</span></button>
           <button class="tab-button" data-status="active">활성</button>
           <button class="tab-button" data-status="inactive">비활성</button>
+          <button class="tab-button" data-status="rejected">승인 거부</button>
         </div>
 
         <div class="admin-content">
@@ -86,7 +88,8 @@
                     <span class="status-badge"
                           th:classappend="${user.userStatus == '재직중' ? 'status-active' :
                                           (user.userStatus == '승인대기' ? 'status-pending' :
-                                          (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger'))}"
+                                          (user.userStatus == '승인거부' ? 'status-rejected' :
+                                          (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger')))}"
                           th:text="${user.userStatus}">재직중</span>
                 </td>
                 <td class="actions">
