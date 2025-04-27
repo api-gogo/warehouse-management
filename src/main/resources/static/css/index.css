@@ -7,7 +7,7 @@
     background-color: var(--bg-card);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color); /* 테두리 추가 */
+    border: 1px solid var(--border-color);
 }
 
 .welcome-icon {
@@ -15,22 +15,26 @@
     color: var(--color-primary);
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color); /* 아이콘 아래 구분선 추가 */
+    border-bottom: 1px solid var(--border-color);
 }
 
 .welcome-title {
     font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-name {
+    color: var(--color-primary);
+    border-bottom: 2px dashed var(--color-primary);
+    padding-bottom: 0.25rem;
 }
 
 .welcome-subtitle {
     font-size: 1.25rem;
     color: var(--text-secondary);
-    margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px dashed var(--border-color); /* 부제목 아래 구분선 추가 */
 }
 
 .action-buttons {
@@ -39,7 +43,192 @@
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--border-color); /* 액션 버튼 위 구분선 추가 */
+    border-top: 1px solid var(--border-color);
+}
+
+/* 로그인 후 사용자 정보 컨테이너 */
+.user-info-container {
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    border: 1px solid var(--border-color);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    text-align: left;
+}
+
+.avatar {
+    font-size: 3.5rem;
+    color: var(--color-primary);
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 90px;
+    flex-shrink: 0;
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* 상태 배지 스타일 */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* 재직중: 초록색 계열 - 활성 상태 */
+.status-active {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981; /* 초록색 */
+    border: 1px solid #10b981;
+}
+
+/* 휴직중: 파란색 계열 - 일시적 비활성 상태 */
+.status-inactive {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6; /* 파란색 */
+    border: 1px solid #3b82f6;
+}
+
+/* 승인대기: 노란색 계열 - 대기 상태 */
+.status-pending {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b; /* 노란색 */
+    border: 1px solid #f59e0b;
+}
+
+/* 승인거부: 빨간색 계열 - 거부 상태 */
+.status-rejected {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: #dc2626; /* 빨간색 */
+    border: 1px solid #dc2626;
+}
+
+/* 퇴사: 회색/검정 계열 - 종료 상태 */
+.status-resigned {
+    background-color: rgba(75, 85, 99, 0.1);
+    color: #4b5563; /* 진한 회색 */
+    border: 1px solid #4b5563;
+}
+
+/* 바로가기 섹션 */
+.dashboard-shortcuts {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.shortcuts-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+/* 단일 프로필 버튼을 위한 특별 스타일 */
+.shortcuts-grid-single {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.shortcut-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+/* 단일 프로필 버튼을 위한 너비 조정 */
+.shortcut-card-single {
+    width: 150px;
+}
+
+.shortcut-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+.shortcut-card i {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+}
+
+.shortcut-card span {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .shortcuts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .user-profile {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .avatar {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-label {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
 }
 
 @media (max-width: 576px) {
@@ -59,5 +248,9 @@
     .action-buttons .btn {
         width: 100%;
         margin-bottom: 0.5rem;
+    }
+    
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
     }
 }

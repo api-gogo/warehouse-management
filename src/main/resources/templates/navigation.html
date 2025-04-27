@@ -59,8 +59,8 @@
           <span>반품 관리</span>
         </a>
       </li>
-      <li th:class="${activeMenu == 'user' ? 'active' : ''}">
-        <a href="#">
+      <li th:class="${activeMenu == 'user' ? 'active' : ''}" th:if="${#authorization.expression('hasAuthority(''관리자'')')}">
+        <a th:href="@{/admin/users}">
           <i class="fas fa-users"></i>
           <span>사용자 관리</span>
         </a>
@@ -112,7 +112,7 @@
       <div class="dropdown-menu">
         <!-- 로그인한 사용자에게만 보이는 메뉴 -->
         <th:block th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
-          <a href="#">프로필</a>
+          <a href="/user/profile">프로필</a>
           <a href="#">설정</a>
           <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">로그아웃</a>
           <form id="logout-form" action="/auth/logout" method="post" style="display: none;"></form>

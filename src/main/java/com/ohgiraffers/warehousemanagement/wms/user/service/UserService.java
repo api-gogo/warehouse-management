@@ -1,8 +1,11 @@
 package com.ohgiraffers.warehousemanagement.wms.user.service;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserRole;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
 import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +28,62 @@ public class UserService {
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public List<UserDTO> getAllUsers() {
+        List<UserDTO> users = new ArrayList<>();
+
+        for (User user : userRepository.findAll()) {
+            UserDTO userDTO = new UserDTO(
+                    user.getUserId(),
+                    user.getUserCode(),
+                    user.getUserName(),
+                    user.getUserEmail(),
+                    user.getUserPhone(),
+                    user.getUserPart().getPart(),
+                    user.getUserRole().getRole(),
+                    user.getUserStatus().getStatus(),
+                    user.getUserCreatedAt(),
+                    user.getUserUpdatedAt(),
+                    user.getUserDeletedAt()
+            );
+            users.add(userDTO);
+        }
+
+        return users;
+    }
+
+    public LoginUserDTO findbyUserCode(String userCode) {
+        Optional<User> user = userRepository.findByUserCode(userCode);
+
+        return user.map(u -> new LoginUserDTO(
+                u.getUserId(),
+                u.getUserCode(),
+                u.getUserPass(),
+                u.getUserName(),
+                u.getUserPart().getPart(),
+                u.getUserRole().getRole(),
+                u.getUserStatus().getStatus()
+        )).orElse(null);
+    }
+
+    public UserDTO getUserByUserId(Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        return user.map(u -> new UserDTO(
+                u.getUserId(),
+                u.getUserCode(),
+                u.getUserPass(),
+                u.getUserName(),
+                u.getUserEmail(),
+                u.getUserPhone(),
+                u.getUserPart().getPart(),
+                u.getUserRole().getRole(),
+                u.getUserStatus().getStatus(),
+                u.getUserCreatedAt(),
+                u.getUserUpdatedAt(),
+                u.getUserDeletedAt()
+        )).orElse(null);
     }
 
     @Transactional
@@ -49,17 +111,67 @@ public class UserService {
         }
     }
 
-    public LoginUserDTO findbyUserCode(String userCode) {
-        Optional<User> user = userRepository.findByUserCode(userCode);
+    @Transactional
+    public boolean updateProfile(Integer userId,UserDTO userDTO) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
 
-        return user.map(u -> new LoginUserDTO(
-                u.getUserId(),
-                u.getUserCode(),
-                u.getUserPass(),
-                u.getUserName(),
-                u.getUserPart().getPart(),
-                u.getUserRole().getRole(),
-                u.getUserStatus().getStatus()
-        )).orElse(null);
+        if (userDTO.getUserPass() != null && !userDTO.getUserPass().trim().isEmpty()) {
+            user.setUserPass(passwordEncoder.encode(userDTO.getUserPass()));
+        }
+
+        user.setUserEmail(userDTO.getUserEmail());
+        user.setUserPhone(userDTO.getUserPhone());
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean updateUser(Integer userId,UserDTO userDTO) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserEmail(userDTO.getUserEmail());
+        user.setUserPhone(userDTO.getUserPhone());
+        user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
+        user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
+        user.setUserStatus(UserStatus.valueOf(userDTO.getUserStatus()));
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean approveUser(Integer userId,UserDTO userDTO) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
+        user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
+        user.setUserStatus(UserStatus.재직중);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean rejectUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.승인거부);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
     }
 }

@@ -40,19 +40,19 @@
 
 /* 다크 모드 */
 body.dark-mode {
-    --bg-main: #111827;
-    --bg-secondary: #1f2937;
-    --bg-sidebar: #1f2937;
-    --bg-card: #1f2937;
-    --bg-header: #1f2937;
+    --bg-main: #121212;
+    --bg-secondary: #1a1a1a;
+    --bg-sidebar: #1a1a1a;
+    --bg-card: #1e1e1e;
+    --bg-header: #1a1a1a;
 
-    --text-primary: #f9fafb;
-    --text-secondary: #e5e7eb;
-    --text-muted: #9ca3af;
-    --text-sidebar: #d1d5db;
-    --text-sidebar-active: #f9fafb;
+    --text-primary: #f5f5f5;
+    --text-secondary: #e0e0e0;
+    --text-muted: #9e9e9e;
+    --text-sidebar: #d4d4d4;
+    --text-sidebar-active: #ffffff;
 
-    --border-color: #374151;
+    --border-color: #333333;
 }
 
 /* 기본 스타일 */

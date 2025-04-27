@@ -83,10 +83,10 @@
               </div>
 
               <div class="mb-4">
-                <label for="userPassConfirm" class="form-label">
+                <label for="confirmUserPass" class="form-label">
                   <i class="fas fa-lock me-2"></i>비밀번호 확인
                 </label>
-                <input type="password" class="form-control" id="userPassConfirm" placeholder="비밀번호를 다시 입력하세요" required>
+                <input type="password" class="form-control" id="confirmUserPass" placeholder="비밀번호를 다시 입력하세요" required>
               </div>
 
               <div class="mb-3">
@@ -129,13 +129,26 @@
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const userPass = document.getElementById('userPass');
-    const userPassConfirm = document.getElementById('userPassConfirm');
+    const confirmUserPass = document.getElementById('confirmUserPass');
 
     form.addEventListener('submit', function(event) {
-      if (userPass.value !== userPassConfirm.value) {
-        event.preventDefault();
-        alert('비밀번호가 일치하지 않습니다.');
-        userPassConfirm.focus();
+      // 비밀번호 입력 확인
+      if (userPass.value.trim() !== '') {
+        // 새 비밀번호와 확인이 일치하는지 확인
+        if (userPass.value !== confirmUserPass.value) {
+          event.preventDefault();
+          alert('새 비밀번호가 일치하지 않습니다.');
+          confirmUserPass.focus();
+          return;
+        }
+
+        // 비밀번호 길이 체크
+        if (userPass.value.length < 8) {
+          event.preventDefault();
+          alert('비밀번호는 8자 이상이어야 합니다.');
+          userPass.focus();
+          return;
+        }
       }
     });
   });
