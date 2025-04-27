@@ -2,6 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.inventory.model.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,7 +36,7 @@ public class Inventory {
     private long disposedStock;
 
     @Column(name = "inventory_expiry_date")
-    private LocalDateTime inventoryExpiryDate;
+    private LocalDate inventoryExpiryDate;
 
     @Column(name = "inventory_created_at")
     private LocalDateTime inventoryCreatedAt;
@@ -45,7 +46,7 @@ public class Inventory {
 
     public Inventory() {}
 
-    public Inventory(long inventoryid, long storageId, long productId, String lotNumber, long locationCode, long availableStock, long allocatedStock, long disposedStock, LocalDateTime inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
+    public Inventory(long inventoryid, long storageId, long productId, String lotNumber, long locationCode, long availableStock, long allocatedStock, long disposedStock, LocalDate inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
         this.inventoryid = inventoryid;
         this.storageId = storageId;
         this.productId = productId;
@@ -123,11 +124,11 @@ public class Inventory {
         this.disposedStock = disposedStock;
     }
 
-    public LocalDateTime getInventoryExpiryDate() {
+    public LocalDate getInventoryExpiryDate() {
         return inventoryExpiryDate;
     }
 
-    public void setInventoryExpiryDate(LocalDateTime inventoryExpiryDate) {
+    public void setInventoryExpiryDate(LocalDate inventoryExpiryDate) {
         this.inventoryExpiryDate = inventoryExpiryDate;
     }
 

@@ -5,10 +5,7 @@ import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryServic
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -40,18 +37,51 @@ public class InventoryController {
         return "inventory/list";
     }
 
-    // 재고 등록 페이지
-    @GetMapping("inventoryAdd")
-    public String inventoryAdd() {
-        return "add";
+
+    // 재고 상세 조회
+    @GetMapping("/detail/{inventoryId}")
+    public ModelAndView inventoryDetail(@PathVariable("inventoryId") Long inventoryId, ModelAndView mv) {
+        InventoryDTO inventory = inventoryService.findInventoryById(inventoryId);
+        mv.addObject("inventory", inventory);
+        mv.setViewName("inventory/detail");
+        return mv;
     }
 
+    // 재고 수정 페이지
+    @GetMapping("/edit/{inventoryId}")
+    public ModelAndView editInventory(@PathVariable("inventoryId") Long inventoryId, ModelAndView mv) {
+        InventoryDTO inventory = inventoryService.findInventoryById(inventoryId);
+        mv.addObject("inventory", inventory);
+        mv.setViewName("inventory/edit");
+        return mv;
+    }
+    
+    // 재고 수정 처리
+    @PostMapping("/edit/{inventoryId}")
+    public String updateInventory(@PathVariable("inventoryId") Long inventoryId, @ModelAttribute InventoryDTO inventoryDTO) {
+        inventoryService.updateInventory(inventoryId, inventoryDTO);
+        return "redirect:/inventory/detail/{inventoryId}";
+    }
+
+    // 재고 삭제
+    @GetMapping("/delete/{inventoryId}")
+    public String deleteInventory(@PathVariable("inventoryId") Long inventoryId) {
+        inventoryService.deleteInventory(inventoryId);
+        return "redirect:/inventory/list";
+    }
 
     // 재고 등록
-    /*@PostMapping("inventoryAdd")
-    public ModelAndView inventoryAdd(InventoryDTO inventoryDTO) {
+    @GetMapping("add")
+    public String inventoryAdd() {
+        return "inventory/add";
+    }
 
-    }*/
+    // 재고 등록
+    @PostMapping("add")
+    public String inventoryAdd(@ModelAttribute InventoryDTO inventoryDTO) {
+        inventoryService.createInventory(inventoryDTO);
+        return "redirect:/inventory/list";
+    }
 
 
 

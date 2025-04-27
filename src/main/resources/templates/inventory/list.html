@@ -292,10 +292,12 @@
       background-color: #fff;
       border: 1px solid #ddd;
       color: #333;
+      text-decoration: none;
     }
     
     .btn-outline:hover {
       background-color: #f5f5f5;
+      text-decoration: none;
     }
     
     .btn-primary {
@@ -637,7 +639,7 @@
           <button class="btn btn-outline">
             <i class="fas fa-upload"></i> 가져오기
           </button>
-          <a th:href="@{/inventoryAdd}" class="btn btn-primary">
+          <a th:href="@{/inventory/add}" class="btn btn-primary">
             <i class="fas fa-plus"></i> 상품 추가
           </a>
         </div>
@@ -649,28 +651,34 @@
         <p class="description">현재 창고에 보관 중인 모든 상품의 재고 현황입니다.</p>
         
         <!-- 필터링 영역 -->
-        <div class="filter-input">
-          <form th:action="@{/inventory/list}" method="get">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="상품 ID 검색..." name="searchProductId"
-                   th:value="${searchProductId}" class="form-control" />
-          </form>
-        </div>
+        <div class="filter-bar">
+          <div class="filter-input">
+            <form th:action="@{/inventory/list}" method="get">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="상품명 검색..." name="searchProductName"
+                     th:value="${searchProductName}" class="form-control" />
+            </form>
+          </div>
           <div class="filter-dropdown">
-            <select name="searchStorageId">
-              <option value="">전체 창고</option>
-              <option value="1">1번 창고</option>
-              <option value="2">2번 창고</option>
-              <option value="3">3번 창고</option>
+            <select name="category">
+              <option value="">전체</option>
+              <option value="상온">상온</option>
+              <option value="냉장">냉장</option>
+              <option value="냉동">냉동</option>
             </select>
           </div>
           <div class="filter-dropdown">
-            <select name="searchLocationCode">
-              <option value="">전체 위치</option>
-              <option value="A">A 구역</option>
-              <option value="B">B 구역</option>
-              <option value="C">C 구역</option>
+            <select name="status">
+              <option value="">전체</option>
+              <option value="정상">정상</option>
+              <option value="부족">부족</option>
+              <option value="폐기">폐기</option>
             </select>
+          </div>
+          <div>
+            <a th:href="@{/inventory/list}" class="btn btn-outline">
+              <i class="fas fa-undo"></i> 초기화
+            </a>
           </div>
         </div>
         
