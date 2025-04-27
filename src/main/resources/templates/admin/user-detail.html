@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>WMS - 사용자 상세</title>
   <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
+  <link rel="stylesheet" href="/common.css?v=1">
   <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
+  <link rel="stylesheet" href="/css/navigation.css?v=1">
   <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin.css?v=1">
   <!-- 폰트어썸 아이콘 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -62,7 +62,7 @@
                       th:classappend="${user.userStatus == '재직중' ? 'status-active' : 
                                       (user.userStatus == '승인대기' ? 'status-pending' : 
                                       (user.userStatus == '승인거부' ? 'status-rejected' :
-                                      (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger')))}"
+                                      (user.userStatus == '휴직중' ? 'status-inactive' : 'status-resigned')))}"
                       th:text="${user.userStatus}">재직중</span>
               </div>
             </div>
@@ -85,19 +85,19 @@
                   
                   <div class="form-group">
                     <label class="form-label">이메일</label>
-                    <input type="email" class="form-control" name="userEmail" th:value="${user.userEmail}" th:readonly="${user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인거부' ? 'readonly-field' : ''}">
+                    <input type="email" class="form-control" name="userEmail" th:value="${user.userEmail}" th:readonly="${user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">전화번호</label>
                     <input type="tel" class="form-control" name="userPhone" th:value="${user.userPhone}" 
                            pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요."
-                           th:readonly="${user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인거부' ? 'readonly-field' : ''}">
+                           th:readonly="${user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">부서</label>
-                    <select class="form-select" name="userPart" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' ? 'readonly-field' : ''}">
+                    <select class="form-select" name="userPart" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
                       <option value="통합" th:selected="${user.userPart == '통합'}">통합</option>
                       <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
                       <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
@@ -111,7 +111,7 @@
                   
                   <div class="form-group">
                     <label class="form-label">직책</label>
-                    <select class="form-select" name="userRole" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' ? 'readonly-field' : ''}">
+                    <select class="form-select" name="userRole" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
                       <option value="사원" th:selected="${user.userRole == '사원'}">사원</option>
                       <option value="매니저" th:selected="${user.userRole == '매니저'}">매니저</option>
                       <option value="관리자" th:selected="${user.userRole == '관리자'}">관리자</option>
@@ -120,7 +120,7 @@
                   
                   <div class="form-group">
                     <label class="form-label">상태</label>
-                    <select class="form-select" name="userStatus" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' ? 'readonly-field' : ''}">
+                    <select class="form-select" name="userStatus" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
                       <option value="승인대기" th:selected="${user.userStatus == '승인대기'}">승인대기</option>
                       <option value="승인거부" th:selected="${user.userStatus == '승인거부'}">승인거부</option>
                       <option value="재직중" th:selected="${user.userStatus == '재직중'}">재직중</option>
@@ -152,30 +152,30 @@
                   <div class="form-group">
                     <label class="form-label">승인 시 부서</label>
                     <select class="form-select" name="approvalPart">
-                      <option value="통합">통합</option>
-                      <option value="입고" selected>입고</option>
-                      <option value="출고">출고</option>
-                      <option value="재고">재고</option>
-                      <option value="반품">반품</option>
-                      <option value="발주">발주</option>
-                      <option value="수주">수주</option>
-                      <option value="상품">상품</option>
+                      <option value="통합" th:selected="${user.userPart == '통합'}">통합</option>
+                      <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
+                      <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
+                      <option value="재고" th:selected="${user.userPart == '재고'}">재고</option>
+                      <option value="반품" th:selected="${user.userPart == '반품'}">반품</option>
+                      <option value="발주" th:selected="${user.userPart == '발주'}">발주</option>
+                      <option value="수주" th:selected="${user.userPart == '수주'}">수주</option>
+                      <option value="상품" th:selected="${user.userPart == '상품'}">상품</option>
                     </select>
                   </div>
                   
                   <div class="form-group">
                     <label class="form-label">승인 시 직책</label>
                     <select class="form-select" name="approvalRole">
-                      <option value="사원" selected>사원</option>
-                      <option value="매니저">매니저</option>
-                      <option value="관리자">관리자</option>
+                      <option value="사원" th:selected="${user.userRole == '사원' || user.userRole == null}">사원</option>
+                      <option value="매니저" th:selected="${user.userRole == '매니저'}">매니저</option>
+                      <option value="관리자" th:selected="${user.userRole == '관리자'}">관리자</option>
                     </select>
                   </div>
                 </div>
               </div>
               
               <div class="form-actions">
-                <button type="submit" class="btn btn-primary" th:if="${user.userStatus != '승인대기' && user.userStatus != '승인거부'}">
+                <button type="submit" class="btn btn-primary" th:if="${user.userStatus != '승인대기' && user.userStatus != '승인거부' && user.userStatus != '퇴사'}">
                   <i class="fas fa-save me-2"></i>변경사항 저장
                 </button>
               </div>

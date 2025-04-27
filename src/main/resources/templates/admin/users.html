@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>WMS - 사용자 관리</title>
   <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
+  <link rel="stylesheet" href="/common.css?v=1">
   <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
+  <link rel="stylesheet" href="/css/navigation.css?v=1">
   <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin.css?v=1">
   <!-- 폰트어썸 아이콘 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -89,7 +89,7 @@
                           th:classappend="${user.userStatus == '재직중' ? 'status-active' :
                                           (user.userStatus == '승인대기' ? 'status-pending' :
                                           (user.userStatus == '승인거부' ? 'status-rejected' :
-                                          (user.userStatus == '휴직중' ? 'status-inactive' : 'status-danger')))}"
+                                          (user.userStatus == '휴직중' ? 'status-inactive' : 'status-resigned')))}"
                           th:text="${user.userStatus}">재직중</span>
                 </td>
                 <td class="actions">

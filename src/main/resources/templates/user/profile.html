@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>WMS - 프로필</title>
   <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
+  <link rel="stylesheet" href="/common.css?v=1">
   <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
+  <link rel="stylesheet" href="/css/navigation.css?v=1">
   <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/profile.css">
+  <link rel="stylesheet" href="/css/profile.css?v=1">
   <!-- 폰트어썸 아이콘 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -94,7 +94,12 @@
                   <i class="fas fa-toggle-on"></i>
                   <span>상태</span>
                 </div>
-                <div class="info-value status-badge" th:text="${user.userStatus}"></div>
+                <div class="info-value status-badge" 
+                     th:classappend="${user.userStatus == '재직중' ? 'status-active' : 
+                                     (user.userStatus == '승인대기' ? 'status-pending' : 
+                                     (user.userStatus == '승인거부' ? 'status-rejected' :
+                                     (user.userStatus == '휴직중' ? 'status-inactive' : 'status-resigned')))}"
+                     th:text="${user.userStatus}"></div>
               </div>
               
               <div class="info-item">
@@ -108,9 +113,16 @@
           </div>
           
           <div class="profile-actions">
-            <a th:href="@{/user/password-verify}" class="btn btn-primary">
+            <!-- 승인대기 상태가 아닌 사용자에게만 정보 수정 버튼 표시 -->
+            <a th:if="${user.userStatus != '승인대기'}" th:href="@{/user/password-verify}" class="btn btn-primary">
               <i class="fas fa-edit me-2"></i>정보 수정
             </a>
+            
+            <!-- 승인대기 상태인 사용자에게 표시되는 메시지 -->
+            <div th:if="${user.userStatus == '승인대기'}" class="alert alert-warning mt-3" role="alert">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>승인 대기 중입니다.</strong> 관리자의 승인 후에 정보 수정이 가능합니다.
+            </div>
           </div>
         </div>
       </div>

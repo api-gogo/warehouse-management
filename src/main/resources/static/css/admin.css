@@ -199,28 +199,39 @@
     font-weight: 600;
 }
 
+/* 재직중: 초록색 계열 - 활성 상태 */
 .status-active {
     background-color: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
-    border: 1px solid var(--color-success);
+    color: #10b981; /* 초록색 */
+    border: 1px solid #10b981;
 }
 
+/* 휴직중: 파란색 계열 - 일시적 비활성 상태 */
 .status-inactive {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: var(--color-danger);
-    border: 1px solid var(--color-danger);
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6; /* 파란색 */
+    border: 1px solid #3b82f6;
 }
 
+/* 승인대기: 노란색 계열 - 대기 상태 */
 .status-pending {
     background-color: rgba(245, 158, 11, 0.1);
-    color: var(--color-warning);
-    border: 1px solid var(--color-warning);
+    color: #f59e0b; /* 노란색 */
+    border: 1px solid #f59e0b;
 }
 
+/* 승인거부: 빨간색 계열 - 거부 상태 */
 .status-rejected {
     background-color: rgba(220, 38, 38, 0.1);
-    color: #dc2626;
+    color: #dc2626; /* 빨간색 */
     border: 1px solid #dc2626;
+}
+
+/* 퇴사: 회색/검정 계열 - 종료 상태 */
+.status-resigned {
+    background-color: rgba(75, 85, 99, 0.1);
+    color: #4b5563; /* 진한 회색 */
+    border: 1px solid #4b5563;
 }
 
 .pending-count {
