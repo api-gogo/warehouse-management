@@ -1,18 +1,29 @@
 package com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class InventoryDTO {
     private Long inventoryId;
+
     private Long storageId;
+
     private Long productId;
+
     private String lotNumber;
+
     private Long locationCode;
+
     private Long availableStock;
+
     private Long allocatedStock;
     private Long disposedStock;
     private LocalDate inventoryExpiryDate;
+
+
     private LocalDateTime inventoryCreatedAt;
     private LocalDateTime inventoryUpdatedAt;
 

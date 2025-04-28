@@ -67,7 +67,7 @@ public class SecurityConfig {
             // 5. 전체 조회, 상세 조회 - 개발 중이므로 일시적으로 모든 사용자에게 허용
             auth.requestMatchers("/storages", "/storages/{id}").permitAll();
             auth.requestMatchers("/shipments", "/shipments/{id}").permitAll();
-            auth.requestMatchers("/inventories", "/inventories/{id}", "/inventories/**").permitAll();
+            auth.requestMatchers("/inventories", "/inventories/{id}").permitAll();
             auth.requestMatchers("/inspections", "/inspections/{id}").permitAll();
             auth.requestMatchers("/returns", "/returns/{id}").permitAll();
             auth.requestMatchers("/purchases", "/purchases/{id}").permitAll();

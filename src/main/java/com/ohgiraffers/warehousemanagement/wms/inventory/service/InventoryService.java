@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,15 +48,15 @@ public class InventoryService {
                 .collect(Collectors.toList());
     }
 
-    public List<InventoryDTO> findAllInventoriesByProductId(String productId) {
-        try {
-            Long searchProductId = Long.parseLong(productId);
-            List<Inventory> findInventories = inventoryRepository.findByProductId(searchProductId);
-            return findInventories.stream()
+    public List<InventoryDTO> findAllInventoriesByProductId(Long productId) {
+        // 실제 존재하는 상품 ID인지 확인
+        Optional<Inventory> inventory = inventoryRepository.findByProductId(productId);
+        if (inventory.isEmpty()) {
+            throw new IllegalArgumentException("해당 상품의 재고가 존재하지 않습니다.");
+        } else {
+            return inventory.stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
-        } catch (NumberFormatException e) {
-            return Collections.emptyList();
         }
     }
 
@@ -63,6 +64,9 @@ public class InventoryService {
         Inventory findInventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new IllegalArgumentException("없는 재고입니다."));
         return convertToDTO(findInventory);
     }
+
+
+
 
     @Transactional
     public void updateInventory(Long inventoryId, InventoryDTO inventoryDTO) {
@@ -90,6 +94,7 @@ public class InventoryService {
 
     @Transactional
     public InventoryDTO createInventory(InventoryDTO inventoryDTO) {
+
         // 현재 시간 설정
         LocalDateTime now = LocalDateTime.now();
 
@@ -114,4 +119,5 @@ public class InventoryService {
         // 저장된 엔티티를 DTO로 변환하여 반환
         return convertToDTO(savedInventory);
     }
+
 }
