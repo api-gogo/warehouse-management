@@ -1,11 +1,11 @@
-package com.ohgiraffers.warehousemanagement.wms.inspection.model;
+package com.ohgiraffers.warehousemanagement.wms.inspection.model.common;
 
 public enum InspectionTransactionType {
-    INSPECTION("상시",1),
-    PURCHASE("발주", 2),
-    SALE("수주",3),
-    STORAGE("입고",4),
-    SHIPMENT("출고",5);
+    INSPECTION("상시",0),
+    PURCHASE("발주", 1), //입고 검수
+    SALES("수주",2), // 출고 검수
+    STORAGE("입고반품",3),
+    SHIPMENT("출고반품",4);
 
     private String transactionType; // 타입 설명
     private Integer typeId; // 타입 번호
@@ -25,10 +25,7 @@ public enum InspectionTransactionType {
 
     @Override
     public String toString() {
-        return "검수 유형{" +
-                "transactionType=" + transactionType +
-                ", typeId=" + typeId +
-                '}';
+        return "검수 유형: " + transactionType;
     }
 
     /**
