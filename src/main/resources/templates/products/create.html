@@ -63,9 +63,9 @@
                 <label for="categoryId" class="form-label">카테고리 *</label>
                 <select id="categoryId" name="categoryId" th:field="*{categoryId}" class="form-select" required>
                   <option value="">카테고리 선택</option>
-                  <option th:each="cat : ${categories}"
-                          th:value="${cat.id}"
-                          th:text="${cat.name}"></option>
+                  <option th:each="category : ${categories}"
+                          th:value="${category.id}"
+                          th:text="${category.fullName}"></option>
                 </select>
                 <div class="form-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">카테고리를 선택해주세요.</div>
               </div>
@@ -73,14 +73,14 @@
               <!-- 거래처 ID 입력 -->
               <div class="form-group">
                 <label for="supplierId" class="form-label">거래처 ID *</label>
-                <input type="number" id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-input" required>
+                <input type="number" id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-input" required min="1" max="2147483647">
                 <div class="form-error" th:if="${#fields.hasErrors('supplierId')}" th:errors="*{supplierId}">거래처 ID를 입력해주세요.</div>
               </div>
 
               <!-- 담당자 ID 입력 -->
               <div class="form-group">
                 <label for="userId" class="form-label">담당자 ID *</label>
-                <input type="number" id="userId" name="userId" th:field="*{userId}" class="form-input" required>
+                <input type="number" id="userId" name="userId" th:field="*{userId}" class="form-input" required min="1" max="2147483647">
                 <div class="form-error" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">담당자 ID를 입력해주세요.</div>
               </div>
 
@@ -103,7 +103,7 @@
               <!-- 박스당 단가 입력 -->
               <div class="form-group">
                 <label for="pricePerBox" class="form-label">박스당 단가 *</label>
-                <input type="number" id="pricePerBox" name="pricePerBox" th:field="*{pricePerBox}" class="form-input" min="0" step="100" required>
+                <input type="number" id="pricePerBox" name="pricePerBox" th:field="*{pricePerBox}" class="form-input" min="0" max="2147483647" step="100" required>
                 <div class="form-hint">박스당 단가를 원 단위로 입력해주세요.</div>
                 <div class="form-error" th:if="${#fields.hasErrors('pricePerBox')}" th:errors="*{pricePerBox}">박스당 단가를 입력해주세요.</div>
               </div>
@@ -111,7 +111,7 @@
               <!-- 박스당 개수 입력 -->
               <div class="form-group">
                 <label for="quantityPerBox" class="form-label">박스당 개수 *</label>
-                <input type="number" id="quantityPerBox" name="quantityPerBox" th:field="*{quantityPerBox}" class="form-input" min="1" required>
+                <input type="number" id="quantityPerBox" name="quantityPerBox" th:field="*{quantityPerBox}" class="form-input" min="1" max="2147483647" required>
                 <div class="form-hint">박스당 포함된 상품의 수량을 입력해주세요.</div>
                 <div class="form-error" th:if="${#fields.hasErrors('quantityPerBox')}" th:errors="*{quantityPerBox}">박스당 개수를 입력해주세요.</div>
               </div>

@@ -1,5 +1,9 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.DTO;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
 public class ProductCreateDTO {
@@ -54,6 +58,9 @@ public class ProductCreateDTO {
         this.categoryId = categoryId;
     }
 
+    @NotNull(message = "공급업체 ID는 필수 입력 항목입니다.")
+    @Min(value = 1, message = "공급업체 ID는 1 이상이어야 합니다.")
+    @Max(value = 2147483647, message = "공급업체 ID는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getSupplierId() {
         return supplierId;
     }
@@ -109,25 +116,25 @@ public class ProductCreateDTO {
         this.storageMethod = storageMethod;
     }
 
+    @NotNull(message = "박스당 단가는 필수 입력 항목입니다.")
+    @Min(value = 0, message = "박스당 단가는 음수일 수 없습니다.")
+    @Max(value = 2147483647, message = "박스당 단가는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getPricePerBox() {
         return pricePerBox;
     }
 
     public void setPricePerBox(Integer pricePerBox) {
-        if (pricePerBox == null) {
-            throw new IllegalArgumentException("박스당 단가는 null일 수 없습니다.");
-        }
         this.pricePerBox = pricePerBox;
     }
 
+    @NotNull(message = "박스당 개수는 필수 입력 항목입니다.")
+    @Min(value = 0, message = "박스당 개수는 음수일 수 없습니다.")
+    @Max(value = 2147483647, message = "박스당 개수는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getQuantityPerBox() {
         return quantityPerBox;
     }
 
     public void setQuantityPerBox(Integer quantityPerBox) {
-        if (quantityPerBox == null) {
-            throw new IllegalArgumentException("박스당 개수는 null일 수 없습니다.");
-        }
         this.quantityPerBox = quantityPerBox;
     }
 

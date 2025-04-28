@@ -37,6 +37,10 @@
             <i class="fas fa-plus"></i>
             신규 상품
           </a>
+          <a th:href="@{/categories}" class="btn btn-outline btn-sm" aria-label="카테고리 관리">
+            <i class="fas fa-list"></i>
+            카테고리 관리
+          </a>
         </div>
       </div>
 
@@ -80,7 +84,7 @@
               <tr th:each="product : ${products}" th:id="'product-' + ${product.productId}">
                 <td class="font-medium" th:text="${product.productId}"></td>
                 <td th:text="${product.productName}"></td>
-                <td th:text="${product.categoryId}"></td>
+                <td th:text="${product.category != null ? product.category.categoryName : '-'}"></td>
                 <td th:text="${product.supplierId}"></td>
                 <td th:text="${product.storageMethod}"></td>
                 <td th:text="${product.expirationDate}"></td>

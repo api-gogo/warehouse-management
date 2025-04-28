@@ -1,19 +1,20 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.DTO;
 
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
+
 import java.time.LocalDateTime;
 
 public class ProductResponseDTO {
 
     private Integer productId;
     private Category category;
-    private Integer supplierId;
+    private Integer supplierId; // Long -> Integer
     private Integer userId;
     private String productName;
     private Integer expirationDate;
     private String storageMethod;
-    private Integer pricePerBox;
-    private Integer quantityPerBox;
+    private Integer pricePerBox; // Long -> Integer
+    private Integer quantityPerBox; // Long -> Integer
     private LocalDateTime productCreatedAt;
     private LocalDateTime productUpdatedAt;
     private LocalDateTime productDeletedAt;
@@ -21,13 +22,12 @@ public class ProductResponseDTO {
 
     public ProductResponseDTO() {}
 
-    public ProductResponseDTO(Integer productId, Integer categoryId, Integer supplierId, Integer userId,
-                                String productName, Integer expirationDate, String storageMethod,
-                                Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
-                                LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
+    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, Integer userId,
+                              String productName, Integer expirationDate, String storageMethod,
+                              Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
+                              LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
         this.productId = productId;
-        this.category = new Category();
-        this.category.setCategoryId(categoryId);
+        this.category = category;
         this.supplierId = supplierId;
         this.userId = userId;
         this.productName = productName;

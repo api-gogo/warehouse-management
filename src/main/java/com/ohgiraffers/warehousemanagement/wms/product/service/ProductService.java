@@ -2,6 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.product.service;
 
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
 import com.ohgiraffers.warehousemanagement.wms.category.model.repository.CategoryRepository;
+import com.ohgiraffers.warehousemanagement.wms.category.service.CategoryService;
 import com.ohgiraffers.warehousemanagement.wms.product.model.DTO.*;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.product.model.repository.ProductRepository;
@@ -11,20 +12,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, CategoryService categoryService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
     // 모든 상품 목록 조회 (페이지네이션 및 검색 지원)
@@ -36,18 +37,21 @@ public class ProductService {
             throw new IllegalArgumentException("페이지 크기는 1 이상이어야 합니다.");
         }
 
-        Pageable pageable = PageRequest.of(page - 1, pageSize);
-        Page<Product> productPage = productRepository.findAll(pageable);
+        // 모든 상품을 먼저 조회
+        List<Product> allProducts = productRepository.findAll();
 
-        String searchKeywordValue = searchKeyword != null && !searchKeyword.trim().isEmpty() ? searchKeyword.trim() : null;
+        String searchKeywordValue = searchKeyword != null && !searchKeyword.trim().isEmpty() ? searchKeyword.trim().toLowerCase() : null;
 
-        List<ProductResponseDTO> filteredProducts = productPage.getContent().stream()
-                .filter(product -> searchKeywordValue == null || product.getProductName().toLowerCase().contains(searchKeywordValue.toLowerCase()))
+        // 검색 조건에 따라 필터링
+        List<ProductResponseDTO> filteredProducts = allProducts.stream()
+                .filter(product -> searchKeywordValue == null || product.getProductName().toLowerCase().contains(searchKeywordValue))
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
 
+        // 페이지네이션 처리
         int totalItems = filteredProducts.size();
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalItems);
         List<ProductResponseDTO> pagedProducts = startIndex < totalItems ? filteredProducts.subList(startIndex, endIndex) : List.of();
@@ -137,21 +141,21 @@ public class ProductService {
 
     // Product 엔티티를 ProductResponseDTO로 변환
     private ProductResponseDTO convertToResponseDTO(Product product) {
-        return new ProductResponseDTO(
-                product.getProductId(),
-                product.getCategory().getCategoryId(),
-                product.getSupplierId(),
-                product.getUser_id(),
-                product.getProductName(),
-                product.getExpirationDate(),
-                product.getStorageMethod(),
-                product.getPricePerBox(),
-                product.getQuantityPerBox(),
-                product.getProductCreatedAt(),
-                product.getProductUpdatedAt(),
-                product.getProductDeletedAt(),
-                product.getDeleted()
-        );
+        ProductResponseDTO dto = new ProductResponseDTO();
+        dto.setProductId(product.getProductId());
+        dto.setCategory(product.getCategory());
+        dto.setSupplierId(product.getSupplierId());
+        dto.setUserId(product.getUser_id());
+        dto.setProductName(product.getProductName());
+        dto.setExpirationDate(product.getExpirationDate());
+        dto.setStorageMethod(product.getStorageMethod());
+        dto.setPricePerBox(product.getPricePerBox());
+        dto.setQuantityPerBox(product.getQuantityPerBox());
+        dto.setProductCreatedAt(product.getProductCreatedAt());
+        dto.setProductUpdatedAt(product.getProductUpdatedAt());
+        dto.setProductDeletedAt(product.getProductDeletedAt());
+        dto.setIsDeleted(product.getDeleted());
+        return dto;
     }
 
     // 입력 데이터 유효성 검사
@@ -174,29 +178,10 @@ public class ProductService {
         if (dto.getStorageMethod() == null || dto.getStorageMethod().trim().isEmpty()) {
             throw new IllegalArgumentException("보관방법은 필수 입력 항목입니다.");
         }
-        if (dto.getPricePerBox() == null || dto.getPricePerBox() < 0) {
-            throw new IllegalArgumentException("박스당 단가는 필수 입력 항목이며 음수일 수 없습니다.");
-        }
-        if (dto.getQuantityPerBox() == null || dto.getQuantityPerBox() < 0) {
-            throw new IllegalArgumentException("박스당 수량은 필수 입력 항목이며 음수일 수 없습니다.");
-        }
     }
 
     // 카테고리 목록 조회
-    /*
     public List<CategoryOptionDTO> getCategories() {
-        return categoryRepository.findAll().stream()
-                .map(category -> new CategoryOptionDTO(category.getCategoryId(), category.getCategoryName()))
-                .collect(Collectors.toList());
-    }
-    */
-
-    // 임시 카테고리 목록 제공 (목 데이터)
-    public List<CategoryOptionDTO> getMockCategories() {
-        return Arrays.asList(
-                new CategoryOptionDTO(1, "전자제품"),
-                new CategoryOptionDTO(2, "식품"),
-                new CategoryOptionDTO(3, "의류")
-        );
+        return categoryService.getChildCategories();
     }
 }

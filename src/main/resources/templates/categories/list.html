@@ -6,761 +6,258 @@
     <title>WMS - 카테고리 관리</title>
     <!-- 폰트어썸 아이콘 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* 변수 정의 */
-        :root {
-            /* 색상 */
-            --color-primary: #3b82f6;
-            --color-primary-hover: #2563eb;
-            --color-secondary: #f3f4f6;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --color-info: #6366f1;
-
-            /* 배경 */
-            --bg-main: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-sidebar: #ffffff;
-            --bg-card: #ffffff;
-            --bg-header: #ffffff;
-
-            /* 텍스트 */
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --text-muted: #9ca3af;
-            --text-sidebar: #4b5563;
-            --text-sidebar-active: #111827;
-
-            /* 테두리 */
-            --border-color: #e5e7eb;
-
-            /* 그림자 */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-            /* 크기 */
-            --border-radius: 0.5rem;
-        }
-
-        /* 다크 모드 */
-        body.dark-mode {
-            --bg-main: #111827;
-            --bg-secondary: #1f2937;
-            --bg-sidebar: #1f2937;
-            --bg-card: #1f2937;
-            --bg-header: #1f2937;
-
-            --text-primary: #f9fafb;
-            --text-secondary: #e5e7eb;
-            --text-muted: #9ca3af;
-            --text-sidebar: #d1d5db;
-            --text-sidebar-active: #f9fafb;
-
-            --border-color: #374151;
-        }
-
-        /* 기본 스타일 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            line-height: 1.5;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: inherit;
-            color: inherit;
-        }
-
-        /* 페이지 콘텐츠 영역 */
-        .page-content {
-            padding: 1.5rem;
-            min-height: 100vh;
-            background-color: var(--bg-secondary);
-            transition: filter 0.3s;
-        }
-
-        /* 모달창 표시 시 배경 흐려짐 효과 */
-        .modal-open .page-content {
-            filter: blur(5px);
-        }
-
-        /* 카드 */
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem;
-        }
-
-        .card-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .card-description {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .card-content {
-            padding: 1rem;
-        }
-
-        /* 버튼 */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 0.25rem;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-primary-hover);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--bg-secondary);
-        }
-
-        .btn-danger {
-            background-color: var(--color-danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-        }
-
-        .btn-icon {
-            padding: 0.5rem;
-        }
-
-        /* 유틸리티 */
-        .flex {
-            display: flex;
-        }
-
-        .items-center {
-            align-items: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .justify-end {
-            justify-content: flex-end;
-        }
-
-        .space-x-2 > * + * {
-            margin-left: 0.5rem;
-        }
-
-        .font-medium {
-            font-weight: 500;
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        /* 폼 스타일 */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: var(--text-primary);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-
-        .form-hint {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        .form-error {
-            font-size: 0.75rem;
-            color: var(--color-danger);
-            margin-top: 0.25rem;
-        }
-
-        /* 테이블 */
-        .table-container {
-            overflow-x: auto;
-            margin-bottom: 1rem;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table th {
-            font-weight: 600;
-            color: var(--text-secondary);
-            background-color: var(--bg-secondary);
-        }
-
-        .table tbody tr:hover {
-            background-color: var(--bg-secondary);
-        }
-
-        .table .font-medium {
-            font-weight: 500;
-        }
-
-        /* 배지 */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.125rem 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            border-radius: 9999px;
-        }
-
-        .badge-outline {
-            border: 1px solid currentColor;
-        }
-
-        .badge-success {
-            color: var(--color-success);
-        }
-
-        .badge-primary {
-            color: var(--color-primary);
-        }
-
-        .badge-warning {
-            color: var(--color-warning);
-        }
-
-        /* 검색 영역 */
-        .filter-area {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            align-items: center;
-        }
-
-        .search-container {
-            position: relative;
-            flex-grow: 0; /* 검색창이 필요 이상으로 늘어나지 않도록 */
-            max-width: 300px; /* 검색창 최대 길이 제한 */
-            width: 100%;
-        }
-
-        .search-container i {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-
-        /* 페이지네이션 */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        .pagination-item {
-            margin: 0 0.25rem;
-        }
-
-        .pagination-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 2rem;
-            height: 2rem;
-            border-radius: 0.25rem;
-            font-size: 0.875rem;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .pagination-link:hover {
-            background-color: var(--bg-secondary);
-        }
-
-        .pagination-link.active {
-            background-color: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-
-        .pagination-link.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        /* 모달 */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-
-        .modal-backdrop.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 1rem;
-        }
-
-        .modal-footer {
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        /* 트리 구조 스타일 */
-        .tree-item {
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .tree-item::before {
-            content: '';
-            position: absolute;
-            left: 0.5rem;
-            top: 0.75rem;
-            width: 0.75rem;
-            height: 1px;
-            background-color: var(--border-color);
-        }
-
-        .tree-item::after {
-            content: '';
-            position: absolute;
-            left: 0.5rem;
-            top: 0;
-            width: 1px;
-            height: 0.75rem;
-            background-color: var(--border-color);
-        }
-
-        .tree-item:last-child::after {
-            display: none;
-        }
-
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .page-content {
-                padding: 1rem;
-            }
-
-            .search-container {
-                max-width: 200px; /* 모바일 화면에서 검색창 길이 축소 */
-            }
-        }
-    </style>
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" href="/common.css?v=1">
+    <!-- 네비게이션 CSS -->
+    <link rel="stylesheet" href="/css/navigation.css?v=1">
+    <!-- 카테고리페이지 css -->
+    <link rel="stylesheet" th:href="@{/css/products/category/categories.css}">
 </head>
 <body>
-<!-- 페이지 콘텐츠 영역 - 카테고리 관리 페이지 -->
-<main class="page-content">
-    <!-- 페이지 제목과 버튼 -->
-    <div class="flex items-center justify-between">
-        <h1 class="page-title">카테고리 관리</h1>
-        <div class="flex items-center space-x-2">
-            <button type="button" class="btn btn-primary" onclick="showAddCategoryModal()">
-                <i class="fas fa-plus"></i>
-                신규 카테고리
-            </button>
-        </div>
-    </div>
+<div class="layout">
+    <!-- 네비게이션 사이드바 포함 -->
+    <div th:replace="~{navigation :: aside(activeMenu='product')}"></div>
 
-    <!-- 카테고리 목록 카드 -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">카테고리 목록</h2>
-            <p class="card-description">등록된 모든 카테고리를 확인하고 관리할 수 있습니다.</p>
-        </div>
-        <div class="card-content">
-            <!-- 검색 폼 -->
-            <form th:action="@{/categories}" method="get" class="filter-area">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="search" name="searchKeyword" placeholder="카테고리명 검색..." class="search-input" th:value="${searchKeyword}">
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+        <!-- 헤더 포함 -->
+        <div th:replace="~{navigation :: header}"></div>
+        <!-- 페이지 콘텐츠 영역 - 카테고리 관리 페이지 -->
+        <main class="page-content">
+            <!-- 페이지 제목과 버튼 -->
+            <div class="flex items-center justify-between">
+                <h1 class="page-title">카테고리 관리</h1>
+                <div class="flex items-center space-x-2">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="showAddCategoryModal()">
+                        <i class="fas fa-plus"></i>
+                        신규 카테고리
+                    </button>
+                    <a th:href="@{/products}" class="btn btn-outline btn-sm" aria-label="상품 관리">
+                        <i class="fas fa-box"></i>
+                        상품 관리
+                    </a>
                 </div>
-                <select name="level" class="form-select" style="width: auto; min-width: 120px;">
-                    <option value="">전체 레벨</option>
-                    <option value="1" th:selected="${level == 1}">대분류</option>
-                    <option value="2" th:selected="${level == 2}">중분류</option>
-                </select>
-                <button type="submit" class="btn btn-outline btn-icon">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
+            </div>
 
-            <!-- 카테고리 목록 테이블 -->
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>카테고리명</th>
-                        <th>레벨</th>
-                        <th>생성일</th>
-                        <th>수정일</th>
-                        <th class="text-right">관리</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="category : ${categories}" th:id="'category-' + ${category.categoryId}">
-                        <td class="font-medium" th:text="${category.categoryId}">1</td>
-                        <td>
-                            <span th:if="${category.level == 1}" th:text="${category.categoryName}" style="font-weight: bold;">전자제품</span>
-                            <span th:if="${category.level == 2}" class="tree-item" th:text="'└ ' + ${category.categoryName}">스마트폰</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-outline"
-                                  th:classappend="${category.level == 1 ? 'badge-primary' : 'badge-warning'}"
-                                  th:text="${category.level == 1 ? '대분류' : '중분류'}">대분류</span>
-                        </td>
-                        <td th:text="${#temporals.format(category.categoryCreatedAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</td>
-                        <td th:text="${category.categoryUpdatedAt != null ? #temporals.format(category.categoryUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
-                        <td class="text-right">
-                            <button type="button" class="btn btn-outline btn-sm edit-btn"
-                                    th:attr="data-id=${category.categoryId},
+            <!-- 카테고리 목록 카드 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">카테고리 목록</h2>
+                    <p class="card-description">등록된 모든 카테고리를 확인하고 관리할 수 있습니다.</p>
+                </div>
+                <div class="card-content">
+                    <!-- 검색 폼 -->
+                    <form th:action="@{/categories}" method="get" class="filter-area">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="search" name="searchKeyword" placeholder="카테고리명 검색..." class="search-input" th:value="${searchKeyword}">
+                        </div>
+                        <select name="level" class="form-select" style="width: auto; min-width: 120px;">
+                            <option value="">전체 레벨</option>
+                            <option value="1" th:selected="${level == 1}">대분류</option>
+                            <option value="2" th:selected="${level == 2}">중분류</option>
+                        </select>
+                        <button type="submit" class="btn btn-outline btn-icon">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+
+                    <!-- 카테고리 목록 테이블 -->
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>카테고리명</th>
+                                <th>레벨</th>
+                                <th>생성일</th>
+                                <th>수정일</th>
+                                <th class="text-right">관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="category : ${categories}" th:id="'category-' + ${category.categoryId}">
+                                <td class="font-medium" th:text="${category.categoryId}">1</td>
+                                <td>
+                                    <span th:if="${category.level == 1}" th:text="${category.categoryName}" style="font-weight: bold;">전자제품</span>
+                                    <span th:if="${category.level == 2}" class="tree-item" th:text="'└ ' + ${category.categoryName}">스마트폰</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-outline"
+                                          th:classappend="${category.level == 1 ? 'badge-primary' : 'badge-warning'}"
+                                          th:text="${category.level == 1 ? '대분류' : '중분류'}">대분류</span>
+                                </td>
+                                <td th:text="${#temporals.format(category.categoryCreatedAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</td>
+                                <td th:text="${category.categoryUpdatedAt != null ? #temporals.format(category.categoryUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                                <td class="text-right">
+                                    <button type="button" class="btn btn-outline btn-sm edit-btn"
+                                            th:attr="data-id=${category.categoryId},
                                              data-name=${category.categoryName},
                                              data-level=${category.level},
                                              data-parent-id=${category.parentId}"
-                                    onclick="showEditCategoryModal(this)">편집</button>
-                            <button type="button" class="btn btn-outline btn-sm"
-                                    th:onclick="'showDeleteCategoryModal(' + ${category.categoryId} + ')'">삭제</button>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(categories)}">
-                        <td colspan="6" style="text-align: center; padding: 2rem;">등록된 카테고리가 없습니다.</td>
-                    </tr>
-                    </tbody>
-                </table>
+                                            onclick="showEditCategoryModal(this)">편집</button>
+                                    <button type="button" class="btn btn-outline btn-sm"
+                                            th:onclick="'showDeleteCategoryModal(' + ${category.categoryId} + ')'">삭제</button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(categories)}">
+                                <td colspan="6" style="text-align: center; padding: 2rem;">등록된 카테고리가 없습니다.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 페이지네이션 -->
+                    <div class="pagination" th:if="${totalPages > 0}">
+                        <div class="pagination-item">
+                            <a th:href="@{/categories(page=1, searchKeyword=${searchKeyword}, level=${level})}"
+                               class="pagination-link" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </div>
+                        <div class="pagination-item">
+                            <a th:href="@{/categories(page=${currentPage - 1}, searchKeyword=${searchKeyword}, level=${level})}"
+                               class="pagination-link" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </div>
+                        <div class="pagination-item" th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                            <a th:href="@{/categories(page=${i}, searchKeyword=${searchKeyword}, level=${level})}"
+                               class="pagination-link" th:classappend="${i == currentPage ? 'active' : ''}">
+                                <span th:text="${i}">1</span>
+                            </a>
+                        </div>
+                        <div class="pagination-item">
+                            <a th:href="@{/categories(page=${currentPage + 1}, searchKeyword=${searchKeyword}, level=${level})}"
+                               class="pagination-link" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </div>
+                        <div class="pagination-item">
+                            <a th:href="@{/categories(page=${totalPages}, searchKeyword=${searchKeyword}, level=${level})}"
+                               class="pagination-link" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </main>
 
-            <!-- 페이지네이션 -->
-            <div class="pagination" th:if="${totalPages > 0}">
-                <div class="pagination-item">
-                    <a th:href="@{/categories(page=1, searchKeyword=${searchKeyword}, level=${level})}"
-                       class="pagination-link" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
-                        <i class="fas fa-angle-double-left"></i>
-                    </a>
+        <!-- 카테고리 추가 모달 -->
+        <div id="addCategoryModal" class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">신규 카테고리 등록</h3>
+                    <button type="button" class="modal-close" onclick="hideAddCategoryModal()">×</button>
                 </div>
-                <div class="pagination-item">
-                    <a th:href="@{/categories(page=${currentPage - 1}, searchKeyword=${searchKeyword}, level=${level})}"
-                       class="pagination-link" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
-                        <i class="fas fa-angle-left"></i>
-                    </a>
+                <div class="modal-body">
+                    <form id="addCategoryForm" th:action="@{/categories/create}" method="post">
+                        <div class="form-group">
+                            <label for="categoryName" class="form-label">카테고리명 *</label>
+                            <input type="text" id="categoryName" name="categoryName" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="level" class="form-label">레벨 *</label>
+                            <select id="level" name="level" class="form-select" required onchange="toggleParentCategorySelect()">
+                                <option value="">레벨 선택</option>
+                                <option value="1">대분류</option>
+                                <option value="2">중분류</option>
+                            </select>
+                            <div class="form-hint">대분류는 최상위 카테고리, 중분류는 대분류 하위 카테고리입니다.</div>
+                        </div>
+
+                        <div class="form-group" id="parentCategoryGroup" style="display: none;">
+                            <label for="parentId" class="form-label">상위 카테고리 *</label>
+                            <select id="parentId" name="parentId" class="form-select">
+                                <option value="">상위 카테고리 선택</option>
+                                <option th:each="parent : ${parentCategories}"
+                                        th:value="${parent.categoryId}"
+                                        th:text="${parent.categoryName}">전자제품</option>
+                            </select>
+                            <div class="form-hint">중분류 카테고리의 경우 상위 카테고리를 선택해주세요.</div>
+                        </div>
+                    </form>
                 </div>
-                <div class="pagination-item" th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                    <a th:href="@{/categories(page=${i}, searchKeyword=${searchKeyword}, level=${level})}"
-                       class="pagination-link" th:classappend="${i == currentPage ? 'active' : ''}">
-                        <span th:text="${i}">1</span>
-                    </a>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="hideAddCategoryModal()">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAddCategoryForm()">등록</button>
                 </div>
-                <div class="pagination-item">
-                    <a th:href="@{/categories(page=${currentPage + 1}, searchKeyword=${searchKeyword}, level=${level})}"
-                       class="pagination-link" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
-                        <i class="fas fa-angle-right"></i>
-                    </a>
+            </div>
+        </div>
+
+        <!-- 카테고리 수정 모달 -->
+        <div id="editCategoryModal" class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">카테고리 수정</h3>
+                    <button type="button" class="modal-close" onclick="hideEditCategoryModal()">×</button>
                 </div>
-                <div class="pagination-item">
-                    <a th:href="@{/categories(page=${totalPages}, searchKeyword=${searchKeyword}, level=${level})}"
-                       class="pagination-link" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
-                        <i class="fas fa-angle-double-right"></i>
-                    </a>
+                <div class="modal-body">
+                    <form id="editCategoryForm" th:action="@{/categories/update}" method="post">
+                        <input type="hidden" id="editCategoryId" name="categoryId">
+
+                        <div class="form-group">
+                            <label for="editCategoryName" class="form-label">카테고리명 *</label>
+                            <input type="text" id="editCategoryName" name="categoryName" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editLevel" class="form-label">레벨 *</label>
+                            <select id="editLevel" name="level" class="form-select" required onchange="toggleEditParentCategorySelect()">
+                                <option value="">레벨 선택</option>
+                                <option value="1">대분류</option>
+                                <option value="2">중분류</option>
+                            </select>
+                            <div class="form-hint">대분류는 최상위 카테고리, 중분류는 대분류 하위 카테고리입니다.</div>
+                        </div>
+
+                        <div class="form-group" id="editParentCategoryGroup" style="display: none;">
+                            <label for="editParentId" class="form-label">상위 카테고리 *</label>
+                            <select id="editParentId" name="parentId" class="form-select">
+                                <option value="">상위 카테고리 선택</option>
+                                <option th:each="parent : ${parentCategories}"
+                                        th:value="${parent.categoryId}"
+                                        th:text="${parent.categoryName}">전자제품</option>
+                            </select>
+                            <div class="form-hint">중분류 카테고리의 경우 상위 카테고리를 선택해주세요.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="hideEditCategoryModal()">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditCategoryForm()">저장</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 카테고리 삭제 확인 모달 -->
+        <div id="deleteCategoryModal" class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">카테고리 삭제 확인</h3>
+                    <button type="button" class="modal-close" onclick="hideDeleteCategoryModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>정말로 이 카테고리를 삭제하시겠습니까?</p>
+                    <p class="form-error" style="margin-top: 1rem;">
+                        하위 카테고리가 있을 경우, 모든 하위 카테고리도 함께 삭제됩니다.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="hideDeleteCategoryModal()">취소</button>
+                    <form id="deleteCategoryForm" th:action="@{/categories/delete}" method="post">
+                        <input type="hidden" id="deleteCategoryId" name="categoryId">
+                        <button type="submit" class="btn btn-danger">삭제</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</main>
-
-<!-- 카테고리 추가 모달 -->
-<div id="addCategoryModal" class="modal-backdrop">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title">신규 카테고리 등록</h3>
-            <button type="button" class="modal-close" onclick="hideAddCategoryModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <form id="addCategoryForm" th:action="@{/categories/create}" method="post">
-                <div class="form-group">
-                    <label for="categoryName" class="form-label">카테고리명 *</label>
-                    <input type="text" id="categoryName" name="categoryName" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="level" class="form-label">레벨 *</label>
-                    <select id="level" name="level" class="form-select" required onchange="toggleParentCategorySelect()">
-                        <option value="">레벨 선택</option>
-                        <option value="1">대분류</option>
-                        <option value="2">중분류</option>
-                    </select>
-                    <div class="form-hint">대분류는 최상위 카테고리, 중분류는 대분류 하위 카테고리입니다.</div>
-                </div>
-
-                <div class="form-group" id="parentCategoryGroup" style="display: none;">
-                    <label for="parentId" class="form-label">상위 카테고리 *</label>
-                    <select id="parentId" name="parentId" class="form-select">
-                        <option value="">상위 카테고리 선택</option>
-                        <option th:each="parent : ${parentCategories}"
-                                th:value="${parent.categoryId}"
-                                th:text="${parent.categoryName}">전자제품</option>
-                    </select>
-                    <div class="form-hint">중분류 카테고리의 경우 상위 카테고리를 선택해주세요.</div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline" onclick="hideAddCategoryModal()">취소</button>
-            <button type="button" class="btn btn-primary" onclick="submitAddCategoryForm()">등록</button>
-        </div>
-    </div>
 </div>
 
-<!-- 카테고리 수정 모달 -->
-<div id="editCategoryModal" class="modal-backdrop">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title">카테고리 수정</h3>
-            <button type="button" class="modal-close" onclick="hideEditCategoryModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <form id="editCategoryForm" th:action="@{/categories/update}" method="post">
-                <input type="hidden" id="editCategoryId" name="categoryId">
-
-                <div class="form-group">
-                    <label for="editCategoryName" class="form-label">카테고리명 *</label>
-                    <input type="text" id="editCategoryName" name="categoryName" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="editLevel" class="form-label">레벨 *</label>
-                    <select id="editLevel" name="level" class="form-select" required onchange="toggleEditParentCategorySelect()">
-                        <option value="">레벨 선택</option>
-                        <option value="1">대분류</option>
-                        <option value="2">중분류</option>
-                    </select>
-                    <div class="form-hint">대분류는 최상위 카테고리, 중분류는 대분류 하위 카테고리입니다.</div>
-                </div>
-
-                <div class="form-group" id="editParentCategoryGroup" style="display: none;">
-                    <label for="editParentId" class="form-label">상위 카테고리 *</label>
-                    <select id="editParentId" name="parentId" class="form-select">
-                        <option value="">상위 카테고리 선택</option>
-                        <option th:each="parent : ${parentCategories}"
-                                th:value="${parent.categoryId}"
-                                th:text="${parent.categoryName}">전자제품</option>
-                    </select>
-                    <div class="form-hint">중분류 카테고리의 경우 상위 카테고리를 선택해주세요.</div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline" onclick="hideEditCategoryModal()">취소</button>
-            <button type="button" class="btn btn-primary" onclick="submitEditCategoryForm()">저장</button>
-        </div>
-    </div>
-</div>
-
-<!-- 카테고리 삭제 확인 모달 -->
-<div id="deleteCategoryModal" class="modal-backdrop">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title">카테고리 삭제 확인</h3>
-            <button type="button" class="modal-close" onclick="hideDeleteCategoryModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <p>정말로 이 카테고리를 삭제하시겠습니까?</p>
-            <p class="form-error" style="margin-top: 1rem;">
-                하위 카테고리가 있을 경우, 모든 하위 카테고리도 함께 삭제됩니다.
-            </p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline" onclick="hideDeleteCategoryModal()">취소</button>
-            <form id="deleteCategoryForm" th:action="@{/categories/delete}" method="post">
-                <input type="hidden" id="deleteCategoryId" name="categoryId">
-                <button type="submit" class="btn btn-danger">삭제</button>
-            </form>
-        </div>
-    </div>
-</div>
-
+<div th:replace="~{navigation :: scripts}"></div>
 <script>
     // 모달창 표시 시 배경 흐려짐 효과 추가
     function toggleModalBackdrop(show) {

@@ -3,9 +3,11 @@ package com.ohgiraffers.warehousemanagement.wms.category.service;
 import com.ohgiraffers.warehousemanagement.wms.category.model.DTO.CategoryDTO;
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
 import com.ohgiraffers.warehousemanagement.wms.category.model.repository.CategoryRepository;
+import com.ohgiraffers.warehousemanagement.wms.product.model.DTO.CategoryOptionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -233,6 +235,19 @@ public class CategoryService {
     public List<CategoryDTO> getParentCategories() {
         return categoryRepository.findByLevel(1).stream()
                 .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 중분류 카테고리 목록 조회 (level 2), 대분류 이름 포함
+    public List<CategoryOptionDTO> getChildCategories() {
+        List<Category> childCategories = categoryRepository.findByLevel(2);
+        Map<Integer, String> parentCategoryMap = getParentCategoryMap();
+
+        return childCategories.stream()
+                .map(category -> {
+                    String parentName = category.getParentId() != null ? parentCategoryMap.get(category.getParentId()) : null;
+                    return new CategoryOptionDTO(category.getCategoryId(), category.getCategoryName(), parentName);
+                })
                 .collect(Collectors.toList());
     }
 
