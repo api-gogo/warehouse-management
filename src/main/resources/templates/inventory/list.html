@@ -655,8 +655,8 @@
           <div class="filter-input">
             <form th:action="@{/inventory/list}" method="get">
               <i class="fas fa-search"></i>
-              <input type="text" placeholder="상품명 검색..." name="searchProductName"
-                     th:value="${searchProductName}" class="form-control" />
+              <input type="text" placeholder="상품명 검색..." name="searchProductId"
+                     th:value="${searchProductId}" class="form-control" />
             </form>
           </div>
           <div class="filter-dropdown">
@@ -667,14 +667,16 @@
               <option value="냉동">냉동</option>
             </select>
           </div>
-          <div class="filter-dropdown">
-            <select name="status">
-              <option value="">전체</option>
-              <option value="정상">정상</option>
-              <option value="부족">부족</option>
-              <option value="폐기">폐기</option>
-            </select>
-          </div>
+          <form id="inventoryFilterForm" action="/inventory/search" method="get">
+            <div class="filter-dropdown">
+              <select name="status" id="status" onchange="this.form.submit()">
+                <option value="">전체</option>
+                <option value="정상">정상</option>
+                <option value="부족">부족</option>
+                <option value="폐기">폐기</option>
+              </select>
+            </div>
+          </form>
           <div>
             <a th:href="@{/inventory/list}" class="btn btn-outline">
               <i class="fas fa-undo"></i> 초기화
