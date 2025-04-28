@@ -2,7 +2,6 @@ package com.ohgiraffers.warehousemanagement.wms.returning.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnShipmentDTO;
 import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturningService;
-import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipments;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,10 +27,10 @@ public class ReturningController {
     //(반품서) 전체 조회
     //getALlReturning메서드 호출해서 데이터들(List) 받아오기
     @GetMapping
-    public ModelAndView getALlReturning(ModelAndView mv) {
+    public ModelAndView getALLReturning(ModelAndView mv) {
 
-       //서비스의 getALlReturning 호출
-                 List<ReturnShipmentDTO> rsDTOs =  returningService.getALlReturning();
+       //서비스의 getALLReturning 호출
+                 List<ReturnShipmentDTO> rsDTOs =  returningService.getALLReturning();
                  mv.addObject("findAll", rsDTOs);
                  mv.setViewName("returns/outbound/returningList");
 
@@ -40,14 +39,14 @@ public class ReturningController {
 
     //등록 화면 - 신규반품(뷰 화면 필요 - html필요)
     @GetMapping("/regist")
-    public String RegistView(){
+    public String registView(){
         return "returns/outbound/regist_return";
     } //returning/regist_return.html에 등록할 정보들 담기
 
     //등록 --> 등록일 달아주기, 리다이렉트로 다시 돌아가기..
     @PostMapping("/regist")
-    public String CreateReturning(@ModelAttribute ReturnShipmentDTO returnShipmentDTO) {
-        ReturnShipmentDTO rsDTO = returningService.CreateReturning(returnShipmentDTO); //담기만 한 상태
+    public String createReturning(@ModelAttribute ReturnShipmentDTO returnShipmentDTO) {
+        ReturnShipmentDTO rsDTO = returningService.createReturning(returnShipmentDTO); //담기만 한 상태
 
         return "redirect:/returns/outbound/"+rsDTO.getReturnShipmentId(); //흠..********** 로직도 추가
         //자동으로 returing/detail을 랜더링해서 해당id의 상세조회 주소로 다시 리다이렉트 해줌(작성된 양식들은 삭제)
@@ -105,7 +104,7 @@ public class ReturningController {
 
     //수정 화면 - html필요
     @GetMapping("/{return_shipment_id}/update_view")
-    public ModelAndView UpdateReturningById(@PathVariable("return_shipment_id") Integer returnShipmentId, ModelAndView mv)
+    public ModelAndView updateReturningById(@PathVariable("return_shipment_id") Integer returnShipmentId, ModelAndView mv)
     {
             ReturnShipmentDTO returnShipmentDTO = returningService.getReturningById(returnShipmentId);
             returnShipmentDTO.setReturnShipmentId(returnShipmentId);

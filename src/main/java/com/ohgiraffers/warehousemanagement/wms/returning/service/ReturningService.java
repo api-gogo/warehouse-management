@@ -23,7 +23,6 @@ public class ReturningService {
 
     private static final Logger log = LoggerFactory.getLogger(ReturningService.class);
     private final ReturnShipmentRepository returnShipmentRepository;
-    private final ShipmentsRepository shipmentsRepository;
 
     @Autowired
     public ReturningService(ReturnShipmentRepository returnShipmentRepository, ShipmentsRepository shipmentsRepository) { //엔티티를 반환
@@ -32,7 +31,7 @@ public class ReturningService {
     }
 
     //전체조회
-    public List<ReturnShipmentDTO> getALlReturning() {//엔티티 리스트로 받기
+    public List<ReturnShipmentDTO> getALLReturning() {//엔티티 리스트로 받기
 
             List<ReturnShipment> rss = returnShipmentRepository.findAll(); //엔티티로 받기
             List<ReturnShipmentDTO> rsDTOs = new ArrayList<>();
@@ -61,7 +60,7 @@ public class ReturningService {
 
     //등록
     @Transactional
-    public ReturnShipmentDTO CreateReturning(ReturnShipmentDTO returnShipmentDTO) {
+    public ReturnShipmentDTO createReturning(ReturnShipmentDTO returnShipmentDTO) {
 
         ReturnShipment returnShipment = returnShipmentRepository.findById(returnShipmentDTO.getReturnShipmentId())
                 .orElseThrow(() -> new RuntimeException("Shipment not found"));
