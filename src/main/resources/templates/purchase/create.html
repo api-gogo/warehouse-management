@@ -481,8 +481,8 @@
                                     <td>
                                         <select th:field="*{items[__${itemStat.index}__].productId}" class="form-control product-select" required onchange="updateProductInfo(this)">
                                             <option value="">상품 선택</option>
-                                            <option th:each="product : ${products}" 
-                                                    th:value="${product.id}" 
+                                            <option th:each="product : ${products}"
+                                                    th:value="${product.id}"
                                                     th:text="${product.name}"
                                                     th:data-category="${product.category}"
                                                     th:data-price="${product.price}">

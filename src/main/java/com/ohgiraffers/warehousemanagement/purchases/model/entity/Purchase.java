@@ -1,4 +1,4 @@
-package com.ohgiraffers.warehousemanagement.model.entity;
+package com.ohgiraffers.warehousemanagement.purchases.model.entity;
 
 import jakarta.persistence.*;
 
@@ -24,6 +24,7 @@ public class Purchase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "purchase_id")
     private Integer purchaseId;
 
     // 발주 담당자

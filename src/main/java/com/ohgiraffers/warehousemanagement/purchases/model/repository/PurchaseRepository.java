@@ -1,7 +1,7 @@
-package com.ohgiraffers.warehousemanagement.model.repository;
+package com.ohgiraffers.warehousemanagement.purchases.model.repository;
 
-import com.ohgiraffers.warehousemanagement.model.entity.Purchase;
-import com.ohgiraffers.warehousemanagement.model.entity.PurchaseStatus;
+import com.ohgiraffers.warehousemanagement.purchases.model.entity.Purchase;
+import com.ohgiraffers.warehousemanagement.purchases.model.entity.PurchaseStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

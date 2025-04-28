@@ -1,4 +1,4 @@
-package com.ohgiraffers.warehousemanagement.model.dto;
+package com.ohgiraffers.warehousemanagement.purchases.model.dto;
 
 
 import java.time.LocalDate;
