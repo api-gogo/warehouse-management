@@ -1,10 +1,10 @@
-package com.ohgiraffers.warehousemanagement.purchases.controller;
+package com.ohgiraffers.warehousemanagement.wms.purchases.controller;
 
 
-import com.ohgiraffers.warehousemanagement.purchases.model.dto.PurchaseDTO;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseDTO;
 
-import com.ohgiraffers.warehousemanagement.purchases.model.entity.PurchaseStatus;
-import com.ohgiraffers.warehousemanagement.purchases.service.PurchaseService;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseStatus;
+import com.ohgiraffers.warehousemanagement.wms.purchases.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;

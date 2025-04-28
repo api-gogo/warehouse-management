@@ -1,10 +1,10 @@
-package com.ohgiraffers.warehousemanagement.purchases.service;
+package com.ohgiraffers.warehousemanagement.wms.purchases.service;
 
 
-import com.ohgiraffers.warehousemanagement.purchases.model.dto.PurchaseDTO;
-import com.ohgiraffers.warehousemanagement.purchases.model.entity.Purchase;
-import com.ohgiraffers.warehousemanagement.purchases.model.entity.PurchaseStatus;
-import com.ohgiraffers.warehousemanagement.purchases.model.repository.PurchaseRepository;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseDTO;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseStatus;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

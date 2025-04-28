@@ -1,4 +1,4 @@
-package com.ohgiraffers.warehousemanagement.purchases.model.entity;
+package com.ohgiraffers.warehousemanagement.wms.purchases.model.entity;
 
 public enum PurchaseStatus {
     대기("발주대기"),

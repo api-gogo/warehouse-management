@@ -1,4 +1,4 @@
-package com.ohgiraffers.warehousemanagement.purchases.model.entity;
+package com.ohgiraffers.warehousemanagement.wms.purchases.model.entity;
 
 import jakarta.persistence.*;
 
