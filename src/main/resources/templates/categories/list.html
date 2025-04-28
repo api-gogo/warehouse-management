@@ -99,6 +99,12 @@
             padding: 1.5rem;
             min-height: 100vh;
             background-color: var(--bg-secondary);
+            transition: filter 0.3s;
+        }
+
+        /* 모달창 표시 시 배경 흐려짐 효과 */
+        .modal-open .page-content {
+            filter: blur(5px);
         }
 
         /* 카드 */
@@ -338,11 +344,14 @@
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1rem;
+            align-items: center;
         }
 
         .search-container {
             position: relative;
-            flex-grow: 1;
+            flex-grow: 0; /* 검색창이 필요 이상으로 늘어나지 않도록 */
+            max-width: 300px; /* 검색창 최대 길이 제한 */
+            width: 100%;
         }
 
         .search-container i {
@@ -474,7 +483,7 @@
             gap: 0.5rem;
         }
 
-        /* 트리 구조 */
+        /* 트리 구조 스타일 */
         .tree-item {
             padding-left: 1.5rem;
             position: relative;
@@ -515,6 +524,10 @@
             .page-content {
                 padding: 1rem;
             }
+
+            .search-container {
+                max-width: 200px; /* 모바일 화면에서 검색창 길이 축소 */
+            }
         }
     </style>
 </head>
@@ -525,10 +538,10 @@
     <div class="flex items-center justify-between">
         <h1 class="page-title">카테고리 관리</h1>
         <div class="flex items-center space-x-2">
-            <a th:href="@{/categories/create}" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" onclick="showAddCategoryModal()">
                 <i class="fas fa-plus"></i>
                 신규 카테고리
-            </a>
+            </button>
         </div>
     </div>
 
@@ -563,7 +576,6 @@
                         <th>ID</th>
                         <th>카테고리명</th>
                         <th>레벨</th>
-                        <th>상위 카테고리</th>
                         <th>생성일</th>
                         <th>수정일</th>
                         <th class="text-right">관리</th>
@@ -573,26 +585,29 @@
                     <tr th:each="category : ${categories}" th:id="'category-' + ${category.categoryId}">
                         <td class="font-medium" th:text="${category.categoryId}">1</td>
                         <td>
-                            <span th:if="${category.level == 1}" th:text="${category.categoryName}">전자제품</span>
-                            <span th:if="${category.level == 2}" class="tree-item" th:text="${category.categoryName}">스마트폰</span>
+                            <span th:if="${category.level == 1}" th:text="${category.categoryName}" style="font-weight: bold;">전자제품</span>
+                            <span th:if="${category.level == 2}" class="tree-item" th:text="'└ ' + ${category.categoryName}">스마트폰</span>
                         </td>
                         <td>
-                  <span class="badge badge-outline"
-                        th:classappend="${category.level == 1 ? 'badge-primary' : 'badge-warning'}"
-                        th:text="${category.level == 1 ? '대분류' : '중분류'}">대분류</span>
+                            <span class="badge badge-outline"
+                                  th:classappend="${category.level == 1 ? 'badge-primary' : 'badge-warning'}"
+                                  th:text="${category.level == 1 ? '대분류' : '중분류'}">대분류</span>
                         </td>
-                        <td th:text="${category.parentId != null ? parentCategoryMap[category.parentId] : '-'}">-</td>
                         <td th:text="${#temporals.format(category.categoryCreatedAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</td>
                         <td th:text="${category.categoryUpdatedAt != null ? #temporals.format(category.categoryUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
                         <td class="text-right">
-                            <button type="button" class="btn btn-outline btn-sm"
-                                    th:onclick="'showEditCategoryModal(' + ${category.categoryId} + ')'">편집</button>
+                            <button type="button" class="btn btn-outline btn-sm edit-btn"
+                                    th:attr="data-id=${category.categoryId},
+                                             data-name=${category.categoryName},
+                                             data-level=${category.level},
+                                             data-parent-id=${category.parentId}"
+                                    onclick="showEditCategoryModal(this)">편집</button>
                             <button type="button" class="btn btn-outline btn-sm"
                                     th:onclick="'showDeleteCategoryModal(' + ${category.categoryId} + ')'">삭제</button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(categories)}">
-                        <td colspan="7" style="text-align: center; padding: 2rem;">등록된 카테고리가 없습니다.</td>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">등록된 카테고리가 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -635,6 +650,49 @@
     </div>
 </main>
 
+<!-- 카테고리 추가 모달 -->
+<div id="addCategoryModal" class="modal-backdrop">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">신규 카테고리 등록</h3>
+            <button type="button" class="modal-close" onclick="hideAddCategoryModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="addCategoryForm" th:action="@{/categories/create}" method="post">
+                <div class="form-group">
+                    <label for="categoryName" class="form-label">카테고리명 *</label>
+                    <input type="text" id="categoryName" name="categoryName" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="level" class="form-label">레벨 *</label>
+                    <select id="level" name="level" class="form-select" required onchange="toggleParentCategorySelect()">
+                        <option value="">레벨 선택</option>
+                        <option value="1">대분류</option>
+                        <option value="2">중분류</option>
+                    </select>
+                    <div class="form-hint">대분류는 최상위 카테고리, 중분류는 대분류 하위 카테고리입니다.</div>
+                </div>
+
+                <div class="form-group" id="parentCategoryGroup" style="display: none;">
+                    <label for="parentId" class="form-label">상위 카테고리 *</label>
+                    <select id="parentId" name="parentId" class="form-select">
+                        <option value="">상위 카테고리 선택</option>
+                        <option th:each="parent : ${parentCategories}"
+                                th:value="${parent.categoryId}"
+                                th:text="${parent.categoryName}">전자제품</option>
+                    </select>
+                    <div class="form-hint">중분류 카테고리의 경우 상위 카테고리를 선택해주세요.</div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="hideAddCategoryModal()">취소</button>
+            <button type="button" class="btn btn-primary" onclick="submitAddCategoryForm()">등록</button>
+        </div>
+    </div>
+</div>
+
 <!-- 카테고리 수정 모달 -->
 <div id="editCategoryModal" class="modal-backdrop">
     <div class="modal">
@@ -643,7 +701,7 @@
             <button type="button" class="modal-close" onclick="hideEditCategoryModal()">×</button>
         </div>
         <div class="modal-body">
-            <form id="editCategoryForm" th:action="@{/categories/edit}" method="post">
+            <form id="editCategoryForm" th:action="@{/categories/update}" method="post">
                 <input type="hidden" id="editCategoryId" name="categoryId">
 
                 <div class="form-group">
@@ -689,8 +747,8 @@
         </div>
         <div class="modal-body">
             <p>정말로 이 카테고리를 삭제하시겠습니까?</p>
-            <p id="deleteCategoryWarning" class="form-error" style="margin-top: 1rem; display: none;">
-                이 카테고리에는 하위 카테고리가 있습니다. 삭제 시 모든 하위 카테고리도 함께 삭제됩니다.
+            <p class="form-error" style="margin-top: 1rem;">
+                하위 카테고리가 있을 경우, 모든 하위 카테고리도 함께 삭제됩니다.
             </p>
         </div>
         <div class="modal-footer">
@@ -704,58 +762,82 @@
 </div>
 
 <script>
+    // 모달창 표시 시 배경 흐려짐 효과 추가
+    function toggleModalBackdrop(show) {
+        if (show) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+    }
+
+    // 카테고리 추가 모달 표시
+    function showAddCategoryModal() {
+        document.getElementById('addCategoryModal').classList.add('show');
+        document.getElementById('addCategoryForm').reset();
+        document.getElementById('parentCategoryGroup').style.display = 'none';
+        toggleModalBackdrop(true);
+    }
+
+    // 카테고리 추가 모달 숨기기
+    function hideAddCategoryModal() {
+        document.getElementById('addCategoryModal').classList.remove('show');
+        toggleModalBackdrop(false);
+    }
+
     // 카테고리 수정 모달 표시
-    function showEditCategoryModal(categoryId) {
-        // AJAX로 카테고리 정보 가져오기
-        fetch(`/categories/${categoryId}/json`)
-            .then(response => response.json())
-            .then(category => {
-                document.getElementById('editCategoryId').value = category.categoryId;
-                document.getElementById('editCategoryName').value = category.categoryName;
-                document.getElementById('editLevel').value = category.level;
+    function showEditCategoryModal(button) {
+        const categoryId = button.getAttribute('data-id');
+        const categoryName = button.getAttribute('data-name');
+        const level = button.getAttribute('data-level');
+        const parentId = button.getAttribute('data-parent-id');
 
-                if (category.level == 2) {
-                    document.getElementById('editParentCategoryGroup').style.display = 'block';
-                    document.getElementById('editParentId').value = category.parentId;
-                } else {
-                    document.getElementById('editParentCategoryGroup').style.display = 'none';
-                }
+        document.getElementById('editCategoryId').value = categoryId;
+        document.getElementById('editCategoryName').value = categoryName;
+        document.getElementById('editLevel').value = level;
 
-                document.getElementById('editCategoryModal').classList.add('show');
-            });
+        if (level == '2') {
+            document.getElementById('editParentCategoryGroup').style.display = 'block';
+            document.getElementById('editParentId').value = parentId === 'null' ? '' : parentId;
+        } else {
+            document.getElementById('editParentCategoryGroup').style.display = 'none';
+        }
+
+        document.getElementById('editCategoryModal').classList.add('show');
+        toggleModalBackdrop(true);
     }
 
     // 카테고리 수정 모달 숨기기
     function hideEditCategoryModal() {
         document.getElementById('editCategoryModal').classList.remove('show');
+        toggleModalBackdrop(false);
     }
 
     // 카테고리 삭제 확인 모달 표시
     function showDeleteCategoryModal(categoryId) {
-        // AJAX로 카테고리 정보 가져오기
-        fetch(`/categories/${categoryId}/json`)
-            .then(response => response.json())
-            .then(category => {
-                document.getElementById('deleteCategoryId').value = category.categoryId;
-
-                // 하위 카테고리 확인
-                fetch(`/categories/check-children/${categoryId}`)
-                    .then(response => response.json())
-                    .then(hasChildren => {
-                        if (hasChildren) {
-                            document.getElementById('deleteCategoryWarning').style.display = 'block';
-                        } else {
-                            document.getElementById('deleteCategoryWarning').style.display = 'none';
-                        }
-                    });
-
-                document.getElementById('deleteCategoryModal').classList.add('show');
-            });
+        document.getElementById('deleteCategoryId').value = categoryId;
+        document.getElementById('deleteCategoryModal').classList.add('show');
+        toggleModalBackdrop(true);
     }
 
     // 카테고리 삭제 확인 모달 숨기기
     function hideDeleteCategoryModal() {
         document.getElementById('deleteCategoryModal').classList.remove('show');
+        toggleModalBackdrop(false);
+    }
+
+    // 레벨 선택에 따라 상위 카테고리 선택 표시/숨김
+    function toggleParentCategorySelect() {
+        const levelSelect = document.getElementById('level');
+        const parentCategoryGroup = document.getElementById('parentCategoryGroup');
+
+        if (levelSelect.value == '2') {
+            parentCategoryGroup.style.display = 'block';
+            document.getElementById('parentId').setAttribute('required', 'required');
+        } else {
+            parentCategoryGroup.style.display = 'none';
+            document.getElementById('parentId').removeAttribute('required');
+        }
     }
 
     // 수정 모달에서 레벨 선택에 따라 상위 카테고리 선택 표시/숨김
@@ -770,6 +852,20 @@
             parentCategoryGroup.style.display = 'none';
             document.getElementById('editParentId').removeAttribute('required');
         }
+    }
+
+    // 카테고리 추가 폼 제출
+    function submitAddCategoryForm() {
+        const form = document.getElementById('addCategoryForm');
+
+        // 유효성 검사
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        // 폼 제출
+        form.submit();
     }
 
     // 카테고리 수정 폼 제출
@@ -789,6 +885,7 @@
     // ESC 키로 모달 닫기
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
+            hideAddCategoryModal();
             hideEditCategoryModal();
             hideDeleteCategoryModal();
         }
@@ -799,6 +896,7 @@
         modal.addEventListener('click', function(event) {
             if (event.target === this) {
                 this.classList.remove('show');
+                toggleModalBackdrop(false);
             }
         });
     });
