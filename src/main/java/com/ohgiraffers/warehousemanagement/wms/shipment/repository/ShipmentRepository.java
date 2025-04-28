@@ -1,4 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.shipment.repository;
 
-public interface ShipmentRepository {
+import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ShipmentRepository extends JpaRepository<Shipment, Integer> {
 }
