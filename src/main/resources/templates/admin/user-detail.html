@@ -7,6 +7,7 @@
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/admin/user-detail.css">
   </th:block>
 </head>
 <body>
@@ -21,13 +22,22 @@
           <h1 class="admin-title">사용자 상세 정보</h1>
         </div>
 
-        <div class="admin-actions" th:if="${user.userStatus == '승인대기'}">
-          <button class="btn btn-success approve-button" th:data-id="${user.userId}">
-            <i class="fas fa-check me-2"></i>승인
-          </button>
-          <button class="btn btn-danger reject-button" th:data-id="${user.userId}">
-            <i class="fas fa-times me-2"></i>거부
-          </button>
+        <div class="admin-actions">
+          <!-- 승인 대기 상태의 경우 승인/거부 버튼 표시 -->
+          <div th:if="${user.userStatus == '승인대기'}" class="action-buttons">
+            <button class="btn btn-success approve-button" th:data-id="${user.userId}">
+              <i class="fas fa-check me-2"></i>승인
+            </button>
+            <button class="btn btn-danger reject-button" th:data-id="${user.userId}">
+              <i class="fas fa-times me-2"></i>거부
+            </button>
+          </div>
+          <!-- 재직중, 휴직중 상태의 경우 수정 버튼 표시 -->
+          <div th:if="${user.userStatus == '재직중' || user.userStatus == '휴직중'}">
+            <a th:href="@{/admin/users/{id}/edit(id=${user.userId})}" class="btn btn-primary">
+              <i class="fas fa-edit me-2"></i>수정
+            </a>
+          </div>
         </div>
       </div>
 
@@ -51,120 +61,160 @@
         </div>
 
         <div class="user-detail-sections">
-          <form th:action="@{/admin/users/{id}(id=${user.userId})}" method="post" id="userUpdateForm">
-            <input type="hidden" name="_method" value="patch" />
-            <div class="detail-section">
-              <h3 class="section-title">기본 정보</h3>
+          <!-- 기본 정보 섹션 -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <i class="fas fa-info-circle"></i>기본 정보
+            </h3>
+            <div class="info-grid">
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group field-name">
+                    <label class="form-label">이름</label>
+                    <p class="form-control-static" th:text="${user.userName}"></p>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group field-code">
+                    <label class="form-label">사원번호</label>
+                    <p class="form-control-static" th:text="${user.userCode}"></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group field-email">
+                    <label class="form-label">이메일</label>
+                    <p class="form-control-static" th:text="${user.userEmail}"></p>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group field-phone">
+                    <label class="form-label">전화번호</label>
+                    <p class="form-control-static" th:text="${user.userPhone}"></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group field-part">
+                    <label class="form-label">부서</label>
+                    <p class="form-control-static" th:text="${user.userPart}"></p>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group field-role">
+                    <label class="form-label">직책</label>
+                    <p class="form-control-static" th:text="${user.userRole}"></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group field-status">
+                    <label class="form-label">상태</label>
+                    <p class="form-control-static" th:text="${user.userStatus}"></p>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group field-date">
+                    <label class="form-label">가입일</label>
+                    <p class="form-control-static" th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}"></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group field-date">
+                    <label class="form-label">최종 수정일</label>
+                    <p class="form-control-static" th:text="${user.userUpdatedAt != null ? #temporals.format(user.userUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}"></p>
+                  </div>
+                </div>
+                <div class="form-col" th:if="${user.userDeletedAt != null}">
+                  <div class="form-group field-date">
+                    <label class="form-label">삭제일</label>
+                    <p class="form-control-static" th:text="${#temporals.format(user.userDeletedAt, 'yyyy-MM-dd HH:mm')}"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 승인 정보 섹션 (승인 대기 상태일 때만 표시) -->
+          <div class="detail-section" th:if="${user.userStatus == '승인대기'}">
+            <h3 class="section-title">
+              <i class="fas fa-user-check"></i>승인 정보
+            </h3>
+            <div class="approval-section">
+              <p class="section-description">승인 시 부서와 직책을 선택해주세요.</p>
+              
               <div class="info-grid">
-                <div class="form-group">
-                  <label class="form-label">이름</label>
-                  <input type="text" class="form-control readonly-field" th:value="${user.userName}" readonly>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">사원번호</label>
-                  <input type="text" class="form-control readonly-field" th:value="${user.userCode}" readonly>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">이메일</label>
-                  <input type="email" class="form-control" name="userEmail" th:value="${user.userEmail}" th:readonly="${user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">전화번호</label>
-                  <input type="tel" class="form-control" name="userPhone" th:value="${user.userPhone}"
-                         pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요."
-                         th:readonly="${user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">부서</label>
-                  <select class="form-select" name="userPart" id="userPartSelect" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
-                    <option value="통합" th:selected="${user.userPart == '통합'}">통합</option>
-                    <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
-                    <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
-                    <option value="재고" th:selected="${user.userPart == '재고'}">재고</option>
-                    <option value="검수" th:selected="${user.userPart == '검수'}">검수</option>
-                    <option value="반품" th:selected="${user.userPart == '반품'}">반품</option>
-                    <option value="발주" th:selected="${user.userPart == '발주'}">발주</option>
-                    <option value="수주" th:selected="${user.userPart == '수주'}">수주</option>
-                    <option value="상품" th:selected="${user.userPart == '상품'}">상품</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">직책</label>
-                  <select class="form-select" name="userRole" id="userRoleSelect" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
-                    <option value="사원" th:selected="${user.userRole == '사원'}">사원</option>
-                    <option value="매니저" th:selected="${user.userRole == '매니저'}">매니저</option>
-                    <option value="관리자" th:selected="${user.userRole == '관리자'}">관리자</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">상태</label>
-                  <select class="form-select" name="userStatus" th:disabled="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사'}" th:classappend="${user.userStatus == '승인대기' || user.userStatus == '승인거부' || user.userStatus == '퇴사' ? 'readonly-field' : ''}">
-                    <option value="승인대기" th:selected="${user.userStatus == '승인대기'}">승인대기</option>
-                    <option value="승인거부" th:selected="${user.userStatus == '승인거부'}">승인거부</option>
-                    <option value="재직중" th:selected="${user.userStatus == '재직중'}">재직중</option>
-                    <option value="휴직중" th:selected="${user.userStatus == '휴직중'}">휴직중</option>
-                    <option value="퇴사" th:selected="${user.userStatus == '퇴사'}">퇴사</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">가입일</label>
-                  <input type="text" class="form-control readonly-field" th:value="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}" readonly>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">최종 수정일</label>
-                  <input type="text" class="form-control readonly-field" th:value="${user.userUpdatedAt != null ? #temporals.format(user.userUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}" readonly>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">삭제일</label>
-                  <input type="text" class="form-control readonly-field" th:value="${user.userDeletedAt != null ? #temporals.format(user.userDeletedAt, 'yyyy-MM-dd HH:mm') : '-'}" readonly>
+                <div class="form-row">
+                  <div class="form-col">
+                    <div class="form-group field-part">
+                      <label class="form-label">승인 시 부서</label>
+                      <select class="form-select" id="approvalPartSelect">
+                        <option value="통합">통합</option>
+                        <option value="입고">입고</option>
+                        <option value="출고">출고</option>
+                        <option value="재고">재고</option>
+                        <option value="검수">검수</option>
+                        <option value="반품">반품</option>
+                        <option value="발주">발주</option>
+                        <option value="수주">수주</option>
+                        <option value="상품">상품</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-col">
+                    <div class="form-group field-role">
+                      <label class="form-label">승인 시 직책</label>
+                      <select class="form-select" id="approvalRoleSelect">
+                        <option value="사원">사원</option>
+                        <option value="매니저">매니저</option>
+                        <option value="관리자">관리자</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="detail-section" th:if="${user.userStatus == '승인대기'}">
-              <h3 class="section-title">승인 정보</h3>
-              <div class="info-grid approval-section">
-                <div class="form-group">
-                  <label class="form-label">승인 시 부서</label>
-                  <select class="form-select" name="approvalPart" id="approvalPartSelect">
-                    <option value="통합" th:selected="${user.userPart == '통합'}">통합</option>
-                    <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
-                    <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
-                    <option value="재고" th:selected="${user.userPart == '재고'}">재고</option>
-                    <option value="검수" th:selected="${user.userPart == '검수'}">검수</option>
-                    <option value="반품" th:selected="${user.userPart == '반품'}">반품</option>
-                    <option value="발주" th:selected="${user.userPart == '발주'}">발주</option>
-                    <option value="수주" th:selected="${user.userPart == '수주'}">수주</option>
-                    <option value="상품" th:selected="${user.userPart == '상품'}">상품</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">승인 시 직책</label>
-                  <select class="form-select" name="approvalRole" id="approvalRoleSelect">
-                    <option value="사원" th:selected="${user.userRole == '사원' || user.userRole == null}">사원</option>
-                    <option value="매니저" th:selected="${user.userRole == '매니저'}">매니저</option>
-                    <option value="관리자" th:selected="${user.userRole == '관리자'}">관리자</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary" th:if="${user.userStatus != '승인대기' && user.userStatus != '승인거부' && user.userStatus != '퇴사'}">
-                <i class="fas fa-save me-2"></i>변경사항 저장
+          <!-- 하단 버튼 영역 -->
+          <div class="form-actions">
+            <a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+              <i class="fas fa-list me-2"></i>목록으로
+            </a>
+            
+            <!-- 상태에 따른 액션 버튼들 -->
+            <div class="action-buttons">
+              <!-- 재직중, 휴직중 상태의 경우 수정 버튼 표시 -->
+              <a th:if="${user.userStatus == '재직중' || user.userStatus == '휴직중'}" 
+                th:href="@{/admin/users/{id}/edit(id=${user.userId})}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>수정
+              </a>
+              
+              <!-- 재직중 상태일 때 버튼들 -->
+              <button th:if="${user.userStatus == '재직중'}" class="btn btn-warning disable-button" th:data-id="${user.userId}">
+                <i class="fas fa-ban me-2"></i>휴직 처리
+              </button>
+              
+              <!-- 휴직중 상태일 때 버튼들 -->
+              <button th:if="${user.userStatus == '휴직중'}" class="btn btn-success enable-button" th:data-id="${user.userId}">
+                <i class="fas fa-check-circle me-2"></i>복직 처리
+              </button>
+              
+              <!-- 재직중/휴직중 공통 버튼 -->
+              <button th:if="${user.userStatus == '휴직중' || user.userStatus == '재직중'}" class="btn btn-danger resign-button" th:data-id="${user.userId}">
+                <i class="fas fa-times-circle me-2"></i>퇴사 처리
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
@@ -174,29 +224,27 @@
   <th:block layout:fragment="scripts">
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // 부서 선택에 따른 직책 옵션 제어
-        const userPartSelect = document.querySelector('select[name="userPart"]');
-        const userRoleSelect = document.querySelector('select[name="userRole"]');
-        const approvalPartSelect = document.querySelector('select[name="approvalPart"]');
-        const approvalRoleSelect = document.querySelector('select[name="approvalRole"]');
-
-        // 공통: 통합 부서 선택 시 직책을 관리자로 제한하고, 다른 옵션 숨기기
-        function restrictRoleToAdminForIntegratedDept(partSelect, roleSelect) {
-          const options = Array.from(roleSelect.options); // 초기 옵션 저장
-
+        // 승인 부서 선택에 따른 직책 옵션 제어
+        const approvalPartSelect = document.getElementById('approvalPartSelect');
+        const approvalRoleSelect = document.getElementById('approvalRoleSelect');
+        
+        if(approvalPartSelect && approvalRoleSelect) {
+          // 옵션 초기 저장
+          const options = Array.from(approvalRoleSelect.options);
+          
           function updateRoleOptions() {
-            if (partSelect.value === '통합') {
+            if (approvalPartSelect.value === '통합') {
               // 관리자 외 옵션 숨기기 및 비활성화
               options.forEach(option => {
                 if (option.value !== '관리자') {
-                  option.style.display = 'none'; // 숨김 처리
-                  option.disabled = true; // 선택 불가 처리
+                  option.style.display = 'none';
+                  option.disabled = true;
                 } else {
-                  option.style.display = ''; // 관리자 옵션은 보이게
+                  option.style.display = '';
                   option.disabled = false;
                 }
               });
-              roleSelect.value = '관리자'; // 자동으로 관리자 선택
+              approvalRoleSelect.value = '관리자';
             } else {
               // 통합 부서가 아니면 모든 옵션 복원 및 활성화
               options.forEach(option => {
@@ -205,21 +253,11 @@
               });
             }
           }
-
-          partSelect.addEventListener('change', updateRoleOptions);
-
+          
+          approvalPartSelect.addEventListener('change', updateRoleOptions);
+          
           // 페이지 로드 시 초기 상태 확인 및 적용
           updateRoleOptions();
-        }
-
-        // 기본 정보 섹션의 부서-직책 연동
-        if (userPartSelect && userRoleSelect) {
-          restrictRoleToAdminForIntegratedDept(userPartSelect, userRoleSelect);
-        }
-
-        // 승인 정보 섹션의 부서-직책 연동
-        if (approvalPartSelect && approvalRoleSelect) {
-          restrictRoleToAdminForIntegratedDept(approvalPartSelect, approvalRoleSelect);
         }
 
         // 통합 관리자 권한 부여 경고 메시지
@@ -230,8 +268,8 @@
         if (approveButton) {
           approveButton.addEventListener('click', function() {
             const userId = this.dataset.id;
-            const approvalPart = document.querySelector('select[name="approvalPart"]').value;
-            const approvalRole = document.querySelector('select[name="approvalRole"]').value;
+            const approvalPart = document.getElementById('approvalPartSelect').value;
+            const approvalRole = document.getElementById('approvalRoleSelect').value;
 
             // 통합 부서인데 관리자가 아닌 경우
             if (approvalPart === '통합' && approvalRole !== '관리자') {
@@ -248,7 +286,7 @@
 
             // 최종 승인 확인
             if (confirm('해당 사용자의 가입을 승인하시겠습니까?')) {
-              // AJAX 호출 또는 폼 제출
+              // 폼 생성 및 제출
               const form = document.createElement('form');
               form.method = 'POST';
               form.action = `/admin/users/${userId}/approve`;
@@ -286,28 +324,48 @@
             }
           });
         }
-
-        // 폼 제출 전 유효성 검사
-        const userUpdateForm = document.getElementById('userUpdateForm');
-        if (userUpdateForm) {
-          userUpdateForm.addEventListener('submit', function(e) {
-            const selectedPart = userPartSelect.value;
-            const selectedRole = userRoleSelect.value;
-
-            // 통합 부서인데 관리자가 아닌 경우
-            if (selectedPart === '통합' && selectedRole !== '관리자') {
-              e.preventDefault();
-              alert('통합 부서는 관리자 직책만 가질 수 있습니다.');
-              userRoleSelect.value = '관리자';
-              return;
+        
+        // 휴직 처리 버튼
+        const disableButton = document.querySelector('.disable-button');
+        if (disableButton) {
+          disableButton.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('해당 사용자를 휴직 처리 하시겠습니까?')) {
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/disable`;
+              document.body.appendChild(form);
+              form.submit();
             }
-
-            // 통합 관리자 권한 부여 시 경고
-            if (selectedPart === '통합' && selectedRole === '관리자') {
-              if (!confirm(adminWarningMessage)) {
-                e.preventDefault();
-                return;
-              }
+          });
+        }
+        
+        // 복직 처리 버튼
+        const enableButton = document.querySelector('.enable-button');
+        if (enableButton) {
+          enableButton.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('해당 사용자를 복직 처리 하시겠습니까?')) {
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/enable`;
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        }
+        
+        // 퇴사 처리 버튼
+        const resignButton = document.querySelector('.resign-button');
+        if (resignButton) {
+          resignButton.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('해당 사용자를 퇴사 처리 하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/resign`;
+              document.body.appendChild(form);
+              form.submit();
             }
           });
         }

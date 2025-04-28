@@ -80,6 +80,11 @@
                 <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
                   <i class="fas fa-eye"></i>
                 </a>
+                <a th:if="${user.userStatus == '재직중' || user.userStatus == '휴직중'}" 
+                   th:href="@{/admin/users/{id}/edit(id=${user.userId})}" 
+                   class="action-button" title="수정">
+                  <i class="fas fa-edit"></i>
+                </a>
                 <button th:if="${user.userStatus == '승인대기'}" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
                   <i class="fas fa-check"></i>
                 </button>
@@ -212,9 +217,8 @@
         approveButtons.forEach(button => {
           button.addEventListener('click', function() {
             const userId = this.dataset.id;
-            if (confirm('해당 사용자의 가입을 승인하시겠습니까?')) {
-              window.location.href = `/admin/users/${userId}`;
-            }
+            // 상세 페이지로 리다이렉트하여 승인 정보 입력하도록 함
+            window.location.href = `/admin/users/${userId}`;
           });
         });
 

@@ -53,7 +53,7 @@ public class AdminService {
             }
         }
         
-        Page<User> userPage = userRepository.findUsersByStatusAndSearch(userStatus, search, pageable);
+        Page<User> userPage = userRepository.findByStatusAndSearch(userStatus, search, pageable);
 
         return userPage.map(user -> new UserDTO(
                 user.getUserId(),
@@ -72,7 +72,7 @@ public class AdminService {
     }
 
     public Page<UserDTO> findPendingUsers(String search, Pageable pageable) {
-        Page<User> userPage = userRepository.findUsersByStatusAndSearch(UserStatus.승인대기, search, pageable);
+        Page<User> userPage = userRepository.findByStatusAndSearch(UserStatus.승인대기, search, pageable);
 
         return userPage.map(user -> new UserDTO(
                 user.getUserId(),
