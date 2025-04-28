@@ -6,7 +6,7 @@
   <nav class="sidebar-nav">
     <ul>
       <li th:class="${activeMenu == 'dashboard' ? 'active' : ''}">
-        <a th:href="@{/static}">
+        <a th:href="@{/}">
           <i class="fas fa-tachometer-alt"></i>
           <span>대시보드</span>
         </a>
@@ -36,7 +36,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'inspection' ? 'active' : ''}">
-        <a th:href="@{/templates/inspections}">
+        <a th:href="@{/inspections}">
           <i class="fas fa-clipboard-check"></i>
           <span>검수 관리</span>
         </a>
@@ -48,7 +48,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'purchase' ? 'active' : ''}">
-        <a th:href="@{/templates/purchases}">
+        <a th:href="@{/purchases}">
           <i class="fas fa-file-invoice"></i> <span>발주 관리</span>
         </a>
       </li>
@@ -58,7 +58,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'product' ? 'active' : ''}">
-        <a th:href="@{/templates/products}">
+        <a th:href="@{/products}">
           <i class="fas fa-boxes-stacked"></i> <span>상품 관리</span>
         </a>
       </li>
@@ -89,96 +89,129 @@
   </nav>
 </aside>
 
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 -->
-    <header class="header">
-      <div class="header-left">
-        <button id="sidebar-toggle" class="sidebar-toggle">
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="search-container">
-          <i class="fas fa-search"></i>
-          <input type="search" placeholder="검색..." class="search-input">
-        </div>
-      </div>
-      <div class="header-right">
-        <button class="header-button">
-          <i class="fas fa-bell"></i>
-        </button>
-        <button id="theme-toggle" class="header-button">
-          <i class="fas fa-moon"></i>
-        </button>
-        <div class="user-dropdown">
-          <button class="header-button">
-            <i class="fas fa-user"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#">프로필</a>
-            <a href="#">설정</a>
-            <a href="#">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- 페이지 콘텐츠 영역 (비어있음) -->
-    <main class="page-content">
-      <!-- 여기에 페이지 콘텐츠가 들어갑니다 -->
-    </main>
+<!-- 헤더 -->
+<header class="header" th:fragment="header">
+  <div class="header-left">
+    <button id="sidebar-toggle" class="sidebar-toggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input type="search" placeholder="검색..." class="search-input">
+    </div>
   </div>
-</div>
+  <div class="header-right">
+    <button class="header-button">
+      <i class="fas fa-bell"></i>
+    </button>
+    <button id="theme-toggle" class="header-button">
+      <i class="fas fa-moon"></i>
+    </button>
+    <div class="user-dropdown">
+      <button class="header-button">
+        <i class="fas fa-user"></i>
+      </button>
+      <div class="dropdown-menu">
+        <!-- 로그인한 사용자에게만 보이는 메뉴 -->
+        <th:block th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
+          <a href="/user/profile">프로필</a>
+          <a href="#">설정</a>
+          <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">로그아웃</a>
+          <form id="logout-form" action="/auth/logout" method="post" style="display: none;"></form>
+        </th:block>
 
-<script>
-  // 사이드바 토글
-  document.getElementById('sidebar-toggle').addEventListener('click', function() {
-    document.querySelector('.layout').classList.toggle('sidebar-collapsed');
-  });
+        <!-- 비로그인 사용자에게만 보이는 메뉴 -->
+        <th:block th:unless="${#authorization != null && #authorization.expression('isAuthenticated()')}">
+          <a href="/auth/login">로그인</a>
+          <a href="/user/signup">회원가입</a>
+        </th:block>
+      </div>
+    </div>
+  </div>
+</header>
 
-  // 다크 모드 토글
-  document.getElementById('theme-toggle').addEventListener('click', function() {
-    document.body.classList.toggle('dark-mode');
+<!-- 스크립트는 페이지 마지막에 포함 -->
+<th:block th:fragment="scripts">
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 사이드바 토글
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+          document.querySelector('.layout').classList.toggle('sidebar-collapsed');
+        });
+      }
 
-    // 아이콘 변경
-    const icon = this.querySelector('i');
-    if (document.body.classList.contains('dark-mode')) {
-      icon.classList.remove('fa-moon');
-      icon.classList.add('fa-sun');
-    } else {
-      icon.classList.remove('fa-sun');
-      icon.classList.add('fa-moon');
-    }
-  });
+      // 다크 모드 토글
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        // 로컬 스토리지에서 다크 모드 상태 확인
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
 
-  // 사용자 드롭다운
-  document.querySelector('.user-dropdown button').addEventListener('click', function() {
-    document.querySelector('.dropdown-menu').classList.toggle('show');
-  });
+        // 초기 다크 모드 상태 적용
+        if (isDarkMode) {
+          document.body.classList.add('dark-mode');
+          const icon = themeToggle.querySelector('i');
+          if (icon) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+          }
+        }
 
-  // 드롭다운 외부 클릭 시 닫기
-  window.addEventListener('click', function(event) {
-    if (!event.target.matches('.user-dropdown button') && !event.target.matches('.user-dropdown i')) {
-      const dropdowns = document.querySelectorAll('.dropdown-menu');
-      dropdowns.forEach(dropdown => {
-        if (dropdown.classList.contains('show')) {
-          dropdown.classList.remove('show');
+        themeToggle.addEventListener('click', function() {
+          document.body.classList.toggle('dark-mode');
+
+          // 다크 모드 상태 저장
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          localStorage.setItem('darkMode', isDarkMode);
+
+          // 아이콘 변경
+          const icon = this.querySelector('i');
+          if (icon) {
+            if (isDarkMode) {
+              icon.classList.remove('fa-moon');
+              icon.classList.add('fa-sun');
+            } else {
+              icon.classList.remove('fa-sun');
+              icon.classList.add('fa-moon');
+            }
+          }
+        });
+      }
+
+      // 사용자 드롭다운
+      const userDropdownBtn = document.querySelector('.user-dropdown button');
+      if (userDropdownBtn) {
+        userDropdownBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          document.querySelector('.dropdown-menu').classList.toggle('show');
+        });
+      }
+
+      // 드롭다운 외부 클릭 시 닫기
+      window.addEventListener('click', function(event) {
+        if (!event.target.matches('.user-dropdown button') && !event.target.matches('.user-dropdown i')) {
+          const dropdowns = document.querySelectorAll('.dropdown-menu');
+          dropdowns.forEach(dropdown => {
+            if (dropdown.classList.contains('show')) {
+              dropdown.classList.remove('show');
+            }
+          });
         }
       });
-    }
-  });
 
-  // 모바일 화면에서 사이드바 자동 접기
-  function checkScreenSize() {
-    if (window.innerWidth < 768) {
-      document.querySelector('.layout').classList.add('sidebar-collapsed');
-    } else {
-      document.querySelector('.layout').classList.remove('sidebar-collapsed');
-    }
-  }
+      // 모바일 화면에서 사이드바 자동 접기
+      function checkScreenSize() {
+        if (window.innerWidth < 768) {
+          document.querySelector('.layout').classList.add('sidebar-collapsed');
+        } else {
+          document.querySelector('.layout').classList.remove('sidebar-collapsed');
+        }
+      }
 
-  // 초기 로드 및 화면 크기 변경 시 체크
-  window.addEventListener('load', checkScreenSize);
-  window.addEventListener('resize', checkScreenSize);
-</script>
-</body>
-</html>
+      // 초기 로드 및 화면 크기 변경 시 체크
+      checkScreenSize();
+      window.addEventListener('resize', checkScreenSize);
+    });
+  </script>
+</th:block>
