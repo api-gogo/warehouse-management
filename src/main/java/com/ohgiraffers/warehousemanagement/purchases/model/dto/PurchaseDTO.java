@@ -11,6 +11,7 @@ public class PurchaseDTO {
     private String purchaseStatus;
     private LocalDate purchaseUpdatedAt;
     private LocalDate purchaseCreatedAt;
+    private String purchaseNotes;
 
 //    private Supplier supplier;
 //    private List<PurchaseItem> items = new ArrayList<>();
@@ -20,7 +21,7 @@ public class PurchaseDTO {
     public PurchaseDTO() {}
 
 
-    public PurchaseDTO(Integer purchaseId, Integer userId,LocalDate purchaseCreatedAt ,LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, LocalDate purchaseUpdatedAt
+    public PurchaseDTO(Integer purchaseId, Integer userId,LocalDate purchaseCreatedAt ,LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, LocalDate purchaseUpdatedAt,String purchaseNotes
                        )
     {  //Supplier supplier, List<PurchaseItem> items,Storages storages
         this.purchaseId = purchaseId;
@@ -30,9 +31,18 @@ public class PurchaseDTO {
         this.purchaseStatus = purchaseStatus;
         this.purchaseUpdatedAt = purchaseUpdatedAt;
         this.purchaseCreatedAt = purchaseCreatedAt;
+        this.purchaseNotes = purchaseNotes;
 //        this.supplier = supplier;
 //        this.items = items;
 //        this.storages = storages;
+    }
+
+    public String getPurchaseNotes() {
+        return purchaseNotes;
+    }
+
+    public void setPurchaseNotes(String purchaseNotes) {
+        this.purchaseNotes = purchaseNotes;
     }
 
     public Integer getPurchaseId() {
@@ -124,6 +134,7 @@ public class PurchaseDTO {
                 ", purchaseStatus='" + purchaseStatus + '\'' +
                 ", purchase_updated_at=" + purchaseUpdatedAt +
                 ", purchase_created_at=" + purchaseCreatedAt +
+                ", purchase_notes='" + purchaseNotes + '\'' +
 //                ", supplier=" + supplier +
 //                ", items=" + items +
 //                ", storages=" + storages +

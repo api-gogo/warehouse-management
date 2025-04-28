@@ -30,7 +30,7 @@ public class PurchaseController {
 
 
     /*
-    메인, 전체조회 화면 , 발주대기 화면, 발주생성 화면, 발주 수정 화면
+    메인, 전체조회 화면 ,상세 조회 화면 , 발주대기 화면, 발주생성 화면, 발주 수정 화면
      */
      
     // 메인 페이지
@@ -42,7 +42,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "발주 목록");
         model.addAttribute("cardDescription", "모든 발주 내역을 확인하고 관리할 수 있습니다.");
         
-        return "purchases";
+        return "purchases/purchases";
     }
 
 
@@ -55,7 +55,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "발주 목록");
         model.addAttribute("cardDescription", "모든 발주 내역을 확인하고 관리할 수 있습니다.");
         
-        return "purchases"; // 발주 목록 템플릿 직접 호출
+        return "purchases/purchases"; // 발주 목록 템플릿 직접 호출
     }
 
     // status 를 이용하여 조회
@@ -68,7 +68,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", status + " 상태 발주 목록");
         model.addAttribute("cardDescription", status + " 상태의 모든 발주 내역을 확인하고 관리할 수 있습니다.");
         
-        return "purchases";
+        return "purchases/purchases";
     }
 
     // 담당자 id를 이용하여 조회
@@ -81,7 +81,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "담당자별 발주 목록");
         model.addAttribute("cardDescription", "선택한 담당자의 발주 내역을 확인하고 관리할 수 있습니다.");
         
-        return "purchases";
+        return "purchases/purchases";
     }
 
 
@@ -99,7 +99,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "기간별 발주 목록");
         model.addAttribute("cardDescription", startDate + " ~ " + endDate + " 기간의 발주 내역을 확인하고 관리할 수 있습니다.");
         
-        return "purchases"; // 템플릿 경로 수정
+        return "purchases/purchases"; // 템플릿 경로 수정
     }
 
 
@@ -114,6 +114,7 @@ public class PurchaseController {
         model.addAttribute("pageTitle", "발주 상세 정보");
         model.addAttribute("cardTitle", "발주 목록");
         model.addAttribute("cardDescription", "발주 ID: " + id + "의 상세 정보를 확인할 수 있습니다.");
+
         
         // 총 금액 계산
 //        if (purchaseDTO != null && purchaseDTO.getPurchaseItems() != null) {
@@ -123,7 +124,7 @@ public class PurchaseController {
 //            model.addAttribute("totalAmount", totalAmount);
 //        }
 //
-        return "purchases"; // 경로를 purchases 템플릿으로 직접 이동
+        return "purchases/purchases"; // 경로를 purchases 템플릿으로 직접 이동
     }
 
 
@@ -137,7 +138,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "신규 발주 등록");
         model.addAttribute("cardDescription", "새로운 발주를 등록할 수 있습니다.");
 
-        return "create"; // 발주 생성 템플릿 경로
+        return "purchases/create"; // 발주 생성 템플릿 경로
     }
 
 
@@ -151,7 +152,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message","발주 등록에 실패하였습니다. 다시 시도해주세요.");
         }
-        return "redirect:/purchases";
+        return "redirect:/purchases/purchases";
     }
 
 
@@ -166,22 +167,37 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "발주 정보 수정");
         model.addAttribute("cardDescription", "발주 정보를 수정할 수 있습니다.");
 
-        return "purchase-update"; // 발주 수정 템플릿 경로
+        return "purchases/update"; // 발주 수정 템플릿 경로
     }
 
     @PostMapping("/update/{id}")
-    public String updatePurchase(Model model,Integer id,@Validated @ModelAttribute PurchaseDTO purchaseDTO) {
+    public String updatePurchase(Model model,@PathVariable  Integer id,@Validated @ModelAttribute PurchaseDTO purchaseDTO
+    , RedirectAttributes rdtat) {
          PurchaseDTO purchase = purchaseService.updatePurchase(purchaseDTO,id);
-        return "redirect:/purchases";
+        if (purchase != null) {
+            rdtat.addFlashAttribute("message", "발주가 수정되었습니다.");
+        } else {
+            rdtat.addFlashAttribute("message", "발주 수정에 실패했습니다.");
+        }
+        return "redirect:/purchases/purchases";
     }
+
 
     //발주 삭제
     // 관리자만 삭제로 변경가능
     @PostMapping("/delete/{id}")
-    public String deletePurchase(Model model,@PathVariable Integer id,RedirectAttributes rdtat) {
-        purchaseService.deletedpurchase(id);
-        return "redirect:/purchases";
+    public String deletePurchase(Model model, @PathVariable Integer id, RedirectAttributes rdtat) {
+        try {
+            purchaseService.deletedpurchase(id);
+            rdtat.addFlashAttribute("message", "발주가 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            rdtat.addFlashAttribute("message", "삭제할 발주를 찾을 수 없습니다.");
+        }
+        return "redirect:/purchases/purchases";
     }
+
+
+// deletePurchase
 
     //발주 완료(발주완료)
     // 관리자만 발주완료로 변경가능
@@ -196,7 +212,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message","발주 완료가 실패 했습니다.");
         }
-        return "redirect:/purchases";
+        return "redirect:/purchases/purchases";
     }
 
     //발주 거절(발주 거절)
@@ -209,7 +225,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message","발주 거절이 실패 했습니다.");
         }
-        return "redirect:/purchases";
+        return "redirect:/purchases/purchases";
     }
 
 
@@ -223,7 +239,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message", "발주 취소가 실패했습니다.");
         }
-        return "redirect:/purchases";
+        return "redirect:/purchases/purchases";
     }
     
     // GET 방식의 취소 처리 추가 (페이지에서 링크 클릭용)
@@ -236,7 +252,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message", "발주 취소가 실패했습니다.");
         }
-        return "redirect:/purchases";
+        return "redirect:/purchases/purchases";
     }
     
     // 입고 처리 페이지 이동
@@ -248,7 +264,7 @@ public class PurchaseController {
         model.addAttribute("cardTitle", "발주 입고 처리");
         model.addAttribute("cardDescription", "발주 상품의 입고 처리를 진행할 수 있습니다.");
         
-        return "purchase-receive"; // 입고 처리 템플릿
+        return "purchases/purchase-receive"; // 입고 처리 템플릿
     }
     
     // 입고 처리 실행
@@ -262,7 +278,7 @@ public class PurchaseController {
             rdtat.addFlashAttribute("message", "발주 입고 처리에 실패했습니다.");
         }
         
-        return "redirect:/purchases";
+        return "redirect:/purchases/purchases";
     }
 
 

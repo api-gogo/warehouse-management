@@ -40,7 +40,8 @@ public class PurchaseService {
                     purchase.getPurchaseDate(),
                     purchase.getPurchaseDueDate(),
                     purchase.getPurchaseStatus().getLabel(),
-                    purchase.getPurchaseUpdatedAt()
+                    purchase.getPurchaseUpdatedAt(),
+                    purchase.getNotes()
             );
             purchasesDTOs.add(purchaseDTO);
         }
@@ -62,7 +63,8 @@ public class PurchaseService {
                     purchase.getPurchaseDate(),
                     purchase.getPurchaseDueDate(),
                     purchase.getPurchaseStatus().getLabel(),
-                    purchase.getPurchaseUpdatedAt()
+                    purchase.getPurchaseUpdatedAt(),
+                    purchase.getNotes()
             );
             purchasesDTOs.add(purchaseDTO);
         }
@@ -81,7 +83,8 @@ public class PurchaseService {
                     purchase.getPurchaseDate(),
                     purchase.getPurchaseDueDate(),
                     purchase.getPurchaseStatus().getLabel(),
-                    purchase.getPurchaseUpdatedAt()
+                    purchase.getPurchaseUpdatedAt(),
+                    purchase.getNotes()
             );
             purchaseDTOs.add(dto);
         }
@@ -100,7 +103,8 @@ public class PurchaseService {
                     purchase.getPurchaseDate(),
                     purchase.getPurchaseDueDate(),
                     purchase.getPurchaseStatus().getLabel(),
-                    purchase.getPurchaseUpdatedAt()
+                    purchase.getPurchaseUpdatedAt(),
+                    purchase.getNotes()
             );
             purchaseDTOs.add(dto);
         }
@@ -119,7 +123,8 @@ public class PurchaseService {
                 purchase.getPurchaseDate(),
                 purchase.getPurchaseDueDate(),
                 purchase.getPurchaseStatus().getLabel(),
-                purchase.getPurchaseUpdatedAt()
+                purchase.getPurchaseUpdatedAt(),
+                purchase.getNotes()
         );
         return purchaseDTO;
 
@@ -136,7 +141,8 @@ public class PurchaseService {
                 LocalDate.now().plusDays(7),
                  PurchaseStatus.대기,
                  LocalDate.now(),
-                null
+                null,
+                purchaseDTO.getPurchaseNotes()
         );
 
         Purchase savepurchase = purchaseRepository.save(purchase);
@@ -148,7 +154,8 @@ public class PurchaseService {
                 savepurchase.getPurchaseDate(),
                 savepurchase.getPurchaseDueDate(),
                 savepurchase.getPurchaseStatus().getLabel(),
-                savepurchase.getPurchaseUpdatedAt()
+                savepurchase.getPurchaseUpdatedAt(),
+                savepurchase.getNotes()
         );
     }
 
@@ -156,44 +163,76 @@ public class PurchaseService {
 
     // 발주 수정
     @Transactional
-    public PurchaseDTO updatePurchase(PurchaseDTO purchaseDTO,Integer id) {
+    public PurchaseDTO updatePurchase(PurchaseDTO purchaseDTO, Integer id) {
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 발주가 없습니다."));
 
-
-        //해당 발주의 status가 발주대기라면 수정을하고 발주대기가 아니라면 오류를 표시함
+        // 해당 발주의 status가 발주대기라면 수정을하고 발주대기가 아니라면 오류를 표시함
         if(PurchaseStatus.대기.equals(purchase.getPurchaseStatus())) {
-            purchase.setPurchaseStatus(PurchaseStatus.대기);
+            // 기존에는 status를 항상 '대기'로 설정했으나, 이제는 선택된 status로 설정
+            // purchaseDTO에서 문자열로 받은 status를 enum으로 변환
+            PurchaseStatus status;
+            try {
+                // 수정: purchaseDTO.getPurchaseStatus()가 enum의 name 또는 label이 될 수 있음
+                status = getStatusFromString(purchaseDTO.getPurchaseStatus());
+            } catch (IllegalArgumentException e) {
+                // 기본값으로 '대기' 상태 설정
+                status = PurchaseStatus.대기;
+            }
+            
+            // 사용자가 수정한 정보로 엔티티 업데이트
+            purchase.setPurchaseStatus(status);
+            purchase.setUserId(purchaseDTO.getUserId()); // userId 업데이트 추가
             purchase.setPurchaseDate(purchaseDTO.getPurchaseDate());
             purchase.setPurchaseDueDate(purchaseDTO.getPurchaseDueDate());
             purchase.setPurchaseCreatedAt(purchaseDTO.getPurchaseCreatedAt());
             purchase.setPurchaseUpdatedAt(LocalDate.now());
+            purchase.setNotes(purchaseDTO.getPurchaseNotes()); // notes 업데이트 추가
+            
             Purchase updatepurchase = purchaseRepository.save(purchase);
 
-            return new PurchaseDTO(  updatepurchase.getPurchaseId(),
+            return new PurchaseDTO(
+                    updatepurchase.getPurchaseId(),
                     updatepurchase.getUserId(),
                     updatepurchase.getPurchaseCreatedAt(),
                     updatepurchase.getPurchaseDate(),
                     updatepurchase.getPurchaseDueDate(),
                     updatepurchase.getPurchaseStatus().getLabel(),
-                    updatepurchase.getPurchaseUpdatedAt());
+                    updatepurchase.getPurchaseUpdatedAt(),
+                    updatepurchase.getNotes()
+            );
         } else {
             throw new IllegalArgumentException("발주대기가 아니라면 수정을 못합니다.");
-            //발주대기 상태가 아니라면 수정 못한다는 것을 표시
+            // 발주대기 상태가 아니라면 수정 못한다는 것을 표시
         }
-
-
+    }
+    
+    // 문자열 상태를 PurchaseStatus Enum으로 변환하는 헬퍼 메서드
+    private PurchaseStatus getStatusFromString(String statusStr) {
+        // 직접 Enum 이름으로 매칭 시도
+        try {
+            return PurchaseStatus.valueOf(statusStr);
+        } catch (IllegalArgumentException e) {
+            // Enum 이름으로 매칭 실패 시, label로 매칭 시도
+            for (PurchaseStatus status : PurchaseStatus.values()) {
+                if (status.getLabel().equals(statusStr)) {
+                    return status;
+                }
+            }
+            // 두 방식 모두 실패하면 예외 발생
+            throw new IllegalArgumentException("Invalid status: " + statusStr);
+        }
     }
 
-   @Transactional
+
+    @Transactional
     public boolean deletedpurchase(Integer id) {
-       if (!purchaseRepository.existsById(id)) {
-           throw new IllegalArgumentException("해당 발주가 없습니다. ID: " + id);
-       }
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 발주가 없습니다. ID: " + id));
 
+        purchaseRepository.delete(purchase); // 엔티티를 직접 삭제
 
-
-       return true;
+        return true; // 삭제가 완료되었으면 true 반환
     }
 
 
@@ -226,7 +265,7 @@ public class PurchaseService {
             return false;
         }
     }
-
+    @Transactional
     public boolean cancelPurchase(Integer id) {
 
         Purchase purchase = purchaseRepository.findById(id)

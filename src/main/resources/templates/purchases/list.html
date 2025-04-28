@@ -24,15 +24,15 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="purchase : ${purchases}">
+  <tr th:each="purchases : ${purchases}">
     <td th:text="${purchase.id}"></td>
     <td th:text="${purchase.status}"></td>
     <td th:text="${purchase.customerName}"></td>
     <td th:text="${purchase.date}"></td>
-    <td><a th:href="@{/purchase/{id}(id=${purchase.id})}">상세보기</a></td>
-    <td><a th:href="@{/purchase/update/{id}(id=${purchase.id})}">수정</a></td>
+    <td><a th:href="@{/templates/purchases/{id}(id=${purchase.id})}">상세보기</a></td>
+    <td><a th:href="@{/templates/purchases/update/{id}(id=${purchase.id})}">수정</a></td>
     <td>
-      <form th:action="@{/purchase/delete/{id}(id=${purchase.id})}" method="post">
+      <form th:action="@{/templates/purchases/delete/{id}(id=${purchase.id})}" method="post">
         <button type="submit">삭제</button>
       </form>
     </td>

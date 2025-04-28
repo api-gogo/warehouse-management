@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "wms")
+@Table(name = "purchases")
 public class Purchase {
 
 //    @ManyToOne(fetch = FetchType.LAZY) // 거래처와 연결 다대일 관계 여러개의 발주가 거래처 하나만 보유 가능
@@ -46,6 +46,9 @@ public class Purchase {
     @Column(name = "purchase_updated_at")
     private LocalDate purchaseUpdatedAt;
 
+    @Column(name = "notes")
+    private String notes;
+
     public Purchase() {}
 
 
@@ -54,7 +57,7 @@ public class Purchase {
                     Integer purchaseId,
                     Integer userId, LocalDate purchaseDate, LocalDate purchaseDueDate,
                     PurchaseStatus purchaseStatus, LocalDate purchaseCreatedAt,
-                    LocalDate purchase_updated_at) { //Supplier supplier, List<PurchaseItem> items, Storages storages,
+                    LocalDate purchase_updated_at, String notes) { //Supplier supplier, List<PurchaseItem> items, Storages storages,
 //        this.supplier = supplier;
 //        this.items = items;
 //        this.storages = storages;
@@ -65,6 +68,7 @@ public class Purchase {
         this.purchaseStatus = purchaseStatus;
         this.purchaseCreatedAt = purchaseCreatedAt;
         this.purchaseUpdatedAt = purchase_updated_at;
+        this.notes = notes;
     }
 
 
@@ -92,6 +96,15 @@ public class Purchase {
 //    public void setStorages(Storages storages) {
 //        this.storages = storages;
 //    }
+
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     public Integer getPurchaseId() {
         return purchaseId;
@@ -162,6 +175,7 @@ public class Purchase {
                 ", purchaseStatus='" + purchaseStatus + '\'' +
                 ", purchaseCreatedAt=" + purchaseCreatedAt +
                 ", purchase_updated_at=" + purchaseUpdatedAt +
+                ", notes='" + notes + '\'' +
                 '}';
     }
 }
