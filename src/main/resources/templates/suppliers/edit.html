@@ -6,23 +6,23 @@
   <title>거래처 수정</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/common.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='supplier'">
-    <div class="admin-container">
-      <div class="admin-header">
+    <div class="common-container">
+      <div class="common-header">
         <div class="header-left">
           <a th:href="@{/suppliers/{id}(id=${supplier.supplierId})}" class="back-button">
             <i class="fas fa-arrow-left"></i> 상세보기로
           </a>
-          <h1 class="admin-title">거래처 수정</h1>
+          <h1 class="common-title">거래처 수정</h1>
         </div>
       </div>
 
-      <div class="admin-content">
+      <div class="common-content">
         <form th:action="@{/suppliers/{id}/edit(id=${supplier.supplierId})}" method="post" th:object="${supplier}" class="needs-validation" novalidate>
           <!-- 거래처 정보 섹션 -->
           <div class="detail-section">

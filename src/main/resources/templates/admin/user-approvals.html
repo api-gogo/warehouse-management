@@ -6,16 +6,16 @@
   <title>사용자 승인 관리</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/common.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='user'">
-    <div class="admin-container">
-      <div class="admin-header">
-        <h1 class="admin-title">사용자 승인 관리</h1>
-        <div class="admin-actions">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">사용자 승인 관리</h1>
+        <div class="common-actions">
           <div class="search-box">
             <input type="text" id="userSearch" placeholder="이름, 사번, 전화번호 검색..." class="search-input" th:value="${search}">
             <button class="search-button">
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div class="admin-tabs">
+      <div class="common-tabs">
         <div class="approval-stats">
           <span class="stats-item">
             <i class="fas fa-user-clock"></i> 승인 대기: <span class="pending-count" th:text="${pendingCount}">0</span>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div class="admin-content">
+      <div class="common-content">
         <form id="batchApprovalForm" th:action="@{/admin/users/approve-batch}" method="post">
           <div class="table-responsive">
             <table class="data-table">

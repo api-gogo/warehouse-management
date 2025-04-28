@@ -7,16 +7,16 @@
   <title>거래처 관리</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/common.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='supplier'">
-    <div class="admin-container">
-      <div class="admin-header">
-        <h1 class="admin-title">거래처 관리</h1>
-        <div class="admin-actions">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">거래처 관리</h1>
+        <div class="common-actions">
           <div class="search-box">
             <input type="text" id="supplierSearch" placeholder="거래처명, 담당자, 연락처 검색..." class="search-input" th:value="${search}">
             <button class="search-button">
@@ -30,14 +30,14 @@
       </div>
 
       <!-- 탭 메뉴 -->
-      <div class="admin-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'active'}">
+      <div class="common-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'active'}">
         <button class="tab-button" th:classappend="${currentStatus == 'active' || currentStatus == 'all' ? 'active' : ''}" data-status="active">전체</button>
         <!-- 발주_관리자와 통합_관리자만 삭제됨 탭 표시 -->
         <button class="tab-button" th:classappend="${currentStatus == 'deleted' ? 'active' : ''}" data-status="deleted" 
                 sec:authorize="hasAnyAuthority('발주_관리자', '통합_관리자')">삭제됨</button>
       </div>
 
-      <div class="admin-content">
+      <div class="common-content">
         <div class="table-responsive">
           <table class="data-table">
             <thead>

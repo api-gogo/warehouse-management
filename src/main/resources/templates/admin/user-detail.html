@@ -6,23 +6,23 @@
   <title>사용자 상세</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/common.css">
     <link rel="stylesheet" href="/css/admin/user-detail.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='user'">
-    <div class="admin-container">
-      <div class="admin-header">
+    <div class="common-container">
+      <div class="common-header">
         <div class="header-left">
           <a th:href="@{/admin/users}" class="back-button">
             <i class="fas fa-arrow-left"></i> 사용자 목록으로
           </a>
-          <h1 class="admin-title">사용자 상세 정보</h1>
+          <h1 class="common-title">사용자 상세 정보</h1>
         </div>
 
-        <div class="admin-actions">
+        <div class="common-actions">
           <!-- 승인 대기 상태의 경우 승인/거부 버튼 표시 -->
           <div th:if="${user.userStatus == '승인대기'}" class="action-buttons">
             <button class="btn btn-success approve-button" th:data-id="${user.userId}">
