@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -19,7 +19,7 @@ public class ProductController {
     }
 
     // 상품 목록 조회
-    @GetMapping({"", "/list"})
+    @GetMapping("")
     public String getAllProducts(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "searchKeyword", required = false) String searchKeyword,
@@ -38,7 +38,7 @@ public class ProductController {
         model.addAttribute("endItem", productPage.getEndItem());
         model.addAttribute("searchKeyword", searchKeyword);
 
-        return "product/list";
+        return "products/list";
     }
 
     // 특정 상품 조회
@@ -48,7 +48,7 @@ public class ProductController {
         model.addAttribute("pageTitle", "상품 편집 - " + product.getProductName());
         model.addAttribute("product", product);
         model.addAttribute("categories", productService.getMockCategories());
-        return "product/edit";
+        return "products/edit";
     }
 
     // 신규 상품 등록 폼 표시
@@ -57,7 +57,7 @@ public class ProductController {
         model.addAttribute("pageTitle", "신규 상품 등록");
         model.addAttribute("product", new ProductCreateDTO());
         model.addAttribute("categories", productService.getMockCategories());
-        return "product/new";
+        return "products/new";
     }
 
     // 상품 생성
@@ -65,13 +65,13 @@ public class ProductController {
     public String createProduct(@ModelAttribute ProductCreateDTO createDTO, Model model) {
         try {
             productService.createProduct(createDTO);
-            return "redirect:/product";
+            return "redirect:/products";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("pageTitle", "신규 상품 등록");
             model.addAttribute("product", createDTO);
             model.addAttribute("categories", productService.getMockCategories());
-            return "product/new";
+            return "products/new";
         }
     }
 
@@ -80,13 +80,13 @@ public class ProductController {
     public String updateProduct(@PathVariable("id") Integer id, @ModelAttribute ProductCreateDTO updateDTO, Model model) {
         try {
             productService.updateProduct(id, updateDTO);
-            return "redirect:/product";
+            return "redirect:/products";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("pageTitle", "상품 편집 - " + updateDTO.getProductName());
             model.addAttribute("product", updateDTO);
             model.addAttribute("categories", productService.getMockCategories());
-            return "product/edit";
+            return "products/edit";
         }
     }
 
@@ -94,12 +94,12 @@ public class ProductController {
     @PostMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") Integer id) {
         productService.deleteProduct(id);
-        return "redirect:/product";
+        return "redirect:/products";
     }
 
     // 상품 내보내기 (임시 리다이렉트)
     @GetMapping("/export")
     public String exportProducts() {
-        return "redirect:/product";
+        return "redirect:/products";
     }
 }
