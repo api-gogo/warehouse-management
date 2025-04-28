@@ -85,7 +85,7 @@ public class AdminController {
         return "redirect:/admin/users/" + userId;
     }
 
-    @GetMapping("/users/reject/{userId}")
+    @PostMapping("/users/reject/{userId}")
     public String rejectUser(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = userService.rejectUser(userId);
