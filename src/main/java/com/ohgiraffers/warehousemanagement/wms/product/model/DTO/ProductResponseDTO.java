@@ -1,26 +1,24 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.DTO;
 
+import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
 import java.time.LocalDateTime;
-
-/*  전체조회용 DTO  */
 
 public class ProductResponseDTO {
 
-    private Integer productId; // 상품번호
-    private Integer categoryId; // 카테고리 번호
-    private Integer supplierId; // 거래처 ID
-    private Integer userId; // 담당자
-    private String productName; // 품명
-    private Integer expirationDate; // 유통기한
-    private String storageMethod; // 보관방법
-    private Integer pricePerBox; // 박스당 단가
-    private Integer quantityPerBox; // 박스당 개수
-    private LocalDateTime productCreatedAt; // 등록시간
-    private LocalDateTime productUpdatedAt; // 수정시간
-    private LocalDateTime productDeletedAt; // 삭제시간
-    private Boolean isDeleted; // 삭제상태
+    private Integer productId;
+    private Category category;
+    private Integer supplierId;
+    private Integer userId;
+    private String productName;
+    private Integer expirationDate;
+    private String storageMethod;
+    private Integer pricePerBox;
+    private Integer quantityPerBox;
+    private LocalDateTime productCreatedAt;
+    private LocalDateTime productUpdatedAt;
+    private LocalDateTime productDeletedAt;
+    private Boolean isDeleted;
 
-    // 생성자
     public ProductResponseDTO() {}
 
     public ProductResponseDTO(Integer productId, Integer categoryId, Integer supplierId, Integer userId,
@@ -28,7 +26,8 @@ public class ProductResponseDTO {
                                 Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
                                 LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
         this.productId = productId;
-        this.categoryId = categoryId;
+        this.category = new Category();
+        this.category.setCategoryId(categoryId);
         this.supplierId = supplierId;
         this.userId = userId;
         this.productName = productName;
@@ -42,7 +41,6 @@ public class ProductResponseDTO {
         this.isDeleted = isDeleted;
     }
 
-    // Getter와 Setter
     public Integer getProductId() {
         return productId;
     }
@@ -51,12 +49,23 @@ public class ProductResponseDTO {
         this.productId = productId;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public Integer getCategoryId() {
-        return categoryId;
+        return category != null ? category.getCategoryId() : null;
     }
 
     public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
+        if (category == null) {
+            category = new Category();
+        }
+        category.setCategoryId(categoryId);
     }
 
     public Integer getSupplierId() {
@@ -151,7 +160,7 @@ public class ProductResponseDTO {
     public String toString() {
         return "ProductResponseDTO{" +
                 "상품번호=" + productId +
-                ", 카테고리 번호=" + categoryId +
+                ", 카테고리 번호=" + (category != null ? category.getCategoryId() : null) +
                 ", 거래처 ID=" + supplierId +
                 ", 담당자=" + userId +
                 ", 품명='" + productName + '\'' +

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
-@Where(clause = "is_deleted = true") // 삭제상태 -> 1인 경우만 조회가능
+@Where(clause = "is_deleted = false") // 삭제상태 -> 1인 경우만 조회가능
 public class Product {
 
     //상품번호
