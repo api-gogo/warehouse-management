@@ -4,6 +4,7 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class SalesDTO {
     private Integer salesId;
@@ -14,6 +15,8 @@ public class SalesDTO {
     private SalesStatus salesStatus;
     private LocalDateTime salesCreatedAt;
     private LocalDateTime salesUpdatedAt;
+    private List<Integer> items;
+    private List<Integer> quantity;
 
     public SalesDTO() {
     }
@@ -93,6 +96,22 @@ public class SalesDTO {
         this.salesUpdatedAt = salesUpdatedAt;
     }
 
+    public List<Integer> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Integer> items) {
+        this.items = items;
+    }
+
+    public List<Integer> getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(List<Integer> quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
     public String toString() {
         return "SalesDTO{" +
@@ -104,6 +123,8 @@ public class SalesDTO {
                 ", salesStatus=" + salesStatus +
                 ", salesCreatedAt=" + salesCreatedAt +
                 ", salesUpdatedAt=" + salesUpdatedAt +
+                ", items=" + items +
+                ", quantity=" + quantity +
                 '}';
     }
 }

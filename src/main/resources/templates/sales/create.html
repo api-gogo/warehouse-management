@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>WMS - 빈 페이지</title>
+    <link rel="stylesheet" href="/common.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="layout" th:with="activeMenu='dashboard'">
+    <div th:replace="~{navigation :: aside}"></div>
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+        <!-- 헤더 포함 -->
+        <div th:replace="~{navigation :: header}"></div>
+        <main class="page-content">
+            <!-- 알림 메시지 -->
+            <div th:if="${message != null}" class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+            </div>
+
+            <div class="common-container">
+                <div class="common-header">
+                    <h1 class="common-title">수주 등록</h1>
+                    <div class="common-actions">
+                        <a th:href="@{/sales}" class="btn btn-outline-primary back-button">
+                            <i class="fas fa-arrow-left me-2"></i> 목록으로
+                        </a>
+                    </div>
+                </div>
+
+                <div class="common-content">
+                    <!-- 등록 폼 시작 -->
+                    <form th:action="@{/sales/create}" method="post">
+
+                        <!-- 점포 ID -->
+                        <div class="form-group mb-4">
+                            <label for="storeId">점포 ID</label>
+                            <input type="text" id="storeId" name="storeId" class="form-control" placeholder="점포 ID를 입력하세요" required>
+                        </div>
+
+                        <!-- 담당자 ID -->
+                        <div class="form-group mb-4">
+                            <label for="userId">담당자 ID</label>
+                            <input type="text" id="userId" name="userId" class="form-control" placeholder="담당자 ID를 입력하세요" required>
+                        </div>
+
+                        <!-- 수주일 -->
+                        <div class="form-group mb-4">
+                            <label for="salesDate">수주일</label>
+                            <input type="date" id="salesDate" name="salesDate" class="form-control" required>
+                        </div>
+
+                        <!-- 수주 물품 목록 -->
+                        <div class="form-group mb-4">
+                            <label>수주 물품 목록</label>
+                            <div id="items-container">
+                                <!-- 최초 1개 항목 -->
+                                <div class="item-row mb-3">
+                                    <div class="item-header">
+                                        <strong>물품 1</strong>
+                                        <!-- 삭제 버튼은 첫번째 항목은 숨김 -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm remove-item" style="display: none;">
+                                            <i class="fas fa-times"></i> 삭제
+                                        </button>
+                                    </div>
+                                    <input type="text" name="items[0]" class="form-control mb-2" placeholder="상품명 입력" required>
+                                    <input type="number" name="quantity[0]" class="form-control" placeholder="수량 입력" min="1" required>
+                                </div>
+                            </div>
+
+                            <!-- 물품 추가 버튼 -->
+                            <button type="button" id="add-item" class="btn btn-outline-primary mt-2">
+                                <i class="fas fa-plus me-2"></i> 물품 추가
+                            </button>
+                        </div>
+
+                        <!-- 등록/취소 버튼 -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> 등록
+                            </button>
+                            <a th:href="@{/sales}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> 취소
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- 꼭 필요한 최소 JavaScript: 물품 추가/삭제 기능 -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const addItemBtn = document.getElementById('add-item');
+                    const itemsContainer = document.getElementById('items-container');
+
+                    function updateItemHeaders() {
+                        const itemRows = itemsContainer.querySelectorAll('.item-row');
+                        itemRows.forEach((row, index) => {
+                            const header = row.querySelector('.item-header strong');
+                            header.textContent = `물품 ${index + 1}`;
+
+                            const removeButton = row.querySelector('.remove-item');
+                            if (itemRows.length > 1) {
+                                removeButton.style.display = 'inline-block';
+                            } else {
+                                removeButton.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    let itemIndex = 1;
+
+                    addItemBtn.addEventListener('click', function() {
+                        const itemRow = document.createElement('div');
+                        itemRow.className = 'item-row mb-3';
+                        itemRow.innerHTML = `
+          <div class="item-header">
+            <strong>물품 ${itemIndex + 1}</strong>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+              <i class="fas fa-times"></i> 삭제
+            </button>
+          </div>
+          <input type="text" name="items[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
+          <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
+        `;
+                        document.getElementById('items-container').appendChild(itemRow);
+                        itemIndex++;
+
+                        itemsContainer.appendChild(itemRow);
+                        updateItemHeaders();
+                    });
+
+                    itemsContainer.addEventListener('click', function(event) {
+                        if (event.target.closest('.remove-item')) {
+                            const button = event.target.closest('.remove-item');
+                            const itemRow = button.closest('.item-row');
+                            itemRow.remove();
+                            updateItemHeaders();
+                        }
+                    });
+
+                    updateItemHeaders(); // 최초 1개만 있을 때 삭제버튼 숨김
+                });
+            </script>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>
