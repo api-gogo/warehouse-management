@@ -46,7 +46,7 @@ public class InspectionController {
         } else {
             model.addAttribute("inspectionList", inspectionList);
         }
-        return "inspection/inspection";
+        return "inspections/inspection";
     }
 
     // 검수 등록
@@ -63,7 +63,7 @@ public class InspectionController {
             ra.addFlashAttribute("message", "검수 등록에 성공했습니다!");
         }
 
-        return "redirect:/inspection";
+        return "redirect:/inspections";
     }
 
     // 검수 상세 보기
@@ -75,7 +75,7 @@ public class InspectionController {
 
         model.addAttribute("inspection", responseDTO);
 
-        return "inspection/detail";
+        return "inspections/detail";
     }
 
     // 검수 수정 페이지 보기
@@ -87,7 +87,7 @@ public class InspectionController {
 
         model.addAttribute("inspection", responseDTO);
 
-        return "inspection/update";
+        return "inspections/update";
     }
 
     // 검수 수정하기
@@ -104,13 +104,13 @@ public class InspectionController {
             ra.addFlashAttribute("message", "검수 수정에 성공했습니다!");
         }
 
-        return "redirect:/inspection/" + inspectionId;
+        return "redirect:/inspections/" + inspectionId;
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public String illegalArgumentException(Model model, IllegalArgumentException e) {
         log.error(e.getMessage());
         model.addAttribute("message", e.getMessage());
-        return "inspection/error";
+        return "inspections/error";
     }
 }
