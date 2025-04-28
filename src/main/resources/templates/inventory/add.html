@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>재고 추가</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <style>
+      /* 재고 추가 페이지 스타일 */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .page-title {
+        font-size: 24px;
+        font-weight: 600;
+      }
+      
+      .button-group {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      
+      .btn i {
+        margin-right: 5px;
+      }
+      
+      .btn-outline {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        color: #333;
+        text-decoration: none;
+      }
+      
+      .btn-outline:hover {
+        background-color: #f5f5f5;
+        text-decoration: none;
+      }
+      
+      .btn-primary {
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+      }
+      
+      .btn-primary:hover {
+        background-color: #0b5ed7;
+      }
+      
+      .btn-success {
+        background-color: #198754;
+        color: white;
+        border: none;
+      }
+      
+      .btn-success:hover {
+        background-color: #157347;
+      }
+      
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+      }
+      
+      .btn-danger:hover {
+        background-color: #bb2d3b;
+      }
+      
+      .subtitle {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      
+      .description {
+        color: #777;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      
+      /* 재고 추가 폼 섹션 */
+      .product-form-section {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      
+      /* 폼 스타일 */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #555;
+      }
+      
+      .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+      
+      .form-control:focus {
+        border-color: #0d6efd;
+        outline: none;
+      }
+      
+      .form-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+      }
+      
+      .form-helper {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+      }
+      
+      .form-error {
+        font-size: 12px;
+        color: #dc3545;
+        margin-top: 5px;
+      }
+      
+      .form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      
+      .form-check-input {
+        margin-right: 8px;
+      }
+      
+      .form-check-label {
+        font-size: 14px;
+      }
+      
+      .form-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      
+      .form-divider {
+        border-top: 1px solid #eee;
+        margin: 20px 0;
+      }
+      
+      /* 다크 모드 내 재고 추가 페이지 스타일 */
+      body.dark-mode .btn-outline {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+      
+      body.dark-mode .btn-outline:hover {
+        background-color: #333;
+      }
+      
+      body.dark-mode .product-form-section {
+        background-color: #1e1e1e;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+      
+      body.dark-mode .form-control,
+      body.dark-mode .form-select {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+      
+      body.dark-mode .form-label {
+        color: #b0b0b0;
+      }
+      
+      body.dark-mode .form-helper {
+        color: #aaa;
+      }
+      
+      body.dark-mode .form-divider {
+        border-color: #333;
+      }
+      
+      @media (max-width: 768px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        
+        .button-group {
+          width: 100%;
+        }
+        
+        .form-buttons {
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .form-buttons .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='inventory'">
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+      <h1 class="page-title">재고 추가</h1>
+      <div class="button-group">
+        <a th:href="@{/inventories}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> 목록으로 돌아가기
+        </a>
+      </div>
+    </div>
+    
+    <!-- 재고 추가 폼 섹션 -->
+    <div class="product-form-section">
+      <h2 class="subtitle">재고 정보</h2>
+      <p class="description">새로운 재고 정보를 등록하기 위해 필요한 정보를 입력해주세요.</p>
+      
+      <form id="inventoryForm" th:action="@{/inventories/add}" method="post">
+        <div class="form-grid">
+          <!-- 왼쪽 컬럼 -->
+          <div>
+            <div class="form-group">
+              <label for="storageId" class="form-label">창고 ID *</label>
+              <input type="number" id="storageId" name="storageId" class="form-control" required>
+              <div class="form-helper">창고 식별 번호를 입력하세요.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="productId" class="form-label">상품 ID *</label>
+              <input type="number" id="productId" name="productId" class="form-control" required>
+              <div class="form-helper">상품 식별 번호를 입력하세요.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="lotNumber" class="form-label">로트 번호 *</label>
+              <input type="text" id="lotNumber" name="lotNumber" class="form-control" required>
+              <div class="form-helper">상품의 로트 번호를 입력하세요.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="locationCode" class="form-label">위치 코드 *</label>
+              <input type="number" id="locationCode" name="locationCode" class="form-control" required>
+              <div class="form-helper">창고 내 위치 코드를 입력하세요.</div>
+            </div>
+          </div>
+          
+          <!-- 오른쪽 컬럼 -->
+          <div>
+            <div class="form-group">
+              <label for="availableStock" class="form-label">가용 재고 *</label>
+              <input type="number" id="availableStock" name="availableStock" class="form-control" min="0" required>
+              <div class="form-helper">현재 사용 가능한 재고 수량</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="allocatedStock" class="form-label">할당 재고 *</label>
+              <input type="number" id="allocatedStock" name="allocatedStock" class="form-control" min="0" required>
+              <div class="form-helper">주문에 할당된 재고 수량</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="disposedStock" class="form-label">폐기 재고</label>
+              <input type="number" id="disposedStock" name="disposedStock" class="form-control" min="0" value="0">
+              <div class="form-helper">폐기된 재고 수량</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="inventoryExpiryDate" class="form-label">유통기한</label>
+              <input type="date" id="inventoryExpiryDate" name="inventoryExpiryDate" class="form-control">
+              <div class="form-helper">재고 유통기한을 입력하세요.</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-buttons">
+          <button type="button" class="btn btn-outline" onclick="resetForm()">
+            <i class="fas fa-undo"></i> 초기화
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> 재고 등록
+          </button>
+        </div>
+      </form>
+    </div>
+  </th:block>
+  
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      // 폼 초기화
+      function resetForm() {
+        document.getElementById('inventoryForm').reset();
+      }
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log("재고 추가 페이지 스크립트 로딩 완료");
+      });
+      /*]]>*/
+    </script>
+  </th:block>
+</body>
+</html>

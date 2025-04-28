@@ -1,0 +1,208 @@
+/* 
+ * 인증 레이아웃 - 로그인, 회원가입 등 인증 페이지 레이아웃
+ */
+.auth-body {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.auth-logo {
+    margin-bottom: 2rem;
+}
+
+.auth-logo h1 {
+    font-size: 2rem;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.auth-footer {
+    margin-top: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* 로그인 및 회원가입 폼 */
+.auth-form {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.auth-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* 로그인 폼 특화 스타일 */
+.login-form {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.login-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 0.75rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+}
+
+/* 회원가입 폼 특화 스타일 */
+.signup-form {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.signup-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.signup-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-signup {
+    width: 100%;
+    padding: 0.75rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+}
+
+/* 실패 페이지 스타일 */
+.fail-container {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+.fail-icon {
+    font-size: 4rem;
+    color: var(--color-danger);
+    margin-bottom: 1.5rem;
+}
+
+.fail-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.fail-message-box {
+    background-color: rgba(var(--color-danger-rgb), 0.1);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-danger);
+    text-align: left;
+}
+
+.fail-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.fail-message i {
+    font-size: 1.25rem;
+    margin-top: 0.125rem;
+}
+
+.fail-details {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.fail-details ul {
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+    list-style-type: disc;
+}
+
+.fail-details li {
+    margin-bottom: 0.5rem;
+}
+
+.fail-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* 반응형 */
+@media (max-width: 576px) {
+    .auth-form,
+    .login-form,
+    .signup-form,
+    .fail-container {
+        padding: 1.5rem;
+    }
+    
+    .auth-title,
+    .login-title,
+    .signup-title {
+        font-size: 1.35rem;
+    }
+    
+    .fail-title {
+        font-size: 1.5rem;
+    }
+    
+    .fail-actions {
+        flex-direction: column;
+    }
+}

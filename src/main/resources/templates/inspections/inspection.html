@@ -1,0 +1,23 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>WMS - 검수</title>
+</head>
+<body>
+    <th:block layout:fragment="content" th:with="activeMenu='dashboard'">
+
+        <!-- 페이지 콘텐츠 영역 -->
+        <main class="page-content">
+            <!-- 알림 메시지 -->
+            <div th:if="${message != null}" class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+            </div>
+        </main>
+    </th:block>
+</body>
+</html>

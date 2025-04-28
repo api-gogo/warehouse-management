@@ -1,106 +1,93 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 네비게이션</title>
-  <link rel="stylesheet" href="../../static/css/navigation.css">
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
-</head>
-<body>
-<div class="layout">
-  <!-- 사이드바 -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1 class="logo">WMS System</h1>
-    </div>
-    <nav class="sidebar-nav">
-      <ul>
-        <!--   li에다가 class="active" 주면 강조표시 됩니다      -->
-        <li>
-          <a href="index.html">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>대시보드</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-box"></i>
-            <span>재고 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-truck-loading"></i>
-            <span>입고 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-shopping-cart"></i>
-            <span>수주 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-clipboard-check"></i>
-            <span>검수 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-building"></i>
-            <span>공급업체 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-folder-tree"></i>
-            <span>카테고리 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-truck"></i>
-            <span>출고 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-undo"></i>
-            <span>반품 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-users"></i>
-            <span>사용자 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-store"></i>
-            <span>매장 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-chart-bar"></i>
-            <span>보고서</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-cog"></i>
-            <span>설정</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </aside>
+<!-- 사이드바 -->
+<aside class="sidebar" th:fragment="aside">
+  <div class="sidebar-header">
+    <h1 class="logo">WMS System</h1>
+  </div>
+  <nav class="sidebar-nav">
+    <ul>
+      <li th:class="${activeMenu == 'dashboard' ? 'active' : ''}">
+        <a th:href="@{/}">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>대시보드</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'user' ? 'active' : ''}" th:if="${#authorization.expression('hasAuthority(''관리자'')')}">
+        <a th:href="@{/admin/users}">
+          <i class="fas fa-users"></i>
+          <span>사용자 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'storage' ? 'active' : ''}">
+        <a th:href="@{/storages}">
+          <i class="fas fa-truck-loading"></i>
+          <span>입고 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'shipment' ? 'active' : ''}">
+        <a th:href="@{/shipments}">
+          <i class="fas fa-truck"></i>
+          <span>출고 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'inventory' ? 'active' : ''}">
+        <a th:href="@{/inventories}">
+          <i class="fas fa-box"></i>
+          <span>재고 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'inspection' ? 'active' : ''}">
+        <a th:href="@{/inspections}">
+          <i class="fas fa-clipboard-check"></i>
+          <span>검수 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'return' ? 'active' : ''}">
+        <a th:href="@{/returns}">
+          <i class="fas fa-undo"></i>
+          <span>반품 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'purchase' ? 'active' : ''}">
+        <a th:href="@{/purchases}">
+          <i class="fas fa-file-invoice"></i> <span>발주 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'sales' ? 'active' : ''}">
+        <a th:href="@{/sales}">
+          <i class="fas fa-receipt"></i> <span>수주 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'product' ? 'active' : ''}">
+        <a th:href="@{/products}">
+          <i class="fas fa-boxes-stacked"></i> <span>상품 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'supplier' ? 'active' : ''}">
+        <a th:href="@{/suppliers}">
+          <i class="fas fa-truck"></i> <span>거래처 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'store' ? 'active' : ''}">
+        <a th:href="@{/stores}">
+          <i class="fas fa-store"></i>
+          <span>점포 관리</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'report' ? 'active' : ''}">
+        <a href="#">
+          <i class="fas fa-chart-bar"></i>
+          <span>보고서</span>
+        </a>
+      </li>
+      <li th:class="${activeMenu == 'settings' ? 'active' : ''}">
+        <a href="#">
+          <i class="fas fa-cog"></i>
+          <span>설정</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
 
   <!-- 메인 콘텐츠 -->
   <div class="main-content">

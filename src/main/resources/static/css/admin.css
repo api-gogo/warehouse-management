@@ -1,0 +1,293 @@
+/* 관리자 페이지 공통 스타일 */
+.admin-container {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.admin-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-right: 1rem;
+    transition: color 0.2s;
+}
+
+.back-button:hover {
+    color: var(--color-primary);
+}
+
+.back-button i {
+    margin-right: 0.5rem;
+}
+
+/* 탭 관련 커스텀 스타일 - 기본 스타일은 components/tabs.css 참조 */
+
+.admin-content {
+    padding: 1.5rem;
+}
+
+/* 검색 및 필터 */
+.search-box {
+    position: relative;
+    width: 300px;
+}
+
+.search-button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.search-button:hover {
+    color: var(--color-primary);
+}
+
+.filter-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* 테이블 커스텀 스타일 - 기본 스타일은 components/tables.css 참조 */
+.data-table th {
+    cursor: pointer;
+}
+
+.data-table th:hover {
+    color: var(--color-primary);
+}
+
+/* 액션 버튼 커스텀 스타일 - 기본 스타일은 components/tables.css 참조 */
+
+/* 페이지네이션 스타일 추가 커스텀 - 기본 스타일은 components/tables.css 참조 */
+
+/* 사용자 상세 페이지 */
+.user-detail-container {
+    padding: 1.5rem;
+}
+
+.user-profile-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-avatar {
+    font-size: 4rem;
+    color: var(--color-primary);
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.user-basic-info {
+    flex: 1;
+}
+
+.user-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.user-code {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+}
+
+.user-status {
+    margin-top: 0.5rem;
+}
+
+/* 읽기 전용 필드 스타일 */
+.readonly-field {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed !important;
+}
+
+.detail-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+}
+
+.section-description {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* 승인 관리 페이지 */
+.batch-approval-options {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.batch-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.select-all-checkbox,
+.user-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+}
+
+/* 승인 관리 배치 작업 관련 스타일 */
+.batch-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 992px) {
+    .info-grid,
+    .batch-options-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .full-width {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .admin-actions {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .user-profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-avatar {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-tabs {
+        justify-content: flex-start;
+    }
+    
+    .admin-content {
+        padding: 1rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+    }
+}

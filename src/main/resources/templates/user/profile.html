@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>프로필</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/profile.css">
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='profile'">
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="profile-title">
+          <h1 class="profile-name" th:text="${user.userName}">사용자 이름</h1>
+          <p class="profile-role">
+            <span th:text="${user.userPart}">부서</span> - 
+            <span th:text="${user.userRole}">직책</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="profile-body">
+        <div class="profile-section">
+          <h2 class="section-title">개인 정보</h2>
+          
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-id-card"></i>
+                <span>사원번호</span>
+              </div>
+              <div class="info-value" th:text="${user.userCode}"></div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-envelope"></i>
+                <span>이메일</span>
+              </div>
+              <div class="info-value" th:text="${user.userEmail}"></div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-phone"></i>
+                <span>전화번호</span>
+              </div>
+              <div class="info-value" th:text="${user.userPhone}"></div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-users"></i>
+                <span>부서</span>
+              </div>
+              <div class="info-value" th:text="${user.userPart}"></div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-user-tag"></i>
+                <span>직책</span>
+              </div>
+              <div class="info-value" th:text="${user.userRole}"></div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-toggle-on"></i>
+                <span>상태</span>
+              </div>
+              <div class>
+                <span class="status-badge"
+                   th:classappend="${user.userStatus == '재직중' ? 'status-active' : 
+                                   (user.userStatus == '승인대기' ? 'status-pending' : 
+                                   (user.userStatus == '승인거부' ? 'status-rejected' :
+                                   (user.userStatus == '휴직중' ? 'status-inactive' : 'status-resigned')))}"
+                      th:text="${user.userStatus}"></span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-calendar-alt"></i>
+                <span>가입일</span>
+              </div>
+              <div class="info-value" th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd hh:mm')}">2023-01-01</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="profile-actions">
+          <!-- 승인대기 상태가 아닌 사용자에게만 정보 수정 버튼 표시 -->
+          <a th:if="${user.userStatus != '승인대기'}" th:href="@{/user/password-verify}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>정보 수정
+          </a>
+          
+          <!-- 승인대기 상태인 사용자에게 표시되는 메시지 -->
+          <div th:if="${user.userStatus == '승인대기'}" class="alert alert-warning mt-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>승인 대기 중입니다.</strong> 관리자의 승인 후에 정보 수정이 가능합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>

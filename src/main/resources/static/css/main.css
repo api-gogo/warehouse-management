@@ -1,0 +1,30 @@
+/* 
+ * 메인 CSS 파일 - 모든 CSS 컴포넌트를 임포트
+ */
+
+/* Base */
+@import 'base/variables.css';
+@import 'base/reset.css';
+@import 'base/typography.css';
+
+/* Components */
+@import 'components/buttons.css';
+@import 'components/forms.css';
+@import 'components/cards.css';
+@import 'components/alerts.css';
+@import 'components/tables.css';
+@import 'components/badges.css';
+@import 'components/tabs.css';
+
+/* Layouts */
+@import 'layouts/grid.css';
+@import 'layouts/navigation.css';
+@import 'layouts/default-layout.css';
+@import 'layouts/auth-layout.css';
+
+/* Utilities */
+@import 'utilities/spacing.css';
+@import 'utilities/display.css';
+@import 'utilities/colors.css';
+
+/* 페이지별 스타일은 별도 파일로 유지 */
