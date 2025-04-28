@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.user.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.service.AdminService;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,15 +12,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final AdminService adminService;
     private final UserService userService;
 
     @Autowired
-    public AdminController(UserService userService) {
+    public AdminController(AdminService adminService, UserService userService) {
+        this.adminService = adminService;
         this.userService = userService;
     }
 
@@ -34,7 +39,7 @@ public class AdminController {
             search = null;
         }
 
-        Page<UserDTO> userPage = userService.findUsers(search, status, pageable);
+        Page<UserDTO> userPage = adminService.findUsers(search, status, pageable);
 
         if (userPage.isEmpty()) {
             model.addAttribute("message", "조건에 맞는 회원이 없습니다.");
@@ -46,7 +51,7 @@ public class AdminController {
         model.addAttribute("size", userPage.getSize());
 
         // 승인 대기 회원 수 조회
-        long pendingCount = userService.countPendingUsers();
+        long pendingCount = adminService.countPendingUsers();
         model.addAttribute("pendingCount", pendingCount);
 
         model.addAttribute("search", search);
@@ -72,7 +77,7 @@ public class AdminController {
     public String updateUser(@PathVariable Integer userId, UserDTO updateUserDTO,
                              RedirectAttributes redirectAttributes) {
         String message = null;
-        boolean result = userService.updateUser(userId, updateUserDTO);
+        boolean result = adminService.updateUser(userId, updateUserDTO);
 
         if (!result) {
             message = "회원 정보를 찾을 수 없습니다.";
@@ -89,7 +94,7 @@ public class AdminController {
     public String approveUser(@PathVariable Integer userId, UserDTO updateUserDTO,
                              RedirectAttributes redirectAttributes) {
         String message = null;
-        boolean result = userService.approveUser(userId, updateUserDTO);
+        boolean result = adminService.approveUser(userId, updateUserDTO);
 
         if (!result) {
             message = "회원 정보를 찾을 수 없습니다.";
@@ -105,7 +110,7 @@ public class AdminController {
     @PostMapping("/users/{userId}/reject")
     public String rejectUser(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
         String message = null;
-        boolean result = userService.rejectUser(userId);
+        boolean result = adminService.rejectUser(userId);
 
         if (!result) {
             message = "회원 정보를 찾을 수 없습니다.";
@@ -127,7 +132,7 @@ public class AdminController {
             search = null;
         }
 
-        Page<UserDTO> userPage = userService.findPendingUsers(search, pageable);
+        Page<UserDTO> userPage = adminService.findPendingUsers(search, pageable);
 
         if (userPage.isEmpty()) {
             model.addAttribute("message", "승인 대기 중인 회원이 없습니다.");
@@ -139,11 +144,47 @@ public class AdminController {
         model.addAttribute("size", userPage.getSize());
 
         // 승인 대기 회원 수 조회
-        long pendingCount = userService.countPendingUsers();
+        long pendingCount = adminService.countPendingUsers();
         model.addAttribute("pendingCount", pendingCount);
 
         model.addAttribute("search", search);
 
         return "/admin/user-approvals";
+    }
+
+    @PostMapping("/users/approve-batch")
+    public String approveBatchUsers(@RequestParam("selectedUsers") List<Integer> userIds,
+                                    @RequestParam("batchPart") String batchPart,
+                                    @RequestParam("batchRole") String batchRole,
+                                    RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.approveUsers(userIds, batchPart, batchRole);
+
+        if (!result) {
+            message = "승인 도중 오류가 발생하였습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users/approvals";
+        }
+
+        message = "선택한 사용자들이 성공적으로 승인되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users/approvals";
+    }
+
+    @PostMapping("/users/reject-batch")
+    public String rejectBatchUsers(@RequestParam("selectedUsers") List<Integer> userIds,
+                                    RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.rejectUsers(userIds);
+
+        if (!result) {
+            message = "승인 거부 도중 오류가 발생하였습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users/approvals";
+        }
+
+        message = "선택한 사용자들이 성공적으로 승인 거부되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users/approvals";
     }
 }
