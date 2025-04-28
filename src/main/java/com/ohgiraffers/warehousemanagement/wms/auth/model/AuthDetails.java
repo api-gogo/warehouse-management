@@ -28,16 +28,35 @@ public class AuthDetails implements UserDetails {
         this.loginUserDTO = loginUserDTO;
     }
 
-    // 권한 정보 반환 - UserRole과 UserStatus를 모두 권한으로 추가
+    // 권한 정보 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        
-        // 기본 권한 (UserRole 기반)
-        authorities.add(new SimpleGrantedAuthority(loginUserDTO.getUserRole()));
-        
-        // UserStatus 기반 추가 권한 (접두사 없이)
-        authorities.add(new SimpleGrantedAuthority(loginUserDTO.getUserStatus()));
+
+        String status = loginUserDTO.getUserStatus();
+        String role = loginUserDTO.getUserRole();
+        String part = loginUserDTO.getUserPart();
+
+        // 기본 권한 추가
+        authorities.add(new SimpleGrantedAuthority(status));
+        authorities.add(new SimpleGrantedAuthority(role));
+        authorities.add(new SimpleGrantedAuthority(part));
+
+        // 재직중 상태인 경우에만 추가 권한 부여
+        if (UserStatus.재직중.getStatus().equals(status)) {
+            // 모든 재직중인 사용자에게 조회 권한 부여
+            authorities.add(new SimpleGrantedAuthority("READ_ALL"));
+
+            // 통합 부서는 관리자 직책만 가질 수 있음
+            // 통합 부서 + 관리자인 경우 모든 도메인 접근 권한 부여
+            if ("통합".equals(part) && "관리자".equals(role)) {
+                authorities.add(new SimpleGrantedAuthority("통합_관리자"));
+            }
+            // 일반 부서의 경우 부서 + 직책 조합으로 권한 부여
+            else {
+                authorities.add(new SimpleGrantedAuthority(part + "_" + role));
+            }
+        }
         
         return authorities;
     }
