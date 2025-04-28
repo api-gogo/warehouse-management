@@ -39,8 +39,16 @@ public class UserController {
         Integer result = userService.registerUser(signupUserDTO);
         String message = null;
 
-        if (result == null) {
-            message = "중복 회원이 존재합니다.";
+        if (result == -1) {
+            message = "중복된 사원번호가 존재합니다.";
+            model.addAttribute("message", message);
+            return "user/signup";
+        } else if (result == -2) {
+            message = "중복된 이메일이 존재합니다.";
+            model.addAttribute("message", message);
+            return "user/signup";
+        } else if (result == -3) {
+            message = "중복된 전화번호가 존재합니다.";
             model.addAttribute("message", message);
             return "user/signup";
         } else if (result == 0) {
