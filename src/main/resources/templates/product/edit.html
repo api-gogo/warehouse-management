@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WMS - 상품 수정</title>
+  <!-- 폰트어썸 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Flatpickr 달력 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- 페이지 css  -->
+  <link rel="stylesheet" href="../../static/css/product/edit.css" th:href="@{/css/product/edit.css}">
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/common.css?v=1">
+  <!-- 네비게이션 CSS -->
+  <link rel="stylesheet" href="/css/navigation.css?v=1">
+</head>
+<body>
+<div th:replace="~{navigation :: aside}"></div>
+
+<!-- 메인 콘텐츠 -->
+<div class="main-content">
+  <!-- 헤더 포함 -->
+  <div th:replace="~{navigation :: header}"></div>
+
+<!-- 페이지 콘텐츠 영역 - 상품 수정 페이지 -->
+<main class="page-content">
+  <!-- 페이지 제목과 뒤로가기 버튼 -->
+  <div class="flex items-center justify-between">
+    <h1 class="page-title">상품 수정</h1>
+    <div class="flex items-center space-x-2">
+      <a href="/product" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        목록으로
+      </a>
+    </div>
+  </div>
+
+  <!-- 상품 정보 카드 -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">상품 정보</h2>
+      <p class="card-description">상품 정보를 수정해주세요.</p>
+    </div>
+    <div class="card-content">
+      <!-- 에러 메시지 표시 -->
+      <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+      <!-- 상품 수정 폼 -->
+      <form th:action="@{/product/edit/{id}(id=${product.productId})}" method="post" th:object="${product}">
+        <input type="hidden" th:field="*{productId}">
+        <input type="hidden" th:field="*{productCreatedAt}">
+
+        <div class="form-grid">
+          <!-- 품명 입력 -->
+          <div class="form-group">
+            <label for="productName" class="form-label">품명 *</label>
+            <input type="text" id="productName" name="productName" th:field="*{productName}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}">품명을 입력해주세요.</div>
+          </div>
+
+          <!-- 카테고리 선택 -->
+          <div class="form-group">
+            <label for="categoryId" class="form-label">카테고리 *</label>
+            <select id="categoryId" name="categoryId" th:field="*{categoryId}" class="form-select" required>
+              <option value="">카테고리 선택</option>
+              <option th:each="cat : ${categories}"
+                      th:value="${cat.id}"
+                      th:text="${cat.name}"
+                      th:selected="${cat.id == product.categoryId}"></option>
+            </select>
+            <div class="form-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">카테고리를 선택해주세요.</div>
+          </div>
+
+          <!-- 거래처 ID 입력 -->
+          <div class="form-group">
+            <label for="supplierId" class="form-label">거래처 ID *</label>
+            <input type="number" id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('supplierId')}" th:errors="*{supplierId}">거래처 ID를 입력해주세요.</div>
+          </div>
+
+          <!-- 담당자 ID 입력 -->
+          <div class="form-group">
+            <label for="userId" class="form-label">담당자 ID *</label>
+            <input type="number" id="userId" name="userId" th:field="*{userId}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">담당자 ID를 입력해주세요.</div>
+          </div>
+
+          <!-- 보관방법 입력 -->
+          <div class="form-group">
+            <label for="storageMethod" class="form-label">보관방법 *</label>
+            <input type="text" id="storageMethod" name="storageMethod" th:field="*{storageMethod}" class="form-input" required>
+            <div class="form-error" th:if="${#fields.hasErrors('storageMethod')}" th:errors="*{storageMethod}">보관방법을 입력해주세요.</div>
+          </div>
+
+          <!-- 유통기한 선택 -->
+          <div class="form-group">
+            <label for="expirationDatePicker" class="form-label">유통기한 *</label>
+            <input type="text" id="expirationDatePicker" class="form-input" placeholder="유통기한을 선택해주세요" required>
+            <input type="hidden" id="expirationDate" name="expirationDate" th:field="*{expirationDate}">
+            <div class="form-hint">상품의 유통기한을 선택해주세요.</div>
+            <div class="form-error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}">유통기한을 입력해주세요.</div>
+          </div>
+
+          <!-- 박스당 단가 입력 -->
+          <div class="form-group">
+            <label for="pricePerBox" class="form-label">박스당 단가 *</label>
+            <input type="number" id="pricePerBox" name="pricePerBox" th:field="*{pricePerBox}" class="form-input" min="0" step="100" required>
+            <div class="form-hint">박스당 단가를 원 단위로 입력해주세요.</div>
+            <div class="form-error" th:if="${#fields.hasErrors('pricePerBox')}" th:errors="*{pricePerBox}">박스당 단가를 입력해주세요.</div>
+          </div>
+
+          <!-- 박스당 개수 입력 -->
+          <div class="form-group">
+            <label for="quantityPerBox" class="form-label">박스당 개수 *</label>
+            <input type="number" id="quantityPerBox" name="quantityPerBox" th:field="*{quantityPerBox}" class="form-input" min="1" required>
+            <div class="form-hint">박스당 포함된 상품의 수량을 입력해주세요.</div>
+            <div class="form-error" th:if="${#fields.hasErrors('quantityPerBox')}" th:errors="*{quantityPerBox}">박스당 개수를 입력해주세요.</div>
+          </div>
+        </div>
+
+        <!-- 폼 제출 및 삭제 버튼 -->
+        <div class="flex justify-between">
+          <button type="button" class="btn btn-danger" onclick="showDeleteConfirmModal()">
+            <i class="fas fa-trash"></i>
+            삭제
+          </button>
+
+          <div class="flex space-x-2">
+            <button type="button" class="btn btn-outline" onclick="history.back()">취소</button>
+            <button type="submit" class="btn btn-primary">저장</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- 삭제 확인 모달 -->
+<div id="deleteConfirmModal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">상품 삭제 확인</h3>
+      <button type="button" class="modal-close" onclick="hideDeleteConfirmModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <p>정말로 이 상품을 삭제하시겠습니까?</p>
+      <p>삭제하시면 다시는 복구 할 수 없습니다.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" onclick="hideDeleteConfirmModal()">취소</button>
+      <form th:action="@{/product/delete/{id}(id=${product.productId})}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-danger">삭제</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<div th:replace="~{navigation :: scripts}"></div>
+
+<!-- Flatpickr 달력 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+<script>
+  // 유통기한 초기화 및 날짜 표시
+  const currentExpirationDays = parseInt(document.getElementById("expirationDate").value) || 0;
+  let defaultDate = new Date();
+  if (currentExpirationDays > 0) {
+    defaultDate.setDate(defaultDate.getDate() + currentExpirationDays);
+  }
+
+  // 달력 초기화
+  const expirationDatePicker = flatpickr("#expirationDatePicker", {
+    locale: "ko",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    defaultDate: currentExpirationDays > 0 ? defaultDate : null,
+    onChange: function(selectedDates, dateStr) {
+      const selectedDate = selectedDates[0];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const diffTime = selectedDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById("expirationDate").value = diffDays;
+    }
+  });
+
+  // 페이지 로드 시 유통기한 날짜 표시
+  window.addEventListener('DOMContentLoaded', function() {
+    if (currentExpirationDays > 0) {
+      const formattedDate = defaultDate.toISOString().split('T')[0];
+      document.getElementById("expirationDatePicker").value = formattedDate;
+    }
+  });
+
+  // 폼 유효성 검사
+  document.querySelector('form').addEventListener('submit', function(event) {
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+        field.classList.add('border-red-500');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error';
+        errorDiv.textContent = '이 필드는 필수입니다.';
+        const existingError = field.parentNode.querySelector('.form-error:not([th\\:errors])');
+        if (existingError) {
+          field.parentNode.removeChild(existingError);
+        }
+        field.parentNode.appendChild(errorDiv);
+      } else {
+        field.classList.remove('border-red-500');
+        const existingError = field.parentNode.querySelector('.form-error:not([th\\:errors])');
+        if (existingError) {
+          field.parentNode.removeChild(existingError);
+        }
+      }
+    });
+
+    if (!document.getElementById("expirationDate").value) {
+      isValid = false;
+      document.getElementById("expirationDatePicker").classList.add('border-red-500');
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'form-error';
+      errorDiv.textContent = '유통기한을 선택해주세요.';
+      const existingError = document.getElementById("expirationDatePicker").parentNode.querySelector('.form-error:not([th\\:errors])');
+      if (existingError) {
+        document.getElementById("expirationDatePicker").parentNode.removeChild(existingError);
+      }
+      document.getElementById("expirationDatePicker").parentNode.appendChild(errorDiv);
+    }
+
+    if (!isValid) {
+      event.preventDefault();
+    }
+  });
+
+  // 삭제 확인 모달 표시
+  function showDeleteConfirmModal() {
+    document.getElementById('deleteConfirmModal').classList.add('show');
+  }
+
+  // 삭제 확인 모달 숨기기
+  function hideDeleteConfirmModal() {
+    document.getElementById('deleteConfirmModal').classList.remove('show');
+  }
+
+  // ESC 키로 모달 닫기
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      hideDeleteConfirmModal();
+    }
+  });
+
+  // 모달 외부 클릭 시 닫기
+  document.getElementById('deleteConfirmModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+      hideDeleteConfirmModal();
+    }
+  });
+</script>
+</body>
+</html>

@@ -21,7 +21,6 @@ public class ProductPageResponseDTO {
         this.endItem = endItem;
     }
 
-    // Getter와 Setter
     public List<ProductResponseDTO> getProducts() {
         return products;
     }
