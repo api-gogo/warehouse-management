@@ -1,0 +1,175 @@
+/* 
+ * 테이블 컴포넌트 - 테이블 관련 스타일
+ */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    vertical-align: top;
+    border-color: var(--border-color);
+}
+
+.table > :not(:last-child) > :last-child > * {
+    border-bottom-color: currentColor;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.75rem;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--border-color);
+}
+
+.table > thead {
+    vertical-align: bottom;
+}
+
+.table > tbody {
+    vertical-align: inherit;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 데이터 테이블 (WMS 스타일) */
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.data-table th {
+    background-color: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+    border-right: 0;
+}
+
+.data-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.data-table tr:hover {
+    background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+/* 액션 셀 (버튼이 있는 열) */
+.data-table .actions {
+    white-space: nowrap;
+}
+
+.data-table .action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    margin: 0 0.125rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.data-table .action-button:hover {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    color: var(--color-primary);
+}
+
+.data-table .action-button.danger-button:hover {
+    background-color: rgba(var(--color-danger-rgb), 0.1);
+    color: var(--color-danger);
+}
+
+.data-table .action-button.approve-button:hover {
+    background-color: rgba(var(--color-success-rgb), 0.1);
+    color: var(--color-success);
+}
+
+.data-table .action-button.disable-button:hover {
+    background-color: rgba(var(--color-warning-rgb), 0.1);
+    color: var(--color-warning);
+}
+
+/* 데이터가 없을 때 */
+.data-table .no-data {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    margin: 1.5rem 0;
+}
+
+.pagination .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--bg-secondary);
+}
+
+.pagination .page-link.active {
+    background-color: var(--color-primary);
+    color: #fff;
+}
+
+.pagination .page-link.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* 반응형 테이블 조정 */
+@media (max-width: 768px) {
+    .data-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .table-responsive-sm {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
