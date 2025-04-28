@@ -64,15 +64,15 @@ public class SecurityConfig {
             
             // ==================== 업무 도메인별 접근 권한 ==================== //
             
-            // 5. 전체 조회, 상세 조회 - 재직중인 사용자에게만 READ_ALL 권한 부여
-            auth.requestMatchers("/storages", "/storages/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/shipments", "/shipments/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/inventories", "/inventories/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/inspections", "/inspections/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/returns", "/returns/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/purchases", "/purchases/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/sales", "/sales/{id}").hasAuthority("READ_ALL");
-            auth.requestMatchers("/products", "/products/{id}").hasAuthority("READ_ALL");
+            // 5. 전체 조회, 상세 조회 - 개발 중이므로 일시적으로 모든 사용자에게 허용
+            auth.requestMatchers("/storages", "/storages/{id}").permitAll();
+            auth.requestMatchers("/shipments", "/shipments/{id}").permitAll();
+            auth.requestMatchers("/inventories", "/inventories/{id}", "/inventories/**").permitAll();
+            auth.requestMatchers("/inspections", "/inspections/{id}").permitAll();
+            auth.requestMatchers("/returns", "/returns/{id}").permitAll();
+            auth.requestMatchers("/purchases", "/purchases/{id}").permitAll();
+            auth.requestMatchers("/sales", "/sales/{id}").permitAll();
+            auth.requestMatchers("/products", "/products/{id}").permitAll();
             
             // 6. 각 부서별 작업에 대한 권한 설정 -> 이후 직책별에 맞게 수정 필요
             // 입고 부서
