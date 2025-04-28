@@ -2,6 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.model.entity;
 
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Comment;
 
@@ -68,6 +69,19 @@ public class Inspection {
         this.inspectionStatus = inspectionStatus;
         this.inspectionDate = LocalDate.now();
     }
+
+    public Inspection(InspectionRequestDTO dto) {
+        this.userId = dto.getUserId();
+        this.transactionId = dto.getTransactionId();
+        this.transactionType = dto.getTransactionType();
+        this.inspectionQuantity = dto.getInspectionQuantity();
+        this.acceptedQuantity = dto.getAcceptedQuantity();
+        this.defectiveQuantity = dto.getDefectiveQuantity();
+        this.inspectionStatus = dto.getInspectionStatus();
+        this.inspectionDate = LocalDate.now();
+    }
+
+
 
     public Integer getInspectionId() {
         return inspectionId;
