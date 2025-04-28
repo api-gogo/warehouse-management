@@ -1,8 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.auth.config;
 
 import com.ohgiraffers.warehousemanagement.wms.auth.config.handler.AuthFailHandler;
-import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
-import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserRole;
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;

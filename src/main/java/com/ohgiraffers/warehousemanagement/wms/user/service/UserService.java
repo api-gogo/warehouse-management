@@ -9,6 +9,8 @@ import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
 import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +55,52 @@ public class UserService {
         return users;
     }
 
-    public LoginUserDTO findbyUserCode(String userCode) {
+    public Page<UserDTO> findUsers(String search, String status, Pageable pageable) {
+        UserStatus userStatus = null;
+        
+        // 상태값 변환 로직
+        if (status != null && !status.equals("all")) {
+            switch (status) {
+                case "pending":
+                    userStatus = UserStatus.승인대기;
+                    break;
+                case "active":
+                    userStatus = UserStatus.재직중;
+                    break;  
+                case "inactive":
+                    userStatus = UserStatus.휴직중;
+                    break;
+                case "rejected":
+                    userStatus = UserStatus.승인거부;
+                    break;
+                case "resigned":
+                    userStatus = UserStatus.퇴사;
+                    break;
+                default:
+                    // 기본값은 null로 모든 상태 조회
+                    break;
+            }
+        }
+        
+        Page<User> userPage = userRepository.findUsersByStatusAndSearch(userStatus, search, pageable);
+
+        return userPage.map(user -> new UserDTO(
+                user.getUserId(),
+                user.getUserCode(),
+                user.getUserPass(),
+                user.getUserName(),
+                user.getUserEmail(),
+                user.getUserPhone(),
+                user.getUserPart().getPart(),
+                user.getUserRole().getRole(),
+                user.getUserStatus().getStatus(),
+                user.getUserCreatedAt(),
+                user.getUserUpdatedAt(),
+                user.getUserDeletedAt()
+        ));
+    }
+
+    public LoginUserDTO findUserByUserCode(String userCode) {
         Optional<User> user = userRepository.findByUserCode(userCode);
 
         return user.map(u -> new LoginUserDTO(
@@ -84,6 +131,10 @@ public class UserService {
                 u.getUserUpdatedAt(),
                 u.getUserDeletedAt()
         )).orElse(null);
+    }
+
+    public long countPendingUsers() {
+        return userRepository.countByUserStatus(UserStatus.승인대기);
     }
 
     @Transactional

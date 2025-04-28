@@ -3,6 +3,9 @@ package com.ohgiraffers.warehousemanagement.wms.user.controller;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,16 +25,34 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String getUsers(Model model) {
-        List<UserDTO> userDTOList = userService.getAllUsers();
+    public String getUsers(@RequestParam(required = false) String search,
+                           @RequestParam(required = false, defaultValue = "all") String status,
+                           @PageableDefault(size = 10) Pageable pageable,
+                           Model model) {
 
-        if (userDTOList.isEmpty()) {
-            String message = null;
-            message = "가입된 회원이 없습니다.";
-            model.addAttribute("message", message);
+        // 검색어가 빈 문자열일 경우 null로 처리
+        if (search != null && search.trim().isEmpty()) {
+            search = null;
         }
 
-        model.addAttribute("users", userDTOList);
+        Page<UserDTO> userPage = userService.findUsers(search, status, pageable);
+
+        if (userPage.isEmpty()) {
+            model.addAttribute("message", "조건에 맞는 회원이 없습니다.");
+        }
+
+        model.addAttribute("users", userPage.getContent());
+        model.addAttribute("currentPage", userPage.getNumber());
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("size", userPage.getSize());
+
+        // 승인 대기 회원 수 조회
+        long pendingCount = userService.countPendingUsers();
+        model.addAttribute("pendingCount", pendingCount);
+
+        model.addAttribute("search", search);
+        model.addAttribute("status", status);
+
         return "/admin/users";
     }
 
