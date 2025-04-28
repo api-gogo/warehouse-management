@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -23,26 +24,33 @@ public class InventoryController {
 
     // 재고 전체 조회
     @GetMapping
-    public String getinventoryList(@RequestParam(name = "searchProductId", required = false) String productId, Model model) {
-        List<InventoryDTO> inventories;
-        // searchProductId 가 있으면 해당 상품 번호인 재고 조회
-        if (productId != null && !productId.isEmpty()) {
-            inventories = inventoryService.findAllInventoriesByProductId(productId);
-        } else {
-            // searchProductId 가 없으면 전체 조회
-            inventories = inventoryService.findAllInventories();
+    public String getInventoryList(@RequestParam(name = "searchProductId", required = false) Long productId,                                   Model model) {
+
+        List<InventoryDTO> inventories = null;
+
+        try {
+            // 필터링 없는 전체 조회일 경우
+            if (productId == null) {
+                inventories = inventoryService.findAllInventories();
+            } else {
+                inventories = inventoryService.findAllInventoriesByProductId(productId);
+            }
+
+            model.addAttribute("inventories", inventories);
+            model.addAttribute("activeMenu", "inventory");
+            model.addAttribute("today", LocalDate.now());
+
+            // 로그 추가
+            System.out.println("인벤토리 목록 조회 - 데이터 개수: " + inventories.size());
+            return "/inventory/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "/inventory/list";
         }
-        model.addAttribute("inventories", inventories);
-        model.addAttribute("activeMenu", "inventory");
-        
-        // 로그 추가
-        System.out.println("인벤토리 목록 조회 - 데이터 개수: " + inventories.size());
-        
-        return "/inventory/list";
     }
 
 
-    // 재고 상세 조회
+    // 재고 상세 정보 확인
     @GetMapping("/detail/{inventoryId}")
     public ModelAndView inventoryDetail(@PathVariable("inventoryId") Long inventoryId, ModelAndView mv) {
         InventoryDTO inventory = inventoryService.findInventoryById(inventoryId);

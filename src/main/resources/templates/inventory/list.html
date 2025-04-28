@@ -178,6 +178,8 @@
         background-color: #ffe8e8;
         color: #dc3545;
       }
+      
+
 
       .action-link {
         color: #0d6efd;
@@ -254,112 +256,121 @@
   </th:block>
 </head>
 <body>
-  <!-- 페이지 콘텐츠 -->
-  <th:block layout:fragment="content" th:with="activeMenu='inventory'">
-    <!-- 페이지 헤더 -->
-    <div class="page-header">
-      <h1 class="page-title">재고 관리</h1>
-      <div class="button-group">
-        <button class="btn btn-outline">
-          <i class="fas fa-download"></i> 내보내기
-        </button>
-        <button class="btn btn-outline">
-          <i class="fas fa-upload"></i> 가져오기
-        </button>
-        <a th:href="@{/inventories/add}" class="btn btn-primary">
-          <i class="fas fa-plus"></i> 상품 추가
+<!-- 페이지 콘텐츠 -->
+<th:block layout:fragment="content" th:with="activeMenu='inventory'">
+  <!-- 페이지 헤더 -->
+  <div class="page-header">
+    <h1 class="page-title">재고 관리</h1>
+    <div class="button-group">
+      <button class="btn btn-outline">
+        <i class="fas fa-download"></i> 내보내기
+      </button>
+      <button class="btn btn-outline">
+        <i class="fas fa-upload"></i> 가져오기
+      </button>
+      <a th:href="@{/inventories/add}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> 상품 추가
+      </a>
+    </div>
+  </div>
+
+  <!-- 재고 목록 섹션 - 흰색 배경 추가 -->
+  <div class="inventory-section">
+    <h2 class="subtitle">재고 목록</h2>
+    <p class="description">현재 창고에 보관 중인 모든 상품의 재고 현황입니다.</p>
+    
+
+
+    <!-- 필터링 영역 -->
+    <div class="filter-bar">
+      <div class="filter-input">
+        <form th:action="@{/inventories}" method="get">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="상품명 검색..." name="searchProductId"
+                 th:value="${searchProductId}" class="form-control" />
+        </form>
+      </div>
+      <div class="filter-dropdown">
+        <select name="category">
+          <option value="">전체</option>
+          <option value="상온">상온</option>
+          <option value="냉장">냉장</option>
+          <option value="냉동">냉동</option>
+        </select>
+      </div>
+      <form id="inventoryFilterForm" action="/inventories/search" method="get">
+        <div class="filter-dropdown">
+          <select name="status" id="status" onchange="this.form.submit()">
+            <option value="">전체</option>
+            <option value="정상">정상</option>
+            <option value="부족">부족</option>
+            <option value="폐기">폐기</option>
+          </select>
+        </div>
+      </form>
+      <div>
+        <a th:href="@{/inventories}" class="btn btn-outline">
+          <i class="fas fa-undo"></i> 초기화
         </a>
       </div>
     </div>
 
-    <!-- 재고 목록 섹션 - 흰색 배경 추가 -->
-    <div class="inventory-section">
-      <h2 class="subtitle">재고 목록</h2>
-      <p class="description">현재 창고에 보관 중인 모든 상품의 재고 현황입니다.</p>
-
-      <!-- 필터링 영역 -->
-      <div class="filter-bar">
-        <div class="filter-input">
-          <form th:action="@{/inventories}" method="get">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="상품명 검색..." name="searchProductId"
-                   th:value="${searchProductId}" class="form-control" />
-          </form>
-        </div>
-        <div class="filter-dropdown">
-          <select name="category">
-            <option value="">전체</option>
-            <option value="상온">상온</option>
-            <option value="냉장">냉장</option>
-            <option value="냉동">냉동</option>
-          </select>
-        </div>
-        <form id="inventoryFilterForm" action="/inventories/search" method="get">
-          <div class="filter-dropdown">
-            <select name="status" id="status" onchange="this.form.submit()">
-              <option value="">전체</option>
-              <option value="정상">정상</option>
-              <option value="부족">부족</option>
-              <option value="폐기">폐기</option>
-            </select>
-          </div>
-        </form>
-        <div>
-          <a th:href="@{/inventories}" class="btn btn-outline">
-            <i class="fas fa-undo"></i> 초기화
-          </a>
-        </div>
-      </div>
-
-      <!-- 데이터 테이블 -->
-      <div class="data-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>재고 ID</th>
-              <th>상품 ID</th>
-              <th>로트 번호</th>
-              <th>위치 코드</th>
-              <th>가용 재고</th>
-              <th>유통기한</th>
-              <th>상태</th>
-              <th>관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="inventory : ${inventories}">
-              <td th:text="${inventory.inventoryId}"></td>
-              <td th:text="${inventory.productId}"></td>
-              <td th:text="${inventory.lotNumber}"></td>
-              <td th:text="${inventory.locationCode}"></td>
-              <td th:text="${inventory.availableStock}"></td>
-              <td th:text="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}"></td>
-              <td>
+    <!-- 데이터 테이블 -->
+    <div class="data-card">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>재고 ID</th>
+          <th>상품 ID</th>
+          <th>로트 번호</th>
+          <th>위치 코드</th>
+          <th>가용 재고</th>
+          <th>유통기한</th>
+          <th>상태</th>
+          <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="inventory : ${inventories}">
+          <td th:text="${inventory.inventoryId}"></td>
+          <td th:text="${inventory.productId}"></td>
+          <td th:text="${inventory.lotNumber}"></td>
+          <td th:text="${inventory.locationCode}"></td>
+          <td th:text="${inventory.availableStock}"></td>
+          <td th:text="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}"></td>
+          <td>
                 <span
-                  th:class="${inventory.availableStock > 100 ? 'status-tag status-normal' : 'status-tag status-low'}"
-                  th:text="${inventory.availableStock > 100 ? '정상' : '부족'}">
+                        th:class="${inventory.availableStock > 100 ? 'status-tag status-normal' : 'status-tag status-low'}"
+                        th:text="${inventory.availableStock > 100 ? '정상' : '부족'}">
                 </span>
-              </td>
-              <td>
-                <a th:href="@{/inventories/detail/{id}(id=${inventory.inventoryId})}" class="action-link">상세</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          </td>
+          <td>
+            <a th:href="@{/inventories/detail/{id}(id=${inventory.inventoryId})}" class="action-link">상세</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
-  </th:block>
+  </div>
+</th:block>
 
-  <!-- 페이지별 스크립트 -->
-  <th:block layout:fragment="scripts">
-    <script th:inline="javascript">
-      /*<![CDATA[*/
-      document.addEventListener('DOMContentLoaded', function() {
-        // 스크립트 실행 여부 확인을 위한 로그
-        console.log("재고 목록 페이지 스크립트 로딩 완료");
-      });
-      /*]]>*/
-    </script>
-  </th:block>
+<!-- 페이지별 스크립트 -->
+<th:block layout:fragment="scripts">
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+      // 스크립트 실행 여부 확인을 위한 로그
+      console.log("재고 목록 페이지 스크립트 로딩 완료");
+    });
+    /*]]>*/
+  </script>
+  
+  <!-- 오류 발생 시 알림창 표시 -->
+  <script th:if="${errorMessage}" th:inline="javascript">
+    /*<![CDATA[*/
+    alert(/*[[${errorMessage}]]*/ '오류가 발생했습니다.');
+    /*]]>*/
+  </script>
+</th:block>
 </body>
 </html>
