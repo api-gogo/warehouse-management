@@ -47,14 +47,14 @@ public class InspectionServiceImpl implements InspectionService {
 
     public Page<Inspection> getAllInspection(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return inspectionRepository.findAll(pageable);
+        return inspectionRepository.findAllByOrderByInspectionIdDesc(pageable);
     }
 
     public Page<Inspection> getAllInspectionByTag(String type, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         if (InspectionTransactionType.typeContains(type))
-            return inspectionRepository.findAllByTransactionType(InspectionTransactionType.valueOf(type), pageable);
+            return inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(type), pageable);
         else
             throw new IllegalArgumentException("존재하지 않는 유형입니다!");
     }

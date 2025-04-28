@@ -9,8 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface InspectionRepository extends JpaRepository<Inspection, Integer> {
-
     Optional<Inspection> findByTransactionTypeAndTransactionId(InspectionTransactionType transactionType, Integer transactionId);
 
-    Page<Inspection> findAllByTransactionType(InspectionTransactionType transactionType, Pageable pageable);
+    Page<Inspection> findAllByOrderByInspectionIdDesc(Pageable pageable);
+
+    Page<Inspection> findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType transactionType, Pageable pageable);
 }
