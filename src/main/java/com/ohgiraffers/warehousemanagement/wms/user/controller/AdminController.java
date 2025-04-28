@@ -120,7 +120,58 @@ public class AdminController {
 
         message = "승인이 거부되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
-        return "redirect:/admin/users/" + userId;
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{userId}/disable")
+    public String disableUser(@PathVariable Integer userId,
+                              RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.disableUser(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원이 휴직 처리되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{userId}/enable")
+    public String enableUser(@PathVariable Integer userId,
+                              RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.enableUser(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원이 복직 처리되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{userId}/resign")
+    public String resignUser(@PathVariable Integer userId,
+                             RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.resignUser(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원이 퇴사 처리되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
     }
 
     @GetMapping("/users/approvals")

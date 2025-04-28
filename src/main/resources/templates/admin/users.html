@@ -83,6 +83,9 @@
                 <button th:if="${user.userStatus == '승인대기'}" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
                   <i class="fas fa-check"></i>
                 </button>
+                <button th:if="${user.userStatus == '승인대기'}" class="action-button reject-button" th:data-id="${user.userId}" title="거부">
+                  <i class="fas fa-times"></i>
+                </button>
                 <button th:if="${user.userStatus == '재직중'}" class="action-button disable-button" th:data-id="${user.userId}" title="휴직">
                   <i class="fas fa-ban"></i>
                 </button>
@@ -179,15 +182,47 @@
 
         // 사용자 상태 변경 버튼 이벤트
         const approveButtons = document.querySelectorAll('.approve-button');
+        const rejectButtons = document.querySelectorAll('.reject-button');
         const disableButtons = document.querySelectorAll('.disable-button');
         const enableButtons = document.querySelectorAll('.enable-button');
+        const dangerButtons = document.querySelectorAll('.danger-button');
+
+        // POST 요청을 보내는 공통 함수
+        function sendPostRequest(url) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = url;
+          
+          // CSRF 토큰 추가 (Spring Security 사용 시)
+          const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+          const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+          
+          if (csrfToken && csrfHeader) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = csrfHeader;
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+          }
+          
+          document.body.appendChild(form);
+          form.submit();
+        }
 
         approveButtons.forEach(button => {
           button.addEventListener('click', function() {
             const userId = this.dataset.id;
             if (confirm('해당 사용자의 가입을 승인하시겠습니까?')) {
-              // AJAX 호출 또는 폼 제출
-              window.location.href = `/admin/users/approve/${userId}`;
+              window.location.href = `/admin/users/${userId}`;
+            }
+          });
+        });
+
+        rejectButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('해당 사용자의 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+              sendPostRequest(`/admin/users/${userId}/reject`);
             }
           });
         });
@@ -195,9 +230,8 @@
         disableButtons.forEach(button => {
           button.addEventListener('click', function() {
             const userId = this.dataset.id;
-            if (confirm('해당 사용자의 계정을 비활성화하시겠습니까?')) {
-              // AJAX 호출 또는 폼 제출
-              window.location.href = `/admin/users/disable/${userId}`;
+            if (confirm('해당 사용자를 휴직 처리 하시겠습니까?')) {
+              sendPostRequest(`/admin/users/${userId}/disable`);
             }
           });
         });
@@ -205,9 +239,17 @@
         enableButtons.forEach(button => {
           button.addEventListener('click', function() {
             const userId = this.dataset.id;
-            if (confirm('해당 사용자의 계정을 활성화하시겠습니까?')) {
-              // AJAX 호출 또는 폼 제출
-              window.location.href = `/admin/users/enable/${userId}`;
+            if (confirm('해당 사용자를 복직 처리 하시겠습니까?')) {
+              sendPostRequest(`/admin/users/${userId}/enable`);
+            }
+          });
+        });
+
+        dangerButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('해당 사용자를 퇴사 처리 하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+              sendPostRequest(`/admin/users/${userId}/resign`);
             }
           });
         });

@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,29 +24,6 @@ public class UserService {
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public List<UserDTO> getAllUsers() {
-        List<UserDTO> users = new ArrayList<>();
-
-        for (User user : userRepository.findAll()) {
-            UserDTO userDTO = new UserDTO(
-                    user.getUserId(),
-                    user.getUserCode(),
-                    user.getUserName(),
-                    user.getUserEmail(),
-                    user.getUserPhone(),
-                    user.getUserPart().getPart(),
-                    user.getUserRole().getRole(),
-                    user.getUserStatus().getStatus(),
-                    user.getUserCreatedAt(),
-                    user.getUserUpdatedAt(),
-                    user.getUserDeletedAt()
-            );
-            users.add(userDTO);
-        }
-
-        return users;
     }
 
     public LoginUserDTO findUserByUserCode(String userCode) {

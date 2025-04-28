@@ -207,4 +207,46 @@ public class AdminService {
         userRepository.saveAll(users);
         return true;
     }
+
+    @Transactional
+    public boolean disableUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.휴직중);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean enableUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.재직중);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+
+    @Transactional
+    public boolean resignUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.퇴사);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
 }
