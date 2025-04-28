@@ -27,20 +27,22 @@ public class InspectionServiceImpl implements InspectionService {
     @Override
     @Transactional
     public InspectionResponseDTO createInspection(InspectionRequestDTO requestDTO) {
-        Optional<Inspection> findInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
-                requestDTO.getTransactionType(), requestDTO.getTransactionId()
-        );
-        if (findInspection.isPresent()) {
-            throw new IllegalArgumentException("이미 검수했습니다.\n" +
-                    "검수 유형 : " +requestDTO.getTransactionType().getTransactionType() +
-                    "\n검수 ID : " + requestDTO.getTransactionId());
+        if(requestDTO.getTransactionId() != null && requestDTO.getTransactionType().equals(InspectionTransactionType.INSPECTION)) {
+            Optional<Inspection> findInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
+                    requestDTO.getTransactionType(), requestDTO.getTransactionId()
+            );
+            if (findInspection.isPresent()) {
+                throw new IllegalArgumentException("이미 검수했습니다.\n" +
+                        "검수 유형 : " + requestDTO.getTransactionType().getTransactionType() +
+                        "\n검수 ID : " + requestDTO.getTransactionId());
+            }
         }
 
-        Inspection inspection = new Inspection(requestDTO);
+            Inspection inspection = new Inspection(requestDTO);
 
-        Inspection saveInspection = inspectionRepository.save(inspection);
+            Inspection saveInspection = inspectionRepository.save(inspection);
 
-        return new InspectionResponseDTO(saveInspection);
+            return new InspectionResponseDTO(saveInspection);
     }
 
     public Page<Inspection> getAllInspection(int page, int size) {
