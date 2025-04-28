@@ -1,8 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.auth.config;
 
 import com.ohgiraffers.warehousemanagement.wms.auth.config.handler.AuthFailHandler;
-import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
-import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserRole;
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -15,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +24,11 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(AuthFailHandler authFailHanlder) {
         this.authFailHanlder = authFailHanlder;
+    }
+
+    @Bean
+    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new HiddenHttpMethodFilter();
     }
 
     @Bean

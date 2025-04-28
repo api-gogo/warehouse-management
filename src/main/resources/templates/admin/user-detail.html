@@ -51,7 +51,8 @@
         </div>
 
         <div class="user-detail-sections">
-          <form th:action="@{/admin/users/update/{id}(id=${user.userId})}" method="post" id="userUpdateForm">
+          <form th:action="@{/admin/users/{id}(id=${user.userId})}" method="post" id="userUpdateForm">
+            <input type="hidden" name="_method" value="patch" />
             <div class="detail-section">
               <h3 class="section-title">기본 정보</h3>
               <div class="info-grid">
@@ -250,7 +251,7 @@
               // AJAX 호출 또는 폼 제출
               const form = document.createElement('form');
               form.method = 'POST';
-              form.action = `/admin/users/approve/${userId}`;
+              form.action = `/admin/users/${userId}/approve`;
 
               const partInput = document.createElement('input');
               partInput.type = 'hidden';
@@ -278,7 +279,7 @@
             if (confirm('해당 사용자의 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
               const form = document.createElement('form');
               form.method = 'POST';
-              form.action = `/admin/users/reject/${userId}`;
+              form.action = `/admin/users/${userId}/reject`;
 
               document.body.appendChild(form);
               form.submit();
