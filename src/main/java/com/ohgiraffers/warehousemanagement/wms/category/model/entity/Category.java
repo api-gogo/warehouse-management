@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categories")
-public Category {
+public class Category {
 
     //카테고리 번호
     @Id
