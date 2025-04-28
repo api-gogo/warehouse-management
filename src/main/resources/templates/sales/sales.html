@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <title>WMS - 빈 페이지</title>
+    <title>수주 관리 - WMS</title>
     <link rel="stylesheet" href="/common.css">
-    <link rel="stylesheet" href="/css/navigation.css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/layouts/navigation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -25,10 +23,10 @@
                 <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
             </div>
 
-            <div class="admin-container">
-                <div class="admin-header">
-                    <h1 class="sales-title">수주 관리</h1>
-                    <div class="sales-actions">
+            <div class="common-container">
+                <div class="common-header">
+                    <h1 class="common-title">수주 관리</h1>
+                    <div class="common-actions">
                         <div class="search-box">
                             <input type="text" id="salesSearch" placeholder="수주ID, 점포명, 담당자 검색..." class="search-input">
                             <button class="search-button">
@@ -37,15 +35,19 @@
                         </div>
                         <select id="statusFilter" class="filter-select">
                             <option value="all">모든 상태</option>
-                            <option value="pending">등록</option>
-                            <option value="approved">승인</option>
-                            <option value="cancelled">취소</option>
-                            <option value="completed">출고완료</option>
+                            <option value="PENDING">수주등록</option>
+                            <option value="APPROVED">수주승인</option>
+                            <option value="CANCELED">수주취소</option>
                         </select>
+                    </div>
+                    <div>
+                        <a th:href="@{/sales/create}" class="btn btn-primary">
+                            <i class="fas fa-user-check me-2"></i>수주 등록
+                        </a>
                     </div>
                 </div>
 
-                <div class="sales-content">
+                <div class="common-content">
                     <div class="table-responsive">
                         <table class="data-table">
                             <thead>
@@ -56,28 +58,36 @@
                                 <th>수주일</th>
                                 <th>출고예정일</th>
                                 <th>수주상태</th>
+                                <th>상세</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="sales : ${salesList}">
-                                <td th:text="${sales.salesCode}">S0001</td>
-                                <td th:text="${sales.storeName}">서울점</td>
-                                <td th:text="${sales.salesManagerName}">홍길동</td>
+                            <tr th:each="sales : ${salesLists}">
+                                <td th:text="${sales.salesId}">S0001</td>
+                                <td th:text="${sales.storeId}">서울점</td>
+                                <td th:text="${sales.userId}">홍길동</td>
                                 <td th:text="${#temporals.format(sales.salesDate, 'yyyy-MM-dd')}">2025-04-28</td>
-                                <td th:text="${#temporals.format(sales.shipmentDueDate, 'yyyy-MM-dd')}">2025-04-30</td>
+                                <td th:text="${#temporals.format(sales.shippingDueDate, 'yyyy-MM-dd')}">2025-04-30</td>
                                 <td>
-                <span class="status-badge"
-                      th:classappend="${sales.salesStatus == '등록' ? 'status-pending' :
-                                      (sales.salesStatus == '승인' ? 'status-active' :
-                                      (sales.salesStatus == '취소' ? 'status-rejected' :
-                                      (sales.salesStatus == '출고완료' ? 'status-completed' : '')))}"
-                      th:text="${sales.salesStatus}">등록</span>
+                                    <span class="status-badge"
+                                        th:classappend="${sales.salesStatus.name() == 'PENDING' ? 'status-pending' :
+                                            (sales.salesStatus.name() == 'APPROVED' ? 'status-active' :
+                                            (sales.salesStatus.name() == 'CANCELED' ? 'status-inactive' : ''))}"
+                                        th:text="${sales.salesStatus.name() == 'PENDING' ? '수주등록' :
+                                            (sales.salesStatus.name() == 'APPROVED' ? '수주승인' :
+                                            (sales.salesStatus.name() == 'CANCELED' ? '수주취소' : ''))}">등록
+                                    </span>
+                                </td>
+                                <td class="actions">
+                                    <a th:href="@{/sales/{salesId}(salesId=${sales.salesId})}" class="action-button" title="상세보기">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                 </td>
                             </tr>
 
                             <!-- 데이터 없을 경우 -->
-                            <tr th:if="${#lists.isEmpty(salesList)}">
-                                <td colspan="6" class="no-data">조회된 수주가 없습니다.</td>
+                            <tr th:if="${#lists.isEmpty(salesLists)}">
+                                <td colspan="7" class="no-data">조회된 수주가 없습니다.</td>
                             </tr>
                             </tbody>
                         </table>

@@ -47,13 +47,13 @@ public class SalesController {
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
     @PostMapping("/create")
     public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
-        SalesDTO savedDTO = salesServiceImpl.createSales(salesDTO);
+        boolean savedDTO = salesServiceImpl.createSales(salesDTO);
         String resultUrl = null;
 
-        if (savedDTO != null) {
+        if (savedDTO) {
             rdtat.addFlashAttribute("salesDTO", savedDTO);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
-            resultUrl = "redirect:/sales" + salesDTO.getSalesId();
+            resultUrl = "redirect:/sales";
         } else {
             rdtat.addFlashAttribute("message","수주서 등록에 실패하였습니다. 다시 시도해주세요.");
             resultUrl = "redirect:/sales";
@@ -63,11 +63,11 @@ public class SalesController {
     }
 
     @GetMapping("/{salesId}")
-    public ModelAndView getSalesById(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
+    public ModelAndView getSalesById(@PathVariable(name = "salesId") Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
         SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
         if (findDTO != null) {
-            mv.addObject("salesDTO", findDTO);
-            mv.setViewName("sales/detail"); // view 수정필요 상세페이지로 가야됨
+            mv.addObject("sales", findDTO);
+            mv.setViewName("/sales/detail"); // view 수정필요 상세페이지로 가야됨
         } else {
             rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
             mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감
@@ -96,9 +96,9 @@ public class SalesController {
         String resultUrl = null;
 
         if (updatedDTO != null) {
-            rdtat.addFlashAttribute("salesDTO", updatedDTO);
+            rdtat.addFlashAttribute("sales", updatedDTO);
             rdtat.addFlashAttribute("message","수주서를 수정했습니다.");
-            resultUrl = "redirect:/sales" + salesId;
+            resultUrl = "redirect:/sales/" + salesId;
         } else {
            rdtat.addFlashAttribute("message", "수주서 수정에 실패했습니다. 다시 시도해주세요.");
            resultUrl = "redirect:/sales/" + salesId;

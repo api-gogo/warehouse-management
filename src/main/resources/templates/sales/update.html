@@ -1,10 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>WMS - 수주 수정</title>
+    <link rel="stylesheet" href="/common.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<h3>수주 수정 부분</h3>
+<div class="layout" th:with="activeMenu='dashboard'">
+    <div th:replace="~{navigation :: aside}"></div>
+    <div class="main-content">
+        <div th:replace="~{navigation :: header}"></div>
+
+        <main class="page-content">
+            <div th:if="${message != null}" class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">[[${message}]]</span>
+            </div>
+
+            <div class="common-container">
+                <div class="common-header">
+                    <h1 class="common-title">수주 수정</h1>
+                    <div class="common-actions">
+                        <a th:href="@{/sales}" class="btn btn-outline-primary back-button">
+                            <i class="fas fa-arrow-left me-2"></i> 목록으로
+                        </a>
+                    </div>
+                </div>
+
+                <div class="common-content">
+                    <form th:action="@{/sales/update/{salesId}(salesId=${salesDTO.salesId})}" method="post">
+                        <input type="hidden" name="_method" value="patch"/>
+
+                        <div class="form-group mb-4">
+                            <label for="storeId">점포 ID</label>
+                            <input type="text" id="storeId" name="storeId" class="form-control"
+                                   th:value="${salesDTO.storeId}" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="userId">담당자 ID</label>
+                            <input type="text" id="userId" name="userId" class="form-control"
+                                   th:value="${salesDTO.userId}" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="salesDate">수주일</label>
+                            <input type="date" id="salesDate" name="salesDate" class="form-control"
+                                   th:value="${salesDTO.salesDate}" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="shippingDueDate">출고 예정일</label>
+                            <input type="date" id="shippingDueDate" name="shippingDueDate" class="form-control"
+                                   th:value="${salesDTO.shippingDueDate}" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label>수주 물품 목록</label>
+                            <div id="items-container">
+                                <th:block th:each="item, iterStat : ${salesDTO.items}">
+                                    <div class="item-row mb-3">
+                                        <div class="item-header">
+                                            <strong th:text="'물품 ' + ${iterStat.index + 1}">물품 1</strong>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-item" th:style="${salesDTO.items.size() == 1} ? 'display: none;' : ''">
+                                                <i class="fas fa-times"></i> 삭제
+                                            </button>
+                                        </div>
+                                        <input type="text" th:name="|items[${iterStat.index}]|" class="form-control mb-2"
+                                               th:value="${item}" required placeholder="상품명 입력">
+                                        <input type="number" th:name="|quantity[${iterStat.index}]|" class="form-control"
+                                               th:value="${salesDTO.quantity[iterStat.index]}" min="1" required placeholder="수량 입력">
+                                    </div>
+                                </th:block>
+                            </div>
+
+                            <button type="button" id="add-item" class="btn btn-outline-primary mt-2">
+                                <i class="fas fa-plus me-2"></i> 물품 추가
+                            </button>
+                        </div>
+
+                        <!-- ✨ 등록/취소 버튼은 맨 아래로 -->
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> 저장
+                            </button>
+                            <a th:href="@{/sales}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> 취소
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const addItemBtn = document.getElementById('add-item');
+                    const itemsContainer = document.getElementById('items-container');
+
+                    function updateItemHeaders() {
+                        const itemRows = itemsContainer.querySelectorAll('.item-row');
+                        itemRows.forEach((row, index) => {
+                            const header = row.querySelector('.item-header strong');
+                            header.textContent = `물품 ${index + 1}`;
+
+                            const itemInput = row.querySelector('input[name^="items["]');
+                            const quantityInput = row.querySelector('input[name^="quantity["]');
+
+                            if (itemInput) {
+                                itemInput.name = `items[${index}]`;
+                            }
+                            if (quantityInput) {
+                                quantityInput.name = `quantity[${index}]`;
+                            }
+
+                            const removeButton = row.querySelector('.remove-item');
+                            if (itemRows.length > 1) {
+                                removeButton.style.display = 'inline-block';
+                            } else {
+                                removeButton.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    let itemIndex = document.querySelectorAll('.item-row').length;
+
+                    addItemBtn.addEventListener('click', function() {
+                        const itemRow = document.createElement('div');
+                        itemRow.className = 'item-row mb-3';
+                        itemRow.innerHTML = `
+                    <div class="item-header">
+                        <strong>물품 ${itemIndex + 1}</strong>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                            <i class="fas fa-times"></i> 삭제
+                        </button>
+                    </div>
+                    <input type="text" name="items[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
+                    <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
+                    `;
+                        itemsContainer.appendChild(itemRow);
+                        itemIndex++;
+                        updateItemHeaders();
+                    });
+
+                    itemsContainer.addEventListener('click', function(event) {
+                        if (event.target.closest('.remove-item')) {
+                            const button = event.target.closest('.remove-item');
+                            const itemRow = button.closest('.item-row');
+                            itemRow.remove();
+                            updateItemHeaders();
+                            itemIndex = document.querySelectorAll('.item-row').length;
+                        }
+                    });
+
+                    updateItemHeaders();
+                });
+            </script>
+
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{navigation :: scripts}"></div>
 </body>
 </html>
