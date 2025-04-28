@@ -1,141 +1,118 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/default-layout}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 메인</title>
-  <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
-  <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
-  <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/index.css">
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>메인</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/index.css">
+  </th:block>
 </head>
 <body>
-<div class="layout" th:with="activeMenu='dashboard'">
-  <!-- 네비게이션 사이드바 포함 -->
-  <div th:replace="~{navigation :: aside}"></div>
-
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 포함 -->
-    <div th:replace="~{navigation :: header}"></div>
-
-    <!-- 페이지 콘텐츠 영역 -->
-    <main class="page-content">
-      <!-- 알림 메시지 -->
-      <div th:if="${message != null}" class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='dashboard'">
+    <!-- 메인 환영 섹션 -->
+    <div class="welcome-container mb-5">
+      <div class="welcome-icon">
+        <i class="fas fa-clipboard-list"></i>
       </div>
 
-      <!-- 메인 환영 섹션 -->
-      <div class="welcome-container mb-5">
-        <div class="welcome-icon">
-          <i class="fas fa-clipboard-list"></i>
+      <!-- 로그인하지 않은 경우 -->
+      <th:block th:unless="${#authorization != null && #authorization.expression('isAuthenticated()')}">
+        <h1 class="welcome-title">WMS에 오신 것을 환영합니다!</h1>
+        <p class="welcome-subtitle">로그인하고 시스템을 이용해주세요.</p>
+
+        <div class="action-buttons">
+          <a th:href="@{/auth/login}" class="btn btn-primary btn-lg me-2">
+            <i class="fas fa-sign-in-alt me-2"></i>로그인
+          </a>
+          <a th:href="@{/user/signup}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-user-plus me-2"></i>회원가입
+          </a>
+        </div>
+      </th:block>
+
+      <!-- 로그인한 경우 -->
+      <th:block th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
+        <h1 class="welcome-title">
+          안녕하세요, <span th:text="${#authentication.principal.userRealName}" class="user-name">사용자</span>님!
+        </h1>
+        
+        <!-- 승인 대기 상태 메시지 -->
+        <div th:if="${#authentication.principal.userStatus == '승인대기'}" class="alert alert-warning mt-3" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>승인 대기 중입니다.</strong> 관리자의 승인이 필요합니다. 승인 후 모든 기능을 이용할 수 있습니다.
         </div>
 
-        <!-- 로그인하지 않은 경우 -->
-        <th:block th:unless="${#authorization != null && #authorization.expression('isAuthenticated()')}">
-          <h1 class="welcome-title">WMS에 오신 것을 환영합니다!</h1>
-          <p class="welcome-subtitle">로그인하고 시스템을 이용해주세요.</p>
-
-          <div class="action-buttons">
-            <a th:href="@{/auth/login}" class="btn btn-primary btn-lg me-2">
-              <i class="fas fa-sign-in-alt me-2"></i>로그인
-            </a>
-            <a th:href="@{/user/signup}" class="btn btn-outline-primary btn-lg">
-              <i class="fas fa-user-plus me-2"></i>회원가입
-            </a>
-          </div>
-        </th:block>
-
-        <!-- 로그인한 경우 -->
-        <th:block th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
-          <h1 class="welcome-title">
-            안녕하세요, <span th:text="${#authentication.principal.userRealName}" class="user-name">사용자</span>님!
-          </h1>
-          
-          <!-- 승인 대기 상태 메시지 -->
-          <div th:if="${#authentication.principal.userStatus == '승인대기'}" class="alert alert-warning mt-3" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>승인 대기 중입니다.</strong> 관리자의 승인이 필요합니다. 승인 후 모든 기능을 이용할 수 있습니다.
-          </div>
-
-          <!-- 휴직 상태 메시지 -->
-          <div th:if="${#authentication.principal.userStatus == '휴직중'}" class="alert alert-info mt-3" role="alert">
-            <i class="fas fa-info-circle me-2"></i>
-            <strong>휴직 중입니다.</strong> 프로필 조회 및 수정만 가능합니다.
-          </div>
-          
-          <div class="user-info-container">
-            <div class="user-profile">
-              <div class="avatar">
-                <i class="fas fa-user-circle"></i>
+        <!-- 휴직 상태 메시지 -->
+        <div th:if="${#authentication.principal.userStatus == '휴직중'}" class="alert alert-info mt-3" role="alert">
+          <i class="fas fa-info-circle me-2"></i>
+          <strong>휴직 중입니다.</strong> 프로필 조회 및 수정만 가능합니다.
+        </div>
+        
+        <div class="user-info-container">
+          <div class="user-profile">
+            <div class="avatar">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="user-details">
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-id-badge me-2"></i>직책:</span>
+                <span class="info-value" th:text="${#authentication.principal.userRole}"></span>
               </div>
-              <div class="user-details">
-                <div class="info-item">
-                  <span class="info-label"><i class="fas fa-id-badge me-2"></i>직책:</span>
-                  <span class="info-value" th:text="${#authentication.principal.userRole}"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label"><i class="fas fa-users me-2"></i>부서:</span>
-                  <span class="info-value" th:text="${#authentication.principal.userPart}"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label"><i class="fas fa-toggle-on me-2"></i>상태:</span>
-                  <span class="info-value status-badge" 
-                        th:classappend="${#authentication.principal.userStatus == '재직중' ? 'status-active' : 
-                                       (#authentication.principal.userStatus == '휴직중' ? 'status-inactive' : 
-                                       (#authentication.principal.userStatus == '승인대기' ? 'status-pending' : 
-                                       (#authentication.principal.userStatus == '승인거부' ? 'status-rejected' : 'status-resigned')))}"
-                        th:text="${#authentication.principal.userStatus}"></span>
-                </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-users me-2"></i>부서:</span>
+                <span class="info-value" th:text="${#authentication.principal.userPart}"></span>
+              </div>
+              <div class="info-item">
+                <span class="info-label"><i class="fas fa-toggle-on me-2"></i>상태:</span>
+                <span class="status-badge"
+                      th:classappend="${#authentication.principal.userStatus == '재직중' ? 'status-active' : 
+                                     (#authentication.principal.userStatus == '휴직중' ? 'status-inactive' : 
+                                     (#authentication.principal.userStatus == '승인대기' ? 'status-pending' : 
+                                     (#authentication.principal.userStatus == '승인거부' ? 'status-rejected' : 'status-resigned')))}"
+                      th:text="${#authentication.principal.userStatus}"></span>
               </div>
             </div>
           </div>
+        </div>
+        
+        <!-- 대시보드 바로가기 -->
+        <div class="dashboard-shortcuts">
+          <h3 class="shortcuts-title">자주 사용하는 기능</h3>
           
-          <!-- 대시보드 바로가기 -->
-          <div class="dashboard-shortcuts">
-            <h3 class="shortcuts-title">자주 사용하는 기능</h3>
-            
-            <!-- 재직중인 경우 모든 기능 표시 -->
-            <div th:if="${#authentication.principal.userStatus == '재직중'}" class="shortcuts-grid">
-              <a th:href="@{/user/profile}" class="shortcut-card">
-                <i class="fas fa-user"></i>
-                <span>프로필</span>
-              </a>
-              <a href="#" class="shortcut-card">
-                <i class="fas fa-chart-bar"></i>
-                <span>보고서</span>
-              </a>
-              <a href="#" class="shortcut-card">
-                <i class="fas fa-bell"></i>
-                <span>알림</span>
-              </a>
-              <a href="#" class="shortcut-card">
-                <i class="fas fa-cog"></i>
-                <span>설정</span>
-              </a>
-            </div>
-            
-            <!-- 승인대기 또는 휴직중인 경우 프로필 버튼만 중앙에 표시 -->
-            <div th:if="${#authentication.principal.userStatus == '승인대기' || #authentication.principal.userStatus == '휴직중'}" class="shortcuts-grid-single">
-              <a th:href="@{/user/profile}" class="shortcut-card shortcut-card-single">
-                <i class="fas fa-user"></i>
-                <span>프로필</span>
-              </a>
-            </div>
+          <!-- 재직중인 경우 모든 기능 표시 -->
+          <div th:if="${#authentication.principal.userStatus == '재직중'}" class="shortcuts-grid">
+            <a th:href="@{/user/profile}" class="shortcut-card">
+              <i class="fas fa-user"></i>
+              <span>프로필</span>
+            </a>
+            <a href="#" class="shortcut-card">
+              <i class="fas fa-chart-bar"></i>
+              <span>보고서</span>
+            </a>
+            <a href="#" class="shortcut-card">
+              <i class="fas fa-bell"></i>
+              <span>알림</span>
+            </a>
+            <a href="#" class="shortcut-card">
+              <i class="fas fa-cog"></i>
+              <span>설정</span>
+            </a>
           </div>
-        </th:block>
-      </div>
-    </main>
-  </div>
-</div>
-
-<!-- 스크립트 포함 -->
-<div th:replace="~{navigation :: scripts}"></div>
+          
+          <!-- 승인대기 또는 휴직중인 경우 프로필 버튼만 중앙에 표시 -->
+          <div th:if="${#authentication.principal.userStatus == '승인대기' || #authentication.principal.userStatus == '휴직중'}" class="shortcuts-grid-single">
+            <a th:href="@{/user/profile}" class="shortcut-card shortcut-card-single">
+              <i class="fas fa-user"></i>
+              <span>프로필</span>
+            </a>
+          </div>
+        </div>
+      </th:block>
+    </div>
+  </th:block>
 </body>
 </html>
