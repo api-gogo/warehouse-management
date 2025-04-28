@@ -9,7 +9,7 @@
   <!-- Flatpickr 달력 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <!-- 페이지 css -->
-  <link rel="stylesheet" href="../../static/css/products/edit.css" th:href="@{/css/products/edit.css}">
+  <link rel="stylesheet" href="../../static/css/products/update.css" th:href="@{/css/products/update.css}">
   <!-- 공통 CSS -->
   <link rel="stylesheet" href="/common.css?v=1">
   <!-- 네비게이션 CSS -->
@@ -49,7 +49,7 @@
           <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
 
           <!-- 상품 수정 폼 -->
-          <form th:action="@{/products/edit/{id}(id=${product.productId})}" method="post" th:object="${product}">
+          <form th:action="@{/products/update/{id}(id=${product.productId})}" method="post" th:object="${product}">
             <input type="hidden" th:field="*{productId}">
             <input type="hidden" th:field="*{productCreatedAt}">
 

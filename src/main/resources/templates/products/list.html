@@ -33,7 +33,7 @@
             <i class="fas fa-download"></i>
             내보내기
           </a>
-          <a th:href="@{/products/new}" class="btn btn-primary btn-sm" aria-label="신규 상품 등록">
+          <a th:href="@{/products/create}" class="btn btn-primary btn-sm" aria-label="신규 상품 등록">
             <i class="fas fa-plus"></i>
             신규 상품
           </a>
@@ -93,7 +93,7 @@
                         th:text="${product.isDeleted == false} ? '활성' : '비활성'"></span>
                 </td>
                 <td class="text-right">
-                  <a th:href="@{/products/{id}(id=${product.productId})}" class="btn btn-outline btn-sm" aria-label="상품 편집">편집</a>
+                  <a th:href="@{/products/{id}(id=${product.productId})}" class="btn btn-outline btn-sm" aria-label="상품 수정">수정</a>
                   <form th:action="@{/products/delete/{id}(id=${product.productId})}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-outline btn-sm" aria-label="상품 삭제">삭제</button>
                   </form>

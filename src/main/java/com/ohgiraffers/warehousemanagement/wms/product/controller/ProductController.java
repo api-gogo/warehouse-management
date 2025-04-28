@@ -41,27 +41,27 @@ public class ProductController {
         return "products/list";
     }
 
-    // 특정 상품 조회
+    // 특정 상품 조회 (수정 폼)
     @GetMapping("/{id}")
     public String getProductById(@PathVariable("id") Integer id, Model model) {
         ProductResponseDTO product = productService.getProductById(id);
-        model.addAttribute("pageTitle", "상품 편집 - " + product.getProductName());
+        model.addAttribute("pageTitle", "상품 수정 - " + product.getProductName());
         model.addAttribute("product", product);
         model.addAttribute("categories", productService.getMockCategories());
-        return "products/edit";
+        return "products/update";
     }
 
     // 신규 상품 등록 폼 표시
-    @GetMapping("/new")
+    @GetMapping("/create")
     public String showCreateProductForm(Model model) {
         model.addAttribute("pageTitle", "신규 상품 등록");
         model.addAttribute("product", new ProductCreateDTO());
         model.addAttribute("categories", productService.getMockCategories());
-        return "products/new";
+        return "products/create";
     }
 
     // 상품 생성
-    @PostMapping("/add")
+    @PostMapping("/create")
     public String createProduct(@ModelAttribute ProductCreateDTO createDTO, Model model) {
         try {
             productService.createProduct(createDTO);
@@ -71,22 +71,22 @@ public class ProductController {
             model.addAttribute("pageTitle", "신규 상품 등록");
             model.addAttribute("product", createDTO);
             model.addAttribute("categories", productService.getMockCategories());
-            return "products/new";
+            return "products/create";
         }
     }
 
     // 상품 수정
-    @PostMapping("/edit/{id}")
+    @PostMapping("/update/{id}")
     public String updateProduct(@PathVariable("id") Integer id, @ModelAttribute ProductCreateDTO updateDTO, Model model) {
         try {
             productService.updateProduct(id, updateDTO);
             return "redirect:/products";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("pageTitle", "상품 편집 - " + updateDTO.getProductName());
+            model.addAttribute("pageTitle", "상품 수정 - " + updateDTO.getProductName());
             model.addAttribute("product", updateDTO);
             model.addAttribute("categories", productService.getMockCategories());
-            return "products/edit";
+            return "products/update";
         }
     }
 
