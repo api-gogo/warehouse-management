@@ -2,10 +2,10 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.model.common;
 
 public enum InspectionTransactionType {
     INSPECTION("상시",0),
-    PURCHASE("발주", 1),
-    SALE("수주",2),
-    STORAGE("입고",3),
-    SHIPMENT("출고",4);
+    PURCHASE("발주", 1), //입고 검수
+    SALES("수주",2), // 출고 검수
+    STORAGE("입고반품",3),
+    SHIPMENT("출고반품",4);
 
     private String transactionType; // 타입 설명
     private Integer typeId; // 타입 번호

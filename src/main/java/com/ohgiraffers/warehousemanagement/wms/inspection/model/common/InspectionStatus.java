@@ -8,14 +8,12 @@ public enum InspectionStatus {
 
 
     private String inspectionStatus; // 스테이터스 설명
-    private Integer statusId;
+    private Integer statusId; // 스테이터스 번호
 
     InspectionStatus(String inspectionStatus, Integer statusId) {
         this.inspectionStatus = inspectionStatus;
         this.statusId = statusId;
     }
-
-    // 스테이터스 번호
 
     public String getInspectionStatus() {
         return inspectionStatus;
