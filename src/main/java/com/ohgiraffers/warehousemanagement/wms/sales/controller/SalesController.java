@@ -32,7 +32,7 @@ public class SalesController {
 
         if (salesLists != null) {
             mv.addObject("salesLists", salesLists);
-            mv.setViewName("sales");
+            mv.setViewName("sales/sales");
         } else { // 아무것도 없으면 빈 리스트
             mv.addObject("salesLists", new ArrayList<>());
         }
@@ -67,7 +67,7 @@ public class SalesController {
         SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
         if (findDTO != null) {
             mv.addObject("salesDTO", findDTO);
-            mv.setViewName("sales"); // view 수정필요 상세페이지로 가야됨
+            mv.setViewName("sales/detail"); // view 수정필요 상세페이지로 가야됨
         } else {
             rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
             mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감
