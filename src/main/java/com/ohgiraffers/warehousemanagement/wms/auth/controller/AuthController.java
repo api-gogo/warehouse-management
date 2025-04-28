@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @GetMapping("login")
+    @GetMapping("/login")
     public void login() {}
 
     @GetMapping("/fail")

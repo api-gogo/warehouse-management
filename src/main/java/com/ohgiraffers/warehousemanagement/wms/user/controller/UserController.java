@@ -107,7 +107,7 @@ public class UserController {
         return "redirect:/";
     }
 
-    @PostMapping("/update")
+    @PatchMapping("/profile")
     public String updateProfile(Authentication authentication, @ModelAttribute UserDTO updateUser,
                                 RedirectAttributes redirectAttributes) {
         String message = null;

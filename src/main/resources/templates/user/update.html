@@ -19,7 +19,8 @@
       </div>
 
       <div class="update-body">
-        <form th:action="@{/user/update}" method="post" id="updateForm">
+        <form th:action="@{/user/profile}" method="post" id="updateForm">
+          <input type="hidden" name="_method" value="patch" />
           <input type="hidden" name="userCode" th:value="${user.userCode}">
           <input type="hidden" name="passwordVerified" value="true">
           
