@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>발주 수정</title>
+</head>
+<body>
+<h1>발주 수정</h1>
+
+<form th:action="@{/purchase/update/{id}(id=${purchaseDTO.id})}" th:object="${purchaseDTO}" method="post">
+  <label for="customerName">주문자</label>
+  <input type="text" id="customerName" th:field="*{customerName}" required />
+
+  <label for="status">상태</label>
+  <select id="status" th:field="*{status}">
+    <option value="WAITING">발주 대기</option>
+    <option value="COMPLETED">발주 완료</option>
+    <option value="CANCELLED">발주 취소</option>
+  </select>
+
+  <label for="date">날짜</label>
+  <input type="date" id="date" th:field="*{date}" required />
+
+  <button type="submit">발주 수정</button>
+</form>
+
+<a href="/purchase/list">목록으로 돌아가기</a>
+</body>
+</html>
