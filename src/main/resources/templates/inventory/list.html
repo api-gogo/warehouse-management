@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>재고 관리</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <style>
+      /* 재고 관리 페이지 스타일 */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .page-title {
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+
+      .btn i {
+        margin-right: 5px;
+      }
+
+      .btn-outline {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        color: #333;
+        text-decoration: none;
+      }
+
+      .btn-outline:hover {
+        background-color: #f5f5f5;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background-color: #0d6efd;
+        text-decoration: none;
+        color: white;
+        border: none;
+      }
+
+      .btn-primary:hover {
+        background-color: #0b5ed7;
+        text-decoration: none;
+      }
+
+      .subtitle {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #777;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      /* 재고 목록 섹션 - 흰색 배경 추가 */
+      .inventory-section {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      /* 검색 필터 */
+      .filter-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+
+      .filter-input {
+        position: relative;
+        flex: 1;
+      }
+
+      .filter-input input {
+        padding: 8px 15px 8px 35px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .filter-input i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+      }
+
+      .filter-dropdown {
+        min-width: 150px;
+      }
+
+      .filter-dropdown select {
+        padding: 8px 30px 8px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        width: 100%;
+        font-size: 14px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+      }
+
+      /* 테이블 */
+      .data-card {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+
+      .data-table th {
+        font-weight: 500;
+        color: #777;
+        background-color: #f9f9f9;
+      }
+
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .status-tag {
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .status-normal {
+        background-color: #e7f5ea;
+        color: #198754;
+      }
+
+      .status-low {
+        background-color: #ffe8e8;
+        color: #dc3545;
+      }
+
+      .action-link {
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .action-link:hover {
+        text-decoration: underline;
+      }
+
+      /* 다크 모드 내 재고 페이지 스타일 */
+      body.dark-mode .btn-outline {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+
+      body.dark-mode .btn-outline:hover {
+        background-color: #333;
+      }
+
+      body.dark-mode .inventory-section,
+      body.dark-mode .filter-bar,
+      body.dark-mode .data-card {
+        background-color: #1e1e1e;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+
+      body.dark-mode .filter-input input,
+      body.dark-mode .filter-dropdown select {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+
+      body.dark-mode .data-table th {
+        background-color: #252525;
+        color: #b0b0b0;
+      }
+
+      body.dark-mode .data-table td {
+        border-color: #333;
+      }
+
+      body.dark-mode .description {
+        color: #aaa;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar-toggle {
+          display: block;
+        }
+
+        .filter-bar {
+          flex-direction: column;
+        }
+
+        .filter-dropdown {
+          width: 100%;
+        }
+
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .button-group {
+          width: 100%;
+        }
+      }
+    </style>
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='inventory'">
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+      <h1 class="page-title">재고 관리</h1>
+      <div class="button-group">
+        <button class="btn btn-outline">
+          <i class="fas fa-download"></i> 내보내기
+        </button>
+        <button class="btn btn-outline">
+          <i class="fas fa-upload"></i> 가져오기
+        </button>
+        <a th:href="@{/inventories/add}" class="btn btn-primary">
+          <i class="fas fa-plus"></i> 상품 추가
+        </a>
+      </div>
+    </div>
+
+    <!-- 재고 목록 섹션 - 흰색 배경 추가 -->
+    <div class="inventory-section">
+      <h2 class="subtitle">재고 목록</h2>
+      <p class="description">현재 창고에 보관 중인 모든 상품의 재고 현황입니다.</p>
+
+      <!-- 필터링 영역 -->
+      <div class="filter-bar">
+        <div class="filter-input">
+          <form th:action="@{/inventories}" method="get">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="상품명 검색..." name="searchProductId"
+                   th:value="${searchProductId}" class="form-control" />
+          </form>
+        </div>
+        <div class="filter-dropdown">
+          <select name="category">
+            <option value="">전체</option>
+            <option value="상온">상온</option>
+            <option value="냉장">냉장</option>
+            <option value="냉동">냉동</option>
+          </select>
+        </div>
+        <form id="inventoryFilterForm" action="/inventories/search" method="get">
+          <div class="filter-dropdown">
+            <select name="status" id="status" onchange="this.form.submit()">
+              <option value="">전체</option>
+              <option value="정상">정상</option>
+              <option value="부족">부족</option>
+              <option value="폐기">폐기</option>
+            </select>
+          </div>
+        </form>
+        <div>
+          <a th:href="@{/inventories}" class="btn btn-outline">
+            <i class="fas fa-undo"></i> 초기화
+          </a>
+        </div>
+      </div>
+
+      <!-- 데이터 테이블 -->
+      <div class="data-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>재고 ID</th>
+              <th>상품 ID</th>
+              <th>로트 번호</th>
+              <th>위치 코드</th>
+              <th>가용 재고</th>
+              <th>유통기한</th>
+              <th>상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="inventory : ${inventories}">
+              <td th:text="${inventory.inventoryId}"></td>
+              <td th:text="${inventory.productId}"></td>
+              <td th:text="${inventory.lotNumber}"></td>
+              <td th:text="${inventory.locationCode}"></td>
+              <td th:text="${inventory.availableStock}"></td>
+              <td th:text="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}"></td>
+              <td>
+                <span
+                  th:class="${inventory.availableStock > 100 ? 'status-tag status-normal' : 'status-tag status-low'}"
+                  th:text="${inventory.availableStock > 100 ? '정상' : '부족'}">
+                </span>
+              </td>
+              <td>
+                <a th:href="@{/inventories/detail/{id}(id=${inventory.inventoryId})}" class="action-link">상세</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      document.addEventListener('DOMContentLoaded', function() {
+        // 스크립트 실행 여부 확인을 위한 로그
+        console.log("재고 목록 페이지 스크립트 로딩 완료");
+      });
+      /*]]>*/
+    </script>
+  </th:block>
+</body>
+</html>
