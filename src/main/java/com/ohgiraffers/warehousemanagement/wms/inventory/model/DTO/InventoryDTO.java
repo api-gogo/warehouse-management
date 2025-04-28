@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class InventoryDTO {
@@ -11,13 +12,13 @@ public class InventoryDTO {
     private Long availableStock;
     private Long allocatedStock;
     private Long disposedStock;
-    private LocalDateTime inventoryExpiryDate;
+    private LocalDate inventoryExpiryDate;
     private LocalDateTime inventoryCreatedAt;
     private LocalDateTime inventoryUpdatedAt;
 
     public InventoryDTO() {}
 
-    public InventoryDTO(Long inventoryId, Long storageId, Long productId, String lotNumber, Long locationCode, Long availableStock, Long allocatedStock, Long disposedStock, LocalDateTime inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
+    public InventoryDTO(Long inventoryId, Long storageId, Long productId, String lotNumber, Long locationCode, Long availableStock, Long allocatedStock, Long disposedStock, LocalDate inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
         this.inventoryId = inventoryId;
         this.storageId = storageId;
         this.productId = productId;
@@ -95,11 +96,11 @@ public class InventoryDTO {
         this.disposedStock = dispsosedStock;
     }
 
-    public LocalDateTime getInventoryExpiryDate() {
+    public LocalDate getInventoryExpiryDate() {
         return inventoryExpiryDate;
     }
 
-    public void setInventoryExpiryDate(LocalDateTime inventoryExpiryDate) {
+    public void setInventoryExpiryDate(LocalDate inventoryExpiryDate) {
         this.inventoryExpiryDate = inventoryExpiryDate;
     }
 
