@@ -1,157 +1,128 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/auth-layout}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 회원가입</title>
-  <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
-  <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
-  <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/signup.css">
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>회원가입</title>
 </head>
 <body>
-<div class="layout" th:with="activeMenu='signup'">
-  <!-- 네비게이션 사이드바 포함 -->
-  <div th:replace="~{navigation :: aside}"></div>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content">
+    <div class="signup-form">
+      <h2 class="signup-title">회원가입</h2>
 
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 포함 -->
-    <div th:replace="~{navigation :: header}"></div>
-
-    <!-- 페이지 콘텐츠 영역 -->
-    <main class="page-content">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="signup-form">
-            <h2 class="signup-title">회원가입</h2>
-
-            <!-- 알림 메시지 -->
-            <div th:if="${message != null}" class="alert alert-info" role="alert">
-              <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
-            </div>
-
-            <form th:action="@{/user/signup}" method="post">
-              <div class="mb-3">
-                <label for="userName" class="form-label">
-                  <i class="fas fa-user me-2"></i>이름
-                </label>
-                <input type="text" class="form-control" id="userName" name="userName" placeholder="이름을 입력하세요" required autofocus>
-              </div>
-
-              <div class="mb-3">
-                <label for="userEmail" class="form-label">
-                  <i class="fas fa-envelope me-2"></i>이메일
-                </label>
-                <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="이메일을 입력하세요" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="userPhone" class="form-label">
-                  <i class="fas fa-phone me-2"></i>전화번호
-                </label>
-                <input
-                        type="tel"
-                        class="form-control"
-                        id="userPhone"
-                        name="userPhone"
-                        placeholder="전화번호 (예: 010-1234-5678)"
-                        required
-                        pattern="^\d{3}-\d{4}-\d{4}$"
-                        title="010-1234-5678 형식으로 입력해주세요."
-                >
-              </div>
-
-              <div class="mb-3">
-                <label for="userCode" class="form-label">
-                  <i class="fas fa-id-card me-2"></i>사원번호
-                </label>
-                <input type="text" class="form-control" id="userCode" name="userCode" placeholder="사원번호를 입력하세요" required>
-                <div class="form-text">사원번호를 로그인 시 아이디로 사용됩니다.</div>
-              </div>
-
-              <div class="mb-3">
-                <label for="userPass" class="form-label">
-                  <i class="fas fa-lock me-2"></i>비밀번호
-                </label>
-                <input type="password" class="form-control" id="userPass" name="userPass" placeholder="비밀번호를 입력하세요" required>
-                <div class="form-text">8자 이상의 영문, 숫자, 특수문자 조합을 권장합니다.</div>
-              </div>
-
-              <div class="mb-4">
-                <label for="confirmUserPass" class="form-label">
-                  <i class="fas fa-lock me-2"></i>비밀번호 확인
-                </label>
-                <input type="password" class="form-control" id="confirmUserPass" placeholder="비밀번호를 다시 입력하세요" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="userPart" class="form-label">
-                  <i class="fas fa-users me-2"></i>부서
-                </label>
-                <select class="form-select" id="userPart" name="userPart" required>
-                  <option value="" disabled selected>-- 부서를 선택해주세요 --</option> 
-                  <option value="입고">입고</option>
-                  <option value="출고">출고</option>
-                  <option value="재고">재고</option>
-                  <option value="반품">반품</option>
-                  <option value="발주">발주</option>
-                  <option value="수주">수주</option>
-                  <option value="상품">상품</option>
-                </select>
-                <div class="form-text">목록에서 정확한 부서를 선택해주세요.</div>
-              </div>
-
-              <button type="submit" class="btn btn-primary btn-signup">
-                <i class="fas fa-user-plus me-2"></i>회원가입
-              </button>
-            </form>
-
-            <div class="signup-footer">
-              <p>이미 계정이 있으신가요? <a th:href="@{/auth/login}" class="text-decoration-none">로그인</a></p>
-            </div>
-          </div>
+      <form th:action="@{/user/signup}" method="post">
+        <div class="mb-3">
+          <label for="userName" class="form-label">
+            <i class="fas fa-user me-2"></i>이름
+          </label>
+          <input type="text" class="form-control" id="userName" name="userName" placeholder="이름을 입력하세요" required autofocus>
         </div>
+
+        <div class="mb-3">
+          <label for="userEmail" class="form-label">
+            <i class="fas fa-envelope me-2"></i>이메일
+          </label>
+          <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="이메일을 입력하세요" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="userPhone" class="form-label">
+            <i class="fas fa-phone me-2"></i>전화번호
+          </label>
+          <input
+                  type="tel"
+                  class="form-control"
+                  id="userPhone"
+                  name="userPhone"
+                  placeholder="전화번호 (예: 010-1234-5678)"
+                  required
+                  pattern="^\d{3}-\d{4}-\d{4}$"
+                  title="010-1234-5678 형식으로 입력해주세요."
+          >
+        </div>
+
+        <div class="mb-3">
+          <label for="userCode" class="form-label">
+            <i class="fas fa-id-card me-2"></i>사원번호
+          </label>
+          <input type="text" class="form-control" id="userCode" name="userCode" placeholder="사원번호를 입력하세요" required>
+          <div class="form-text">사원번호를 로그인 시 아이디로 사용됩니다.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="userPass" class="form-label">
+            <i class="fas fa-lock me-2"></i>비밀번호
+          </label>
+          <input type="password" class="form-control" id="userPass" name="userPass" placeholder="비밀번호를 입력하세요" required>
+          <div class="form-text">8자 이상의 영문, 숫자, 특수문자 조합을 권장합니다.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="confirmUserPass" class="form-label">
+            <i class="fas fa-lock me-2"></i>비밀번호 확인
+          </label>
+          <input type="password" class="form-control" id="confirmUserPass" placeholder="비밀번호를 다시 입력하세요" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="userPart" class="form-label">
+            <i class="fas fa-users me-2"></i>부서
+          </label>
+          <select class="form-select" id="userPart" name="userPart" required>
+            <option value="" disabled selected>-- 부서를 선택해주세요 --</option> 
+            <option value="입고">입고</option>
+            <option value="출고">출고</option>
+            <option value="재고">재고</option>
+            <option value="반품">반품</option>
+            <option value="발주">발주</option>
+            <option value="수주">수주</option>
+            <option value="상품">상품</option>
+          </select>
+          <div class="form-text">목록에서 정확한 부서를 선택해주세요.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-signup">
+          <i class="fas fa-user-plus me-2"></i>회원가입
+        </button>
+      </form>
+
+      <div class="signup-footer">
+        <p>이미 계정이 있으신가요? <a th:href="@{/auth/login}" class="text-decoration-none">로그인</a></p>
       </div>
-    </main>
-  </div>
-</div>
+    </div>
+  </th:block>
+  
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const userPass = document.getElementById('userPass');
+        const confirmUserPass = document.getElementById('confirmUserPass');
 
-<!-- 스크립트 포함 -->
-<div th:replace="~{navigation :: scripts}"></div>
+        form.addEventListener('submit', function(event) {
+          // 비밀번호 입력 확인
+          if (userPass.value.trim() !== '') {
+            // 새 비밀번호와 확인이 일치하는지 확인
+            if (userPass.value !== confirmUserPass.value) {
+              event.preventDefault();
+              alert('새 비밀번호가 일치하지 않습니다.');
+              confirmUserPass.focus();
+              return;
+            }
 
-<!-- 비밀번호 확인 스크립트 -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-    const userPass = document.getElementById('userPass');
-    const confirmUserPass = document.getElementById('confirmUserPass');
-
-    form.addEventListener('submit', function(event) {
-      // 비밀번호 입력 확인
-      if (userPass.value.trim() !== '') {
-        // 새 비밀번호와 확인이 일치하는지 확인
-        if (userPass.value !== confirmUserPass.value) {
-          event.preventDefault();
-          alert('새 비밀번호가 일치하지 않습니다.');
-          confirmUserPass.focus();
-          return;
-        }
-
-        // 비밀번호 길이 체크
-        if (userPass.value.length < 8) {
-          event.preventDefault();
-          alert('비밀번호는 8자 이상이어야 합니다.');
-          userPass.focus();
-          return;
-        }
-      }
-    });
-  });
-</script>
+            // 비밀번호 길이 체크
+            if (userPass.value.length < 8) {
+              event.preventDefault();
+              alert('비밀번호는 8자 이상이어야 합니다.');
+              userPass.focus();
+              return;
+            }
+          }
+        });
+      });
+    </script>
+  </th:block>
 </body>
 </html>
