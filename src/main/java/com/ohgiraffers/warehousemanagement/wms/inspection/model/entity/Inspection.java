@@ -1,5 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.model.entity;
 
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Comment;
 

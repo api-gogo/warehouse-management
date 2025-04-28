@@ -1,4 +1,4 @@
-package com.ohgiraffers.warehousemanagement.wms.inspection.model.entity;
+package com.ohgiraffers.warehousemanagement.wms.inspection.model.common;
 
 public enum InspectionStatus {
     OK("이상 없음",1),

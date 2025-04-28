@@ -1,7 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.repository;
 
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.InspectionTransactionType;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

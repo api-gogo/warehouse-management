@@ -1,4 +1,4 @@
-package com.ohgiraffers.warehousemanagement.wms.inspection.model.entity;
+package com.ohgiraffers.warehousemanagement.wms.inspection.model.common;
 
 public enum InspectionTransactionType {
     INSPECTION("상시",1),

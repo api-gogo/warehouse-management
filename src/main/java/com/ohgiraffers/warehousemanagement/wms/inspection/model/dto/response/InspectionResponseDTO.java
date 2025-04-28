@@ -1,8 +1,8 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response;
 
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.InspectionStatus;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.InspectionTransactionType;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
