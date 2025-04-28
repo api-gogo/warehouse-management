@@ -18,57 +18,57 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'storage' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/storages}">
           <i class="fas fa-truck-loading"></i>
           <span>입고 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'shipment' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/shipments}">
           <i class="fas fa-truck"></i>
           <span>출고 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'inventory' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/inventories}">
           <i class="fas fa-box"></i>
           <span>재고 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'inspection' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/inspections}">
           <i class="fas fa-clipboard-check"></i>
           <span>검수 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'return' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/returns}">
           <i class="fas fa-undo"></i>
           <span>반품 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'purchase' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/purchases}">
           <i class="fas fa-file-invoice"></i> <span>발주 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'sales' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/sales}">
           <i class="fas fa-receipt"></i> <span>수주 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'product' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/products}">
           <i class="fas fa-boxes-stacked"></i> <span>상품 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'supplier' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/suppliers}">
           <i class="fas fa-truck"></i> <span>거래처 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'store' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/stores}">
           <i class="fas fa-store"></i>
           <span>점포 관리</span>
         </a>
