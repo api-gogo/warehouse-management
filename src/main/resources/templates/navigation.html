@@ -6,7 +6,7 @@
   <nav class="sidebar-nav">
     <ul>
       <li th:class="${activeMenu == 'dashboard' ? 'active' : ''}">
-        <a th:href="@{/}">
+        <a th:href="@{/static}">
           <i class="fas fa-tachometer-alt"></i>
           <span>대시보드</span>
         </a>
@@ -36,7 +36,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'inspection' ? 'active' : ''}">
-        <a th:href="@{/inspections}">
+        <a th:href="@{/templates/inspections}">
           <i class="fas fa-clipboard-check"></i>
           <span>검수 관리</span>
         </a>
@@ -48,7 +48,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'purchase' ? 'active' : ''}">
-        <a th:href="@{/purchases}">
+        <a th:href="@{/templates/purchases}">
           <i class="fas fa-file-invoice"></i> <span>발주 관리</span>
         </a>
       </li>
@@ -58,7 +58,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'product' ? 'active' : ''}">
-        <a th:href="@{/products}">
+        <a th:href="@{/templates/products}">
           <i class="fas fa-boxes-stacked"></i> <span>상품 관리</span>
         </a>
       </li>
