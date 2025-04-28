@@ -47,7 +47,7 @@ public class ProductController {
         ProductResponseDTO product = productService.getProductById(id);
         model.addAttribute("pageTitle", "상품 수정 - " + product.getProductName());
         model.addAttribute("product", product);
-        model.addAttribute("categories", productService.getMockCategories());
+        model.addAttribute("categories", productService.getCategories());
         return "products/update";
     }
 
@@ -56,7 +56,7 @@ public class ProductController {
     public String showCreateProductForm(Model model) {
         model.addAttribute("pageTitle", "신규 상품 등록");
         model.addAttribute("product", new ProductCreateDTO());
-        model.addAttribute("categories", productService.getMockCategories());
+        model.addAttribute("categories", productService.getCategories());
         return "products/create";
     }
 
@@ -70,7 +70,7 @@ public class ProductController {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("pageTitle", "신규 상품 등록");
             model.addAttribute("product", createDTO);
-            model.addAttribute("categories", productService.getMockCategories());
+            model.addAttribute("categories", productService.getCategories());
             return "products/create";
         }
     }
@@ -85,7 +85,7 @@ public class ProductController {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("pageTitle", "상품 수정 - " + updateDTO.getProductName());
             model.addAttribute("product", updateDTO);
-            model.addAttribute("categories", productService.getMockCategories());
+            model.addAttribute("categories", productService.getCategories());
             return "products/update";
         }
     }
