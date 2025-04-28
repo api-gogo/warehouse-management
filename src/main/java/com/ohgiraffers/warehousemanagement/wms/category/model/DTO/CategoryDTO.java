@@ -17,7 +17,7 @@ public class CategoryDTO {
     public CategoryDTO() {}
 
     public CategoryDTO(Long categoryId, String categoryName, Long parentId, Integer level,
-                       LocalDateTime categoryCreatedAt, LocalDateTime categoryUpdatedAt) {
+                        LocalDateTime categoryCreatedAt, LocalDateTime categoryUpdatedAt) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.parentId = parentId;
