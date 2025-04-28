@@ -22,7 +22,7 @@ public class InventoryController {
     }
 
     // 재고 전체 조회
-    @GetMapping()
+    @GetMapping
     public String getinventoryList(@RequestParam(name = "searchProductId", required = false) String productId, Model model) {
         List<InventoryDTO> inventories;
         // searchProductId 가 있으면 해당 상품 번호인 재고 조회
@@ -73,7 +73,7 @@ public class InventoryController {
     @GetMapping("/delete/{inventoryId}")
     public String deleteInventory(@PathVariable("inventoryId") Long inventoryId) {
         inventoryService.deleteInventory(inventoryId);
-        return "redirect:/inventories/list";
+        return "redirect:/inventories";
     }
 
     // 재고 등록 페이지

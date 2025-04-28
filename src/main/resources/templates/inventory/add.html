@@ -1,823 +1,352 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default-layout}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 재고 추가</title>
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    /* 전체 레이아웃 */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Noto Sans KR', sans-serif;
-    }
-    
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      color: #333;
-      background-color: #f5f5f5;
-    }
-    
-    .layout {
-      display: flex;
-      min-height: 100vh;
-    }
-    
-    /* 사이드바 스타일 */
-    .sidebar {
-      width: 250px;
-      background-color: #fff;
-      border-right: 1px solid #e0e0e0;
-      transition: width 0.3s ease;
-      z-index: 10;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-    }
-    
-    .sidebar-header {
-      padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .logo {
-      font-size: 20px;
-      font-weight: bold;
-      color: #0d6efd;
-    }
-    
-    .sidebar-nav ul {
-      list-style: none;
-    }
-    
-    .sidebar-nav li {
-      margin: 5px 0;
-    }
-    
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
-      color: #555;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      border-radius: 4px;
-      margin: 0 5px;
-    }
-    
-    .sidebar-nav a:hover {
-      background-color: #f0f7ff;
-      color: #0d6efd;
-    }
-    
-    .sidebar-nav li.active a {
-      background-color: #e9f2ff;
-      color: #0d6efd;
-      font-weight: 500;
-    }
-    
-    .sidebar-nav i {
-      margin-right: 10px;
-      width: 20px;
-      text-align: center;
-    }
-    
-    /* 메인 콘텐츠 영역 */
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background-color: #f5f5f5;
-    }
-    
-    /* 헤더 스타일 */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background-color: #fff;
-      border-bottom: 1px solid #e0e0e0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-    }
-    
-    .sidebar-toggle {
-      background: none;
-      border: none;
-      font-size: 18px;
-      margin-right: 15px;
-      cursor: pointer;
-      color: #555;
-      display: none;
-    }
-    
-    .search-container {
-      position: relative;
-    }
-    
-    .search-input {
-      padding: 8px 15px 8px 35px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      width: 300px;
-      font-size: 14px;
-    }
-    
-    .search-container i {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #888;
-    }
-    
-    .header-right {
-      display: flex;
-      align-items: center;
-    }
-    
-    .header-button {
-      background: none;
-      border: none;
-      font-size: 16px;
-      margin-left: 15px;
-      cursor: pointer;
-      color: #555;
-      position: relative;
-    }
-    
-    /* 사용자 드롭다운 */
-    .user-dropdown {
-      position: relative;
-    }
-    
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background-color: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      width: 150px;
-      display: none;
-      z-index: 100;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    }
-    
-    .dropdown-menu.show {
-      display: block;
-    }
-    
-    .dropdown-menu a {
-      display: block;
-      padding: 10px 15px;
-      color: #333;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    
-    .dropdown-menu a:hover {
-      background-color: #f5f5f5;
-    }
-    
-    /* 페이지 콘텐츠 */
-    .page-content {
-      padding: 20px;
-      flex: 1;
-    }
-    
-    /* 반응형 */
-    .layout.sidebar-collapsed .sidebar {
-      width: 60px;
-    }
-    
-    .layout.sidebar-collapsed .logo {
-      display: none;
-    }
-    
-    .layout.sidebar-collapsed .sidebar-nav span {
-      display: none;
-    }
-    
-    .layout.sidebar-collapsed .sidebar-nav a {
-      justify-content: center;
-      padding: 12px;
-    }
-    
-    .layout.sidebar-collapsed .sidebar-nav i {
-      margin-right: 0;
-    }
-    
-    /* 다크 모드 */
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-    
-    body.dark-mode .sidebar,
-    body.dark-mode .header,
-    body.dark-mode .dropdown-menu {
-      background-color: #1e1e1e;
-      border-color: #333;
-    }
-    
-    body.dark-mode .sidebar-nav a {
-      color: #b0b0b0;
-    }
-    
-    body.dark-mode .sidebar-nav a:hover {
-      background-color: #2a2a2a;
-      color: #fff;
-    }
-    
-    body.dark-mode .sidebar-nav li.active a {
-      background-color: #2e4059;
-      color: #90b4f9;
-    }
-    
-    body.dark-mode .search-input {
-      background-color: #2a2a2a;
-      border-color: #444;
-      color: #e0e0e0;
-    }
-    
-    body.dark-mode .header-button,
-    body.dark-mode .search-container i {
-      color: #b0b0b0;
-    }
-    
-    body.dark-mode .dropdown-menu a:hover {
-      background-color: #2a2a2a;
-    }
-    
-    /* 재고 추가 페이지 스타일 */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .page-title {
-      font-size: 24px;
-      font-weight: 600;
-    }
-    
-    .button-group {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .btn {
-      padding: 8px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    
-    .btn i {
-      margin-right: 5px;
-    }
-    
-    .btn-outline {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      color: #333;
-      text-decoration: none;
-    }
-    
-    .btn-outline:hover {
-      background-color: #f5f5f5;
-      text-decoration: none;
-    }
-    
-    .btn-primary {
-      background-color: #0d6efd;
-      color: white;
-      border: none;
-    }
-    
-    .btn-primary:hover {
-      background-color: #0b5ed7;
-    }
-    
-    .btn-success {
-      background-color: #198754;
-      color: white;
-      border: none;
-    }
-    
-    .btn-success:hover {
-      background-color: #157347;
-    }
-    
-    .btn-danger {
-      background-color: #dc3545;
-      color: white;
-      border: none;
-    }
-    
-    .btn-danger:hover {
-      background-color: #bb2d3b;
-    }
-    
-    .subtitle {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-    
-    .description {
-      color: #777;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    
-    /* 재고 추가 폼 섹션 */
-    .product-form-section {
-      background-color: #fff;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    
-    /* 폼 스타일 */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: #555;
-    }
-    
-    .form-control {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      font-size: 14px;
-      transition: border-color 0.2s;
-    }
-    
-    .form-control:focus {
-      border-color: #0d6efd;
-      outline: none;
-    }
-    
-    .form-select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      font-size: 14px;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-    }
-    
-    .form-helper {
-      font-size: 12px;
-      color: #888;
-      margin-top: 5px;
-    }
-    
-    .form-error {
-      font-size: 12px;
-      color: #dc3545;
-      margin-top: 5px;
-    }
-    
-    .form-check {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    
-    .form-check-input {
-      margin-right: 8px;
-    }
-    
-    .form-check-label {
-      font-size: 14px;
-    }
-    
-    .form-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    
-    .form-divider {
-      border-top: 1px solid #eee;
-      margin: 20px 0;
-    }
-    
-    .image-preview {
-      width: 100%;
-      height: 200px;
-      border: 1px dashed #ddd;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 10px;
-      background-color: #f9f9f9;
-      overflow: hidden;
-    }
-    
-    .image-preview img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-    
-    .placeholder-text {
-      color: #888;
-      font-size: 14px;
-    }
-    
-    .file-input-wrapper {
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-    }
-    
-    .file-input {
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-    
-    /* 다크 모드 내 재고 추가 페이지 스타일 */
-    body.dark-mode .btn-outline {
-      background-color: #2a2a2a;
-      border-color: #444;
-      color: #e0e0e0;
-    }
-    
-    body.dark-mode .btn-outline:hover {
-      background-color: #333;
-    }
-    
-    body.dark-mode .product-form-section {
-      background-color: #1e1e1e;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    
-    body.dark-mode .form-control,
-    body.dark-mode .form-select {
-      background-color: #2a2a2a;
-      border-color: #444;
-      color: #e0e0e0;
-    }
-    
-    body.dark-mode .form-label {
-      color: #b0b0b0;
-    }
-    
-    body.dark-mode .form-helper {
-      color: #aaa;
-    }
-    
-    body.dark-mode .image-preview {
-      border-color: #444;
-      background-color: #2a2a2a;
-    }
-    
-    body.dark-mode .placeholder-text {
-      color: #aaa;
-    }
-    
-    body.dark-mode .form-divider {
-      border-color: #333;
-    }
-    
-    @media (max-width: 768px) {
-      .sidebar-toggle {
-        display: block;
-      }
-      
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-      
+  <title>재고 추가</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <style>
+      /* 재고 추가 페이지 스타일 */
       .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .page-title {
+        font-size: 24px;
+        font-weight: 600;
       }
       
       .button-group {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      
+      .btn i {
+        margin-right: 5px;
+      }
+      
+      .btn-outline {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        color: #333;
+        text-decoration: none;
+      }
+      
+      .btn-outline:hover {
+        background-color: #f5f5f5;
+        text-decoration: none;
+      }
+      
+      .btn-primary {
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+      }
+      
+      .btn-primary:hover {
+        background-color: #0b5ed7;
+      }
+      
+      .btn-success {
+        background-color: #198754;
+        color: white;
+        border: none;
+      }
+      
+      .btn-success:hover {
+        background-color: #157347;
+      }
+      
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+      }
+      
+      .btn-danger:hover {
+        background-color: #bb2d3b;
+      }
+      
+      .subtitle {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      
+      .description {
+        color: #777;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      
+      /* 재고 추가 폼 섹션 */
+      .product-form-section {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      
+      /* 폼 스타일 */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #555;
+      }
+      
+      .form-control {
         width: 100%;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+      
+      .form-control:focus {
+        border-color: #0d6efd;
+        outline: none;
+      }
+      
+      .form-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+      }
+      
+      .form-helper {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+      }
+      
+      .form-error {
+        font-size: 12px;
+        color: #dc3545;
+        margin-top: 5px;
+      }
+      
+      .form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      
+      .form-check-input {
+        margin-right: 8px;
+      }
+      
+      .form-check-label {
+        font-size: 14px;
       }
       
       .form-buttons {
-        flex-direction: column;
-        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
       }
       
-      .form-buttons .btn {
-        width: 100%;
-        justify-content: center;
+      .form-divider {
+        border-top: 1px solid #eee;
+        margin: 20px 0;
       }
-    }
-  </style>
+      
+      /* 다크 모드 내 재고 추가 페이지 스타일 */
+      body.dark-mode .btn-outline {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+      
+      body.dark-mode .btn-outline:hover {
+        background-color: #333;
+      }
+      
+      body.dark-mode .product-form-section {
+        background-color: #1e1e1e;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+      
+      body.dark-mode .form-control,
+      body.dark-mode .form-select {
+        background-color: #2a2a2a;
+        border-color: #444;
+        color: #e0e0e0;
+      }
+      
+      body.dark-mode .form-label {
+        color: #b0b0b0;
+      }
+      
+      body.dark-mode .form-helper {
+        color: #aaa;
+      }
+      
+      body.dark-mode .form-divider {
+        border-color: #333;
+      }
+      
+      @media (max-width: 768px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        
+        .button-group {
+          width: 100%;
+        }
+        
+        .form-buttons {
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .form-buttons .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </th:block>
 </head>
 <body>
-<div class="layout">
-  <!-- 사이드바 -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1 class="logo">WMS System</h1>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='inventory'">
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+      <h1 class="page-title">재고 추가</h1>
+      <div class="button-group">
+        <a th:href="@{/inventories}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> 목록으로 돌아가기
+        </a>
+      </div>
     </div>
-    <nav class="sidebar-nav">
-      <ul>
-        <li>
-          <a href="../index.html">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>대시보드</span>
-          </a>
-        </li>
-        <li class="active">
-          <a href="list.html">
-            <i class="fas fa-box"></i>
-            <span>재고 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-truck-loading"></i>
-            <span>입고 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-shopping-cart"></i>
-            <span>수주 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-clipboard-check"></i>
-            <span>검수 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-building"></i>
-            <span>공급업체 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-folder-tree"></i>
-            <span>카테고리 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-truck"></i>
-            <span>출고 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-undo"></i>
-            <span>반품 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-users"></i>
-            <span>사용자 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-store"></i>
-            <span>매장 관리</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-chart-bar"></i>
-            <span>보고서</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fas fa-cog"></i>
-            <span>설정</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </aside>
-
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 -->
-    <header class="header">
-      <div class="header-left">
-        <button id="sidebar-toggle" class="sidebar-toggle">
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="search-container">
-          <i class="fas fa-search"></i>
-          <input type="search" placeholder="검색..." class="search-input">
-        </div>
-      </div>
-      <div class="header-right">
-        <button class="header-button">
-          <i class="fas fa-bell"></i>
-        </button>
-        <button id="theme-toggle" class="header-button">
-          <i class="fas fa-moon"></i>
-        </button>
-        <div class="user-dropdown">
-          <button class="header-button">
-            <i class="fas fa-user"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#">프로필</a>
-            <a href="#">설정</a>
-            <a href="#">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- 페이지 콘텐츠 영역 - 재고 추가 -->
-    <main class="page-content">
-      <!-- 페이지 헤더 -->
-      <div class="page-header">
-        <h1 class="page-title">재고 추가</h1>
-        <div class="button-group">
-          <a th:href="@{/inventory/list}" class="btn btn-outline">
-            <i class="fas fa-arrow-left"></i> 목록으로 돌아가기
-          </a>
-        </div>
-      </div>
+    
+    <!-- 재고 추가 폼 섹션 -->
+    <div class="product-form-section">
+      <h2 class="subtitle">재고 정보</h2>
+      <p class="description">새로운 재고 정보를 등록하기 위해 필요한 정보를 입력해주세요.</p>
       
-      <!-- 재고 추가 폼 섹션 -->
-      <div class="product-form-section">
-        <h2 class="subtitle">재고 정보</h2>
-        <p class="description">새로운 재고 정보를 등록하기 위해 필요한 정보를 입력해주세요.</p>
-        
-        <form id="inventoryForm" th:action="@{/inventory/add}" method="post">
-          <div class="form-grid">
-            <!-- 왼쪽 컬럼 -->
-            <div>
-              <div class="form-group">
-                <label for="storageId" class="form-label">창고 ID *</label>
-                <input type="number" id="storageId" name="storageId" class="form-control" required>
-                <div class="form-helper">창고 식별 번호를 입력하세요.</div>
-              </div>
-              
-              <div class="form-group">
-                <label for="productId" class="form-label">상품 ID *</label>
-                <input type="number" id="productId" name="productId" class="form-control" required>
-                <div class="form-helper">상품 식별 번호를 입력하세요.</div>
-              </div>
-              
-              <div class="form-group">
-                <label for="lotNumber" class="form-label">로트 번호 *</label>
-                <input type="text" id="lotNumber" name="lotNumber" class="form-control" required>
-                <div class="form-helper">상품의 로트 번호를 입력하세요.</div>
-              </div>
-              
-              <div class="form-group">
-                <label for="locationCode" class="form-label">위치 코드 *</label>
-                <input type="number" id="locationCode" name="locationCode" class="form-control" required>
-                <div class="form-helper">창고 내 위치 코드를 입력하세요.</div>
-              </div>
+      <form id="inventoryForm" th:action="@{/inventories/add}" method="post">
+        <div class="form-grid">
+          <!-- 왼쪽 컬럼 -->
+          <div>
+            <div class="form-group">
+              <label for="storageId" class="form-label">창고 ID *</label>
+              <input type="number" id="storageId" name="storageId" class="form-control" required>
+              <div class="form-helper">창고 식별 번호를 입력하세요.</div>
             </div>
             
-            <!-- 오른쪽 컬럼 -->
-            <div>
-              <div class="form-group">
-                <label for="availableStock" class="form-label">가용 재고 *</label>
-                <input type="number" id="availableStock" name="availableStock" class="form-control" min="0" required>
-                <div class="form-helper">현재 사용 가능한 재고 수량</div>
-              </div>
-              
-              <div class="form-group">
-                <label for="allocatedStock" class="form-label">할당 재고 *</label>
-                <input type="number" id="allocatedStock" name="allocatedStock" class="form-control" min="0" required>
-                <div class="form-helper">주문에 할당된 재고 수량</div>
-              </div>
-              
-              <div class="form-group">
-                <label for="disposedStock" class="form-label">폐기 재고</label>
-                <input type="number" id="disposedStock" name="disposedStock" class="form-control" min="0" value="0">
-                <div class="form-helper">폐기된 재고 수량</div>
-              </div>
-              
-              <div class="form-group">
-                <label for="inventoryExpiryDate" class="form-label">유통기한</label>
-                <input type="date" id="inventoryExpiryDate" name="inventoryExpiryDate" class="form-control">
-                <div class="form-helper">재고 유통기한을 입력하세요.</div>
-              </div>
+            <div class="form-group">
+              <label for="productId" class="form-label">상품 ID *</label>
+              <input type="number" id="productId" name="productId" class="form-control" required>
+              <div class="form-helper">상품 식별 번호를 입력하세요.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="lotNumber" class="form-label">로트 번호 *</label>
+              <input type="text" id="lotNumber" name="lotNumber" class="form-control" required>
+              <div class="form-helper">상품의 로트 번호를 입력하세요.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="locationCode" class="form-label">위치 코드 *</label>
+              <input type="number" id="locationCode" name="locationCode" class="form-control" required>
+              <div class="form-helper">창고 내 위치 코드를 입력하세요.</div>
             </div>
           </div>
           
-          <div class="form-buttons">
-            <button type="button" class="btn btn-outline" onclick="resetForm()">
-              <i class="fas fa-undo"></i> 초기화
-            </button>
-            <button type="submit" class="btn btn-success">
-              <i class="fas fa-save"></i> 재고 등록
-            </button>
+          <!-- 오른쪽 컬럼 -->
+          <div>
+            <div class="form-group">
+              <label for="availableStock" class="form-label">가용 재고 *</label>
+              <input type="number" id="availableStock" name="availableStock" class="form-control" min="0" required>
+              <div class="form-helper">현재 사용 가능한 재고 수량</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="allocatedStock" class="form-label">할당 재고 *</label>
+              <input type="number" id="allocatedStock" name="allocatedStock" class="form-control" min="0" required>
+              <div class="form-helper">주문에 할당된 재고 수량</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="disposedStock" class="form-label">폐기 재고</label>
+              <input type="number" id="disposedStock" name="disposedStock" class="form-control" min="0" value="0">
+              <div class="form-helper">폐기된 재고 수량</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="inventoryExpiryDate" class="form-label">유통기한</label>
+              <input type="date" id="inventoryExpiryDate" name="inventoryExpiryDate" class="form-control">
+              <div class="form-helper">재고 유통기한을 입력하세요.</div>
+            </div>
           </div>
-        </form>
-      </div>
-    </main>
-  </div>
-</div>
-
-<script th:inline="javascript">
-  /*<![CDATA[*/
-  // 사이드바 토글
-  document.getElementById('sidebar-toggle').addEventListener('click', function() {
-    document.querySelector('.layout').classList.toggle('sidebar-collapsed');
-  });
-
-  // 다크 모드 토글
-  document.getElementById('theme-toggle').addEventListener('click', function() {
-    document.body.classList.toggle('dark-mode');
-
-    // 아이콘 변경
-    const icon = this.querySelector('i');
-    if (document.body.classList.contains('dark-mode')) {
-      icon.classList.remove('fa-moon');
-      icon.classList.add('fa-sun');
-    } else {
-      icon.classList.remove('fa-sun');
-      icon.classList.add('fa-moon');
-    }
-  });
-
-  // 사용자 드롭다운
-  document.querySelector('.user-dropdown button').addEventListener('click', function() {
-    document.querySelector('.dropdown-menu').classList.toggle('show');
-  });
-
-  // 드롭다운 외부 클릭 시 닫기
-  window.addEventListener('click', function(event) {
-    if (!event.target.matches('.user-dropdown button') && !event.target.matches('.user-dropdown i')) {
-      const dropdowns = document.querySelectorAll('.dropdown-menu');
-      dropdowns.forEach(dropdown => {
-        if (dropdown.classList.contains('show')) {
-          dropdown.classList.remove('show');
-        }
+        </div>
+        
+        <div class="form-buttons">
+          <button type="button" class="btn btn-outline" onclick="resetForm()">
+            <i class="fas fa-undo"></i> 초기화
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> 재고 등록
+          </button>
+        </div>
+      </form>
+    </div>
+  </th:block>
+  
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      // 폼 초기화
+      function resetForm() {
+        document.getElementById('inventoryForm').reset();
+      }
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log("재고 추가 페이지 스크립트 로딩 완료");
       });
-    }
-  });
-
-  // 모바일 화면에서 사이드바 자동 접기
-  function checkScreenSize() {
-    if (window.innerWidth < 768) {
-      document.querySelector('.layout').classList.add('sidebar-collapsed');
-    } else {
-      document.querySelector('.layout').classList.remove('sidebar-collapsed');
-    }
-  }
-
-  // 폼 초기화
-  function resetForm() {
-    document.getElementById('inventoryForm').reset();
-  }
-
-  // 초기 로드 및 화면 크기 변경 시 체크
-  window.addEventListener('load', checkScreenSize);
-  window.addEventListener('resize', checkScreenSize);
-  /*]]>*/
-</script>
+      /*]]>*/
+    </script>
+  </th:block>
 </body>
 </html>
