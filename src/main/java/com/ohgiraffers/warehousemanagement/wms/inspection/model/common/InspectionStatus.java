@@ -27,9 +27,6 @@ public enum InspectionStatus {
 
     @Override
     public String toString() {
-        return "검수상태{" +
-                "inspectionStatus=" + inspectionStatus +
-                ", statusId=" + statusId +
-                '}';
+        return "검수상태: " + inspectionStatus;
     }
 }
