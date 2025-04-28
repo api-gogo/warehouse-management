@@ -52,43 +52,7 @@
     margin-right: 0.5rem;
 }
 
-.admin-tabs {
-    display: flex;
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-    overflow-x: auto;
-}
-
-.tab-button {
-    padding: 0.75rem 1.25rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.tab-button:hover {
-    color: var(--color-primary);
-}
-
-.tab-button.active {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
-    background-color: rgba(59, 130, 246, 0.05);
-}
-
-.tab-button .badge {
-    margin-left: 0.5rem;
-    background-color: var(--color-primary);
-    color: white;
-    font-size: 0.7rem;
-    border-radius: 9999px;
-    padding: 0.2rem 0.5rem;
-}
+/* 탭 관련 커스텀 스타일 - 기본 스타일은 components/tabs.css 참조 */
 
 .admin-content {
     padding: 1.5rem;
@@ -132,129 +96,18 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* 테이블 스타일 */
-.table-responsive {
-    overflow-x: auto;
-    margin-bottom: 1.5rem;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-size: 0.95rem;
-}
-
-.data-table th, 
-.data-table td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
+/* 테이블 커스텀 스타일 - 기본 스타일은 components/tables.css 참조 */
 .data-table th {
-    font-weight: 600;
-    color: var(--text-secondary);
-    background-color: var(--bg-secondary);
     cursor: pointer;
-    white-space: nowrap;
 }
 
 .data-table th:hover {
     color: var(--color-primary);
 }
 
-.data-table tr:hover {
-    background-color: rgba(59, 130, 246, 0.03);
-}
+/* 액션 버튼 커스텀 스타일 - 기본 스타일은 components/tables.css 참조 */
 
-.data-table .no-data {
-    padding: 2rem;
-    text-align: center;
-    color: var(--text-secondary);
-    font-style: italic;
-}
-
-.pending-count {
-    background-color: var(--color-warning);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.85rem;
-}
-
-/* 액션 버튼 */
-.actions {
-    white-space: nowrap;
-}
-
-.action-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 0.25rem;
-    color: var(--text-secondary);
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.action-button:hover {
-    background-color: var(--bg-secondary);
-    color: var(--color-primary);
-}
-
-.approve-button:hover {
-    color: var(--color-success);
-}
-
-.reject-button:hover,
-.disable-button:hover {
-    color: var(--color-danger);
-}
-
-.enable-button:hover {
-    color: var(--color-success);
-}
-
-/* 페이지네이션 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    margin-top: 1.5rem;
-}
-
-.page-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 0.25rem;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    transition: all 0.2s;
-}
-
-.page-link:hover {
-    background-color: var(--bg-secondary);
-    color: var(--color-primary);
-}
-
-.page-link.active {
-    background-color: var(--color-primary);
-    color: white;
-}
-
-.page-link.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
+/* 페이지네이션 스타일 추가 커스텀 - 기본 스타일은 components/tables.css 참조 */
 
 /* 사용자 상세 페이지 */
 .user-detail-container {
@@ -365,6 +218,13 @@
     width: 1.2rem;
     height: 1.2rem;
     cursor: pointer;
+}
+
+/* 승인 관리 배치 작업 관련 스타일 */
+.batch-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
 }
 
 /* 반응형 스타일 */

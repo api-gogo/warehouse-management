@@ -14,6 +14,7 @@
 @import 'components/alerts.css';
 @import 'components/tables.css';
 @import 'components/badges.css';
+@import 'components/tabs.css';
 
 /* Layouts */
 @import 'layouts/grid.css';

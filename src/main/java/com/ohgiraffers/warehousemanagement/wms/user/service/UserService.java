@@ -100,6 +100,25 @@ public class UserService {
         ));
     }
 
+    public Page<UserDTO> findPendingUsers(String search, Pageable pageable) {
+        Page<User> userPage = userRepository.findUsersByStatusAndSearch(UserStatus.승인대기, search, pageable);
+
+        return userPage.map(user -> new UserDTO(
+                user.getUserId(),
+                user.getUserCode(),
+                user.getUserPass(),
+                user.getUserName(),
+                user.getUserEmail(),
+                user.getUserPhone(),
+                user.getUserPart().getPart(),
+                user.getUserRole().getRole(),
+                user.getUserStatus().getStatus(),
+                user.getUserCreatedAt(),
+                user.getUserUpdatedAt(),
+                user.getUserDeletedAt()
+        ));
+    }
+
     public LoginUserDTO findUserByUserCode(String userCode) {
         Optional<User> user = userRepository.findByUserCode(userCode);
 

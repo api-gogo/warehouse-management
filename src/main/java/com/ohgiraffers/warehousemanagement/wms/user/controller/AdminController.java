@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -117,5 +116,34 @@ public class AdminController {
         message = "승인이 거부되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/admin/users/" + userId;
+    }
+
+    @GetMapping("/users/approvals")
+    public String getPendingUsers(@RequestParam(required = false) String search,
+                                  @PageableDefault(size = 10) Pageable pageable,
+                                  Model model) {
+        // 검색어가 빈 문자열일 경우 null로 처리
+        if (search != null && search.trim().isEmpty()) {
+            search = null;
+        }
+
+        Page<UserDTO> userPage = userService.findPendingUsers(search, pageable);
+
+        if (userPage.isEmpty()) {
+            model.addAttribute("message", "승인 대기 중인 회원이 없습니다.");
+        }
+
+        model.addAttribute("pendingUsers", userPage.getContent());
+        model.addAttribute("currentPage", userPage.getNumber());
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("size", userPage.getSize());
+
+        // 승인 대기 회원 수 조회
+        long pendingCount = userService.countPendingUsers();
+        model.addAttribute("pendingCount", pendingCount);
+
+        model.addAttribute("search", search);
+
+        return "/admin/user-approvals";
     }
 }

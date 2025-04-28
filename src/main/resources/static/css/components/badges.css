@@ -199,8 +199,33 @@
 /* 승인 관리 페이지 특수 배지 스타일 */
 .pending-count {
     background-color: var(--color-warning);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
+    color: #fff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.25rem;
     font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 1.5rem;
+    text-align: center;
+    display: inline-block;
+}
+
+#selectedCount {
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 1.5rem;
+    text-align: center;
+    display: inline-block;
+}
+
+/* 다크모드에서의 배지 색상 조정 */
+html.dark .pending-count {
+    color: #fff;
+}
+
+html.dark #selectedCount {
+    color: #fff;
 }
