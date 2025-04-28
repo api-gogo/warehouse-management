@@ -4,6 +4,7 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
+import jakarta.transaction.InvalidTransactionException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -120,6 +121,26 @@ public class SalesServiceImpl implements SalesService {
 
         salesDTO.setSalesUpdatedAt(savedEntity.getSalesUpdatedAt());
         return salesDTO;
+    }
+
+    @Transactional
+    public boolean updateStatusSales(Integer salesId, SalesStatus status) {
+        Sales findSales = salesRepository.findById(salesId).orElseThrow(
+                () -> new NullPointerException("상태를 변경할 수주 데이터 없음"));
+
+        // 등록상태에서만 승인이나 취소 가능
+        if (findSales.getSalesStatus() != SalesStatus.PENDING) {
+            return false; // InvalidTransactionException 처리필요
+        }
+
+        // 승인이랑 취소 상태로만 변경 가능
+        if (status != SalesStatus.APPROVED && status != SalesStatus.CANCELLED) {
+            return false; // InvalidTransactionException 처리필요
+        }
+
+        findSales.setSalesStatus(status);
+        findSales.setSalesUpdatedAt(LocalDateTime.now());
+        return true;
     }
 
     @Override

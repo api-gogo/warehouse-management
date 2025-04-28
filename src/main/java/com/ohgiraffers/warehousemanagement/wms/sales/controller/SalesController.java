@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,5 +106,19 @@ public class SalesController {
         return resultUrl;
     }
 
+    @PatchMapping("/update/status/{salesId}")
+    public String updateStatusSales(@PathVariable Integer salesId, @RequestParam SalesStatus status, RedirectAttributes rdtat) {
+        boolean result = salesServiceImpl.updateStatusSales(salesId, status);
+        String resultUrl = null;
+
+        if (result) {
+            rdtat.addFlashAttribute("message", "수주 상태가 변경되었습니다.");
+            resultUrl = "redirect:/sales/" + salesId;
+        } else {
+            rdtat.addFlashAttribute("message","상태 변경에 실패했습니다. 다시 시도해주세요.");
+            resultUrl = "redirect:/sales/" + salesId;
+        }
+        return resultUrl;
+    }
 
 }
