@@ -1,67 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/auth-layout}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 로그인 실패</title>
-  <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
-  <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
-  <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/fail.css">
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>로그인 실패</title>
 </head>
 <body>
-<div class="layout" th:with="activeMenu='login'">
-  <!-- 네비게이션 사이드바 포함 -->
-  <div th:replace="~{navigation :: aside}"></div>
-
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 포함 -->
-    <div th:replace="~{navigation :: header}"></div>
-
-    <!-- 페이지 콘텐츠 영역 -->
-    <main class="page-content">
-      <div class="fail-container">
-        <div class="fail-icon">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
-        
-        <h1 class="fail-title">로그인 실패</h1>
-        
-        <div class="fail-message-box">
-          <div class="fail-message">
-            <i class="fas fa-info-circle"></i>
-            <p th:text="${message}">아이디 또는 비밀번호가 올바르지 않습니다.</p>
-          </div>
-        </div>
-        
-        <div class="fail-details">
-          <p>다음 사항을 확인해 주세요:</p>
-          <ul>
-            <li>사원 번호가 정확히 입력되었는지 확인해 주세요.</li>
-            <li>대소문자를 포함하여 비밀번호를 정확히 입력했는지 확인해 주세요.</li>
-            <li>계정이 잠금 상태가 아닌지 확인해 주세요.</li>
-          </ul>
-        </div>
-        
-        <div class="fail-actions">
-          <a href="/auth/login" class="btn btn-primary">
-            <i class="fas fa-sign-in-alt me-2"></i>다시 로그인
-          </a>
-          <a href="/" class="btn btn-outline-primary">
-            <i class="fas fa-home me-2"></i>홈으로 돌아가기
-          </a>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content">
+    <div class="fail-container">
+      <div class="fail-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      
+      <h1 class="fail-title">로그인 실패</h1>
+      
+      <div class="fail-message-box">
+        <div class="fail-message">
+          <i class="fas fa-info-circle"></i>
+          <p th:text="${message}">아이디 또는 비밀번호가 올바르지 않습니다.</p>
         </div>
       </div>
-    </main>
-  </div>
-</div>
-
-<!-- 스크립트 포함 -->
-<div th:replace="~{navigation :: scripts}"></div>
+      
+      <div class="fail-details">
+        <p>다음 사항을 확인해 주세요:</p>
+        <ul>
+          <li>사원 번호가 정확히 입력되었는지 확인해 주세요.</li>
+          <li>대소문자를 포함하여 비밀번호를 정확히 입력했는지 확인해 주세요.</li>
+          <li>계정이 잠금 상태가 아닌지 확인해 주세요.</li>
+        </ul>
+      </div>
+      
+      <div class="fail-actions">
+        <a href="/auth/login" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt me-2"></i>다시 로그인
+        </a>
+        <a href="/" class="btn btn-outline-primary">
+          <i class="fas fa-home me-2"></i>홈으로 돌아가기
+        </a>
+      </div>
+    </div>
+  </th:block>
 </body>
 </html>

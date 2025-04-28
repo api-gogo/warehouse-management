@@ -1,17 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
 </head>
 <body>
-<script th:inline="javascript">
-    // 오류 메세지를 출력함
-    alert([[${message}]]);
-    if(document.referrer)
-        window.location.href = document.referrer;
-    else
-        window.location.replace("/inspection");
-</script>
+
 </body>
 </html>
