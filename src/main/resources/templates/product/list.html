@@ -6,345 +6,23 @@
   <title>WMS - 상품 관리</title>
   <!-- 폰트어썸 아이콘 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --color-primary: #3b82f6;
-      --color-primary-hover: #2563eb;
-      --color-secondary: #f3f4f6;
-      --color-success: #10b981;
-      --color-warning: #f59e0b;
-      --color-danger: #ef4444;
-      --color-info: #6366f1;
-      --bg-main: #ffffff;
-      --bg-secondary: #f9fafb;
-      --bg-sidebar: #ffffff;
-      --bg-card: #ffffff;
-      --bg-header: #ffffff;
-      --text-primary: #111827;
-      --text-secondary: #6b7280;
-      --text-muted: #9ca3af;
-      --text-sidebar: #4b5563;
-      --text-sidebar-active: #111827;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --border-radius: 0.5rem;
-    }
-
-    body.dark-mode {
-      --bg-main: #111827;
-      --bg-secondary: #1f2937;
-      --bg-sidebar: #1f2937;
-      --bg-card: #1f2937;
-      --bg-header: #1f2937;
-      --text-primary: #f9fafb;
-      --text-secondary: #e5e7eb;
-      --text-muted: #9ca3af;
-      --text-sidebar: #d1d5db;
-      --text-sidebar-active: #f9fafb;
-      --border-color: #374151;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      line-height: 1.5;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    ul {
-      list-style: none;
-    }
-
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: inherit;
-      color: inherit;
-    }
-
-    .page-content {
-      padding: 1.5rem;
-      min-height: 100vh;
-      background-color: var(--bg-secondary);
-    }
-
-    .card {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 1.5rem;
-    }
-
-    .card-header {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .card-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-    }
-
-    .card-description {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-    }
-
-    .card-content {
-      padding: 1rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      border-radius: 0.25rem;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background-color: var(--color-primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--color-primary-hover);
-    }
-
-    .btn-outline {
-      background-color: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-    }
-
-    .btn-outline:hover {
-      background-color: var(--bg-secondary);
-    }
-
-    .btn-sm {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-    }
-
-    .btn-icon {
-      padding: 0.25rem;
-      width: 2rem;
-      height: 2rem;
-    }
-
-    .btn i {
-      margin-right: 0.5rem;
-    }
-
-    .btn-icon i {
-      margin-right: 0;
-    }
-
-    .filter-area {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .select-container {
-      position: relative;
-      width: 180px;
-    }
-
-    .select {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      font-size: 0.875rem;
-      appearance: none;
-      cursor: pointer;
-    }
-
-    .select-container::after {
-      content: '\f078';
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
-      position: absolute;
-      right: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    .table-container {
-      overflow-x: auto;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-    }
-
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .table th,
-    .table td {
-      padding: 0.75rem 1rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .table th {
-      font-weight: 500;
-      color: var(--text-secondary);
-      background-color: var(--bg-secondary);
-      font-size: 0.875rem;
-    }
-
-    .table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .table td {
-      font-size: 0.875rem;
-    }
-
-    .table .text-right {
-      text-align: right;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.125rem 0.5rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-      border-radius: 9999px;
-      border: 1px solid transparent;
-    }
-
-    .badge-outline {
-      border-color: var(--border-color);
-    }
-
-    .badge-success {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: #065f46;
-    }
-
-    .badge-danger {
-      background-color: rgba(239, 68, 68, 0.1);
-      color: #b91c1c;
-    }
-
-    .flex {
-      display: flex;
-    }
-
-    .items-center {
-      align-items: center;
-    }
-
-    .justify-between {
-      justify-content: space-between;
-    }
-
-    .justify-end {
-      justify-content: flex-end;
-    }
-
-    .space-x-2 > * + * {
-      margin-left: 0.5rem;
-    }
-
-    .font-medium {
-      font-weight: 500;
-    }
-
-    .page-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 1.5rem;
-      color: var(--text-primary);
-    }
-
-    .search-container {
-      position: relative;
-      width: 300px;
-    }
-
-    .search-container i {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.5rem 0.75rem 0.5rem 2rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      font-size: 0.875rem;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      .search-container {
-        width: 100%;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .page-content {
-        padding: 1rem;
-      }
-
-      .filter-area {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .select-container {
-        width: 100%;
-      }
-    }
-  </style>
+<!-- 페이지 css  -->
+  <link rel="stylesheet" href="../../static/css/product/list.css" th:href="@{/css/product/list.css}">
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/common.css?v=1">
+  <!-- 네비게이션 CSS -->
+  <link rel="stylesheet" href="/css/navigation.css?v=1">
 </head>
 <body>
+
+<div th:replace="~{navigation :: aside}"></div>
+
+<!-- 메인 콘텐츠 -->
+<div class="main-content">
+  <!-- 헤더 포함 -->
+  <div th:replace="~{navigation :: header}"></div>
 <main class="page-content">
+  <!-- 페이지 제목과 버튼 -->
   <div class="flex items-center justify-between">
     <h1 class="page-title" th:text="${pageTitle}">상품 관리</h1>
     <div class="flex items-center space-x-2">
@@ -359,50 +37,25 @@
     </div>
   </div>
 
+  <!-- 상품 목록 카드 -->
   <div class="card">
     <div class="card-header">
       <h2 class="card-title" th:text="${cardTitle}">상품 목록</h2>
       <p class="card-description" th:text="${cardDescription}">등록된 모든 상품을 확인하고 관리할 수 있습니다.</p>
     </div>
     <div class="card-content">
-      <!-- 필터링 폼 -->
+      <!-- 검색 폼 -->
       <form th:action="@{/product/list}" method="get" class="filter-area">
         <div class="search-container">
           <i class="fas fa-search"></i>
           <input type="search" name="searchKeyword" placeholder="상품명 검색..." class="search-input" th:value="${searchKeyword}" aria-label="상품명 검색">
         </div>
-        <div class="select-container">
-          <select class="select" name="category" onchange="this.form.submit()" aria-label="카테고리 선택">
-            <option value="all">카테고리 전체</option>
-            <option th:each="category : ${categories}"
-                    th:value="${category.id}"
-                    th:text="${category.name}"
-                    th:selected="${selectedCategory == category.id}"></option>
-          </select>
-        </div>
-        <div class="select-container">
-          <select class="select" name="storageType" onchange="this.form.submit()" aria-label="보관방법 선택">
-            <option value="all">보관방법 전체</option>
-            <option th:each="type : ${storageTypes}"
-                    th:value="${type.id}"
-                    th:text="${type.name}"
-                    th:selected="${selectedStorageType == type.id}"></option>
-          </select>
-        </div>
-        <div class="select-container">
-          <select class="select" name="supplier" onchange="this.form.submit()" aria-label="공급업체 선택">
-            <option value="all">공급업체 전체</option>
-            <option th:each="supplier : ${suppliers}"
-                    th:value="${supplier.id}"
-                    th:text="${supplier.name}"
-                    th:selected="${selectedSupplier == supplier.id}"></option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-outline btn-icon" aria-label="필터 적용">
-          <i class="fas fa-filter"></i>
+        <button type="submit" class="btn btn-outline btn-icon" aria-label="검색">
+          <i class="fas fa-search"></i>
         </button>
       </form>
 
+      <!-- 상품 목록 테이블 -->
       <div class="table-container">
         <table class="table">
           <thead>
@@ -432,13 +85,13 @@
             <td th:text="${product.quantityPerBox}"></td>
             <td th:text="${#temporals.format(product.productCreatedAt, 'yyyy-MM-dd')}"></td>
             <td>
-                  <span class="badge badge-outline"
-                        th:classappend="${product.isDeleted == false} ? 'badge-success' : 'badge-danger'"
-                        th:text="${product.isDeleted == false} ? '활성' : '비활성'"></span>
+              <span class="badge badge-outline"
+                    th:classappend="${product.isDeleted == false} ? 'badge-success' : 'badge-danger'"
+                    th:text="${product.isDeleted == false} ? '활성' : '비활성'"></span>
             </td>
             <td class="text-right">
               <a th:href="@{/product/{id}(id=${product.productId})}" class="btn btn-outline btn-sm" aria-label="상품 편집">편집</a>
-              <form th:action="@{/product/{id}/delete(id=${product.productId})}" method="post" style="display:inline;">
+              <form th:action="@{/product/delete/{id}(id=${product.productId})}" method="post" style="display:inline;">
                 <button type="submit" class="btn btn-outline btn-sm" aria-label="상품 삭제">삭제</button>
               </form>
             </td>
@@ -456,13 +109,13 @@
           <span th:text="'총 ' + ${totalItems} + '개 항목 중 ' + ${startItem} + '-' + ${endItem} + ' 표시 중'"></span>
         </div>
         <div class="flex space-x-2">
-          <a th:href="@{/product/list(page=${currentPage - 1}, searchKeyword=${searchKeyword}, category=${selectedCategory}, storageType=${selectedStorageType}, supplier=${selectedSupplier})}"
+          <a th:href="@{/product/list(page=${currentPage - 1}, searchKeyword=${searchKeyword})}"
              th:class="'btn btn-outline btn-sm' + (${currentPage == 1} ? ' disabled' : '')"
              aria-label="이전 페이지">
             <i class="fas fa-chevron-left"></i>
           </a>
           <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
-          <a th:href="@{/product/list(page=${currentPage + 1}, searchKeyword=${searchKeyword}, category=${selectedCategory}, for storageType=${selectedStorageType}, supplier=${selectedSupplier})}"
+          <a th:href="@{/product/list(page=${currentPage + 1}, searchKeyword=${searchKeyword})}"
              th:class="'btn btn-outline btn-sm' + (${currentPage == totalPages} ? ' disabled' : '')"
              aria-label="다음 페이지">
             <i class="fas fa-chevron-right"></i>
@@ -472,5 +125,7 @@
     </div>
   </div>
 </main>
+</div>
+<div th:replace="~{navigation :: scripts}"></div>
 </body>
 </html>
