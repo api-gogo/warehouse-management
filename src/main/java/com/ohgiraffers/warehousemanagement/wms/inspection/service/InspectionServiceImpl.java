@@ -27,7 +27,7 @@ public class InspectionServiceImpl implements InspectionService {
     @Override
     @Transactional
     public InspectionResponseDTO createInspection(InspectionRequestDTO requestDTO) {
-        if(requestDTO.getTransactionId() != null && requestDTO.getTransactionType().equals(InspectionTransactionType.INSPECTION)) {
+        if(requestDTO.getTransactionId() != null && !requestDTO.getTransactionType().equals(InspectionTransactionType.INSPECTION)) {
             Optional<Inspection> findInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
                     requestDTO.getTransactionType(), requestDTO.getTransactionId()
             );
@@ -97,7 +97,6 @@ public class InspectionServiceImpl implements InspectionService {
             Inspection dtoToInspection = new Inspection(requestDTO);
 
             dtoToInspection.setInspectionId(inspection.getInspectionId());
-            dtoToInspection.setInspectionDate(inspection.getInspectionDate());
             dtoToInspection.setInspectionUpdatedAt(inspection.getInspectionUpdatedAt());
 
             if(inspection.equals(dtoToInspection))

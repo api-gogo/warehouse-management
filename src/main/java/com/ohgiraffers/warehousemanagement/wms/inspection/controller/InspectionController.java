@@ -51,7 +51,7 @@ public class InspectionController {
 
     // 검수 등록
     @PostMapping("/create")
-    public String createInspection(@Validated @RequestBody InspectionRequestDTO requestDTO, RedirectAttributes ra) {
+    public String createInspection(@Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
         log.info("POST : /inspections");
         log.info("inspectionRequestDTO : {}", requestDTO);
 
