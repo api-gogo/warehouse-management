@@ -23,12 +23,10 @@
             </button>
           </div>
           <select id="typeFilter" class="filter-select">
-            <option value="">모든 유형</option>
-            <option value="INSPECTION">상시</option>
-            <option value="PURCHASE">발주</option>
-            <option value="SALES">수주</option>
-            <option value="STORAGE">입고반품</option>
-            <option value="SHIPMENT">출고반품</option>
+            <option value="inspectionId">검수 ID</option>
+            <option value="userId">검수자 ID</option>
+            <option value="transactionId">검수유형 ID</option>
+            <option value="inspectionDate">검수일자</option>
           </select>
           <a th:href="@{/inspections/create}" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>검수 등록
@@ -37,7 +35,7 @@
       </div>
 
       <div class="common-tabs">
-        <button class="tab-button active" data-type="">전체</button>
+        <button class="tab-button" data-type="">전체</button>
         <button class="tab-button" data-type="INSPECTION">상시</button>
         <button class="tab-button" data-type="PURCHASE">발주</button>
         <button class="tab-button" data-type="SALES">수주</button>
@@ -52,7 +50,7 @@
             <tr>
               <th>검수ID</th>
               <th>검수자ID</th>
-              <th>검수ID</th>
+              <th>검수유형ID</th>
               <th>검수유형</th>
               <th>검수수량</th>
               <th>정상수량</th>
@@ -120,10 +118,10 @@
                th:classappend="${inspectionList.number == i ? 'active' : ''}">1</a>
           </th:block>
 
-          <a th:href="@{/inspections(page=${inspectionList.number + 2}, size=${inspectionList.size}, type=${param.type})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
+          <a th:href="@{/inspections(page=${inspectionList.number + 2}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
             <i class="fas fa-angle-right"></i>
           </a>
-          <a th:href="@{/inspections(page=${inspectionList.totalPages}, size=${inspectionList.size}, type=${param.type})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
+          <a th:href="@{/inspections(page=${inspectionList.totalPages}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-right"></i>
           </a>
         </div>
@@ -134,10 +132,20 @@
   <!-- 페이지별 스크립트 -->
   <th:block layout:fragment="scripts">
     <script>
+      const params = new URLSearchParams(window.location.search);
+      const currentType = params.get('inspectionType');
       document.addEventListener('DOMContentLoaded', function() {
+
         // 탭 전환
         const tabButtons = document.querySelectorAll('.tab-button');
         tabButtons.forEach(button => {
+          const type = button.getAttribute('data-type');
+          if((currentType === null || currentType === '') &&
+                  (type === null || type === '')) {
+            button.classList.add('active');
+          }else if (button.dataset.type === currentType) {
+            button.classList.add('active');
+          }
           button.addEventListener('click', function() {
             // 활성 클래스 제거
             tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -145,38 +153,43 @@
             this.classList.add('active');
 
             // 상태값 가져오기
-            const type = this.dataset.type;
-            // 상태 필터 업데이트
-            document.getElementById('typeFilter').value = type;
-
+            const inspectionType = this.dataset.type;
             // 페이지 이동
-            window.location.href = `/inspections?type=${type}`;
+            window.location.href = `/inspections?inspectionType=${inspectionType}`;
           });
         });
 
         // 상태 필터 변경 이벤트
-        document.getElementById('typeFilter').addEventListener('change', function() {
-          const type = this.value;
-          window.location.href = `/inspections?type=${type}`;
-        });
+        // document.getElementById('typeFilter').addEventListener('change', function() {
+        //   const type = this.value;
+        //   window.location.href = `/inspections?type=${type}`;
+        // });
 
         // 검색 기능
-        const searchBox = document.querySelector('.search-box');
         const searchInput = document.getElementById('inspectionSearch');
+        const searchType = document.getElementById('typeFilter');
         const searchButton = document.querySelector('.search-button');
 
+        // 클릭으로 검색하는 경우
         searchButton.addEventListener('click', function() {
-          const searchTerm = searchInput.value.trim();
-          if (searchTerm) {
-            window.location.href = `/inspections?search=${searchTerm}`;
+          const search = searchInput.value.trim();
+          if (search) {
+            if(currentType !== null) {
+              window.location.href = `/inspections?inspectionType=${currentType}&searchType=${searchType.value}&search=${search}`;
+            } else
+              window.location.href = `/inspections?searchType=${searchType.value}&search=${search}`;
           }
         });
 
+        // 엔터로 검색하는 경우
         searchInput.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
-            const searchTerm = searchInput.value.trim();
-            if (searchTerm) {
-              window.location.href = `/inspections?search=${searchTerm}`;
+            const search = searchInput.value.trim();
+            if (search) {
+              if(currentType !== null) {
+                window.location.href = `/inspections?inspectionType=${currentType}&searchType=${searchType.value}&search=${search}`;
+              } else
+                window.location.href = `/inspections?searchType=${searchType.value}&search=${search}`;
             }
           }
         });
