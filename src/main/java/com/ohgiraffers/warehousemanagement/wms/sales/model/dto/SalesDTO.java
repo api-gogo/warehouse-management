@@ -107,20 +107,20 @@ public class SalesDTO {
         this.productIds = productIds;
     }
 
-    public List<Integer> getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(List<Integer> quantity) {
-        this.quantity = quantity;
-    }
-
     public List<String> getProductNames() {
         return productNames;
     }
 
     public void setProductNames(List<String> productNames) {
         this.productNames = productNames;
+    }
+
+    public List<Integer> getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(List<Integer> quantity) {
+        this.quantity = quantity;
     }
 
     public List<Integer> getPricePerBox() {
