@@ -11,7 +11,8 @@
           <span>대시보드</span>
         </a>
       </li>
-      <li th:class="${activeMenu == 'user' ? 'active' : ''}" th:if="${#authorization.expression('hasAuthority(''관리자'')')}">
+      <li th:class="${activeMenu == 'user' ? 'active' : ''}" 
+          th:if="${#authorization.expression('hasAuthority(''관리자'')') && #authentication.principal.userStatus == '재직중'}">
         <a th:href="@{/admin/users}">
           <i class="fas fa-users"></i>
           <span>사용자 관리</span>

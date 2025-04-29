@@ -85,6 +85,9 @@
                   <button type="button" class="action-button reject-button" th:data-id="${user.userId}" title="거부">
                     <i class="fas fa-times"></i>
                   </button>
+                  <button type="button" class="action-button blacklist-button" th:data-id="${user.userId}" title="영구 차단">
+                    <i class="fas fa-ban"></i>
+                  </button>
                 </td>
               </tr>
               <!-- 데이터가 없을 경우 -->
@@ -325,6 +328,22 @@
             
             if (confirm('해당 사용자의 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
               window.location.href = `/admin/users/reject/${userId}`;
+            }
+          });
+        });
+        
+        // 영구 차단(블랙리스트) 처리 버튼
+        const blacklistButtons = document.querySelectorAll('.blacklist-button');
+        blacklistButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('주의: 해당 사용자를 영구 차단하시겠습니까? 이 작업은 되돌릴 수 없습니다.\n영구 차단된 사용자는 로그인이 불가능합니다.')) {
+              // 폼 생성 및 제출
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/blacklist`;
+              document.body.appendChild(form);
+              form.submit();
             }
           });
         });

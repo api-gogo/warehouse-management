@@ -100,6 +100,20 @@
         const form = document.querySelector('form');
         const userPass = document.getElementById('userPass');
         const confirmUserPass = document.getElementById('confirmUserPass');
+        const phoneInput = document.getElementById('userPhone');
+
+        // 전화번호 자동 하이픈(-) 추가 기능
+        phoneInput.addEventListener('input', function() {
+          let value = phoneInput.value.replace(/\D/g, ''); // 숫자만 남기기
+          
+          if (value.length > 3 && value.length <= 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3);
+          } else if (value.length > 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+          }
+          
+          phoneInput.value = value;
+        });
 
         form.addEventListener('submit', function(event) {
           // 비밀번호 입력 확인

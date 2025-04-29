@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.user.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
@@ -77,12 +78,29 @@ public class UserController {
             }
         }
 
+        System.out.println("디버깅용");
         return "redirect:/";
     }
 
     @GetMapping("/password-verify")
-    public String getVerifyForm() {
-        return "user/password-verify";
+    public String getVerifyForm(Authentication authentication, Model model) {
+        // 로그인 상태 확인
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication.getPrincipal() instanceof AuthDetails) {
+                AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+                String status = authDetails.getUserStatus();
+                
+                // 승인대기 상태는 프로필 수정 불가
+                if (status.equals(UserStatus.승인대기.getStatus())) {
+                    model.addAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
+                    return "redirect:/user/profile";
+                }
+                
+                return "user/password-verify";
+            }
+        }
+        
+        return "redirect:/";
     }
 
     @PostMapping("/password-verify")
@@ -92,6 +110,12 @@ public class UserController {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+                
+                // 승인대기 상태 확인
+                if (authDetails.getUserStatus().equals(UserStatus.승인대기.getStatus())) {
+                    model.addAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
+                    return "redirect:/user/profile";
+                }
 
                 String encodedPassword = authDetails.getPassword();
 

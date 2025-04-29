@@ -67,6 +67,7 @@
             <option value="승인대기" th:selected="${currentStatus == '승인대기'}">승인 대기</option>
             <option value="승인거부" th:selected="${currentStatus == '승인거부'}">승인 거부</option>
             <option value="퇴사" th:selected="${currentStatus == '퇴사'}">퇴사</option>
+            <option value="블랙" th:selected="${currentStatus == '블랙'}">영구 차단</option>
           </select>
         </div>
       </div>
@@ -125,6 +126,9 @@
                 </button>
                 <button th:if="${user.userStatus == '휴직중' || user.userStatus == '재직중'}" class="action-button danger-button" th:data-id="${user.userId}" title="퇴사">
                   <i class="fas fa-times-circle"></i>
+                </button>
+                <button th:if="${user.userStatus != '블랙' && user.userStatus != '퇴사'}" class="action-button blacklist-button" th:data-id="${user.userId}" title="영구 차단">
+                  <i class="fas fa-ban"></i>
                 </button>
               </td>
             </tr>
@@ -215,6 +219,7 @@
         const disableButtons = document.querySelectorAll('.disable-button');
         const enableButtons = document.querySelectorAll('.enable-button');
         const dangerButtons = document.querySelectorAll('.danger-button');
+        const blacklistButtons = document.querySelectorAll('.blacklist-button');
 
         // POST 요청을 보내는 공통 함수
         function sendPostRequest(url) {
@@ -278,6 +283,16 @@
             const userId = this.dataset.id;
             if (confirm('해당 사용자를 퇴사 처리 하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
               sendPostRequest(`/admin/users/${userId}/resign`);
+            }
+          });
+        });
+        
+        // 영구 차단(블랙리스트) 처리 버튼
+        blacklistButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('주의: 해당 사용자를 영구 차단하시겠습니까? 이 작업은 되돌릴 수 없습니다.\n영구 차단된 사용자는 로그인이 불가능합니다.')) {
+              sendPostRequest(`/admin/users/${userId}/blacklist`);
             }
           });
         });

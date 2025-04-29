@@ -180,7 +180,6 @@ public class AdminService {
 
         user.setUserStatus(UserStatus.승인거부);
         user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
     }
@@ -206,7 +205,6 @@ public class AdminService {
         for (User user : users) {
             user.setUserStatus(UserStatus.승인거부);
             user.setUserUpdatedAt(now);
-            user.setUserDeletedAt(now);
         }
 
         userRepository.saveAll(users);
@@ -222,7 +220,6 @@ public class AdminService {
 
         user.setUserStatus(UserStatus.휴직중);
         user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
     }
@@ -236,7 +233,6 @@ public class AdminService {
 
         user.setUserStatus(UserStatus.재직중);
         user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
     }
@@ -253,5 +249,49 @@ public class AdminService {
         user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
+    }
+    
+    /**
+     * 사용자를 블랙 상태로 변경
+     * 지속적으로 부적절한 행동을 하는 사용자를 완전히 차단하기 위한 기능
+     */
+    @Transactional
+    public boolean blacklistUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.블랙);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+    
+    /**
+     * 사용자의 상태가 승인거부인 경우 승인대기로 변경
+     * 관리자가 수동으로 승인거부된 사용자에게 재승인 기회를 주기 위한 기능
+     */
+    @Transactional
+    public boolean resetToApprovalPending(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getUserStatus() != UserStatus.승인거부) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.승인대기);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+    
+    /**
+     * 반복적으로 승인을 거부당하는 사용자를 확인하는 메서드
+     * 동일 사용자가 너무 많은 재승인 시도를 하는 경우 블랙리스트 대상자로 표시할 수 있음
+     */
+    public int countRejectionHistory(Integer userId) {
+        // 여기서는 간단하게 구현하지만, 실제로는 승인 거부 이력을 저장하고 조회하는 로직 필요
+        return 0; // 향후 확장을 위한 메서드 스텁
     }
 }

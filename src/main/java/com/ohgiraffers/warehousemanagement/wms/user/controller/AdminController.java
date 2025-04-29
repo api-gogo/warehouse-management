@@ -72,9 +72,9 @@ public class AdminController {
             model.addAttribute("message", message);
         }
         model.addAttribute("user", userDTO);
-        return "/admin/user-detail";
+        return "admin/user-detail";
     }
-    
+
     @GetMapping("/users/{userId}/edit")
     public String getUserEdit(@PathVariable Integer userId, Model model) {
         UserDTO userDTO = userService.getUserByUserId(userId);
@@ -86,7 +86,7 @@ public class AdminController {
             return "redirect:/admin/users";
         }
         model.addAttribute("user", userDTO);
-        return "/admin/user-edit";
+        return "admin/user-edit";
     }
 
     @PatchMapping("/users/{userId}")
@@ -190,6 +190,40 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    @PostMapping("/users/{userId}/blacklist")
+    public String blacklistUser(@PathVariable Integer userId,
+                               RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.blacklistUser(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원이 영구 차단되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{userId}/reset-to-pending")
+    public String resetToPending(@PathVariable Integer userId,
+                                RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.resetToApprovalPending(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없거나 승인거부 상태가 아닙니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원 상태가 승인대기로 변경되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
+    }
+
     @GetMapping("/users/approvals")
     public String getPendingUsers(@RequestParam(required = false) String search,
                                   @PageableDefault(size = 10) Pageable pageable,
@@ -216,7 +250,7 @@ public class AdminController {
 
         model.addAttribute("search", search);
 
-        return "/admin/user-approvals";
+        return "admin/user-approvals";
     }
 
     @PostMapping("/users/approve-batch")
