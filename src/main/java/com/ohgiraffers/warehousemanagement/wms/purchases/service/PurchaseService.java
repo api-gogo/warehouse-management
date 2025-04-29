@@ -2,8 +2,11 @@ package com.ohgiraffers.warehousemanagement.wms.purchases.service;
 
 
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseDTO;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseItemDTO;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseStatus;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseItemRepository;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +20,12 @@ import java.util.List;
 @Service
 public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
-
-
+    private final PurchaseItemRepository purchaseItemRepository;
 
     @Autowired
-    public PurchaseService(PurchaseRepository purchaseRepository) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository) {
         this.purchaseRepository = purchaseRepository;
+        this.purchaseItemRepository = purchaseItemRepository;
     }
 
 
@@ -30,8 +33,10 @@ public class PurchaseService {
     public List<PurchaseDTO> getAllPurchases() {
         List<PurchaseDTO> purchasesDTOs = new ArrayList<>();
 
+        // 오름차순 정렬 기능
+        Sort sort = Sort.by(Sort.Order.asc("purchaseDate"));
 
-        Sort sort = Sort.by(Sort.Order.asc("purchaseCreatedAt")); // 오름차순 정렬 기능
+        // sort 파라미터 적용
         for (Purchase purchase : purchaseRepository.findAll(sort)) {
             PurchaseDTO purchaseDTO = new PurchaseDTO(
                     purchase.getPurchaseId(),
@@ -46,7 +51,6 @@ public class PurchaseService {
             purchasesDTOs.add(purchaseDTO);
         }
         return purchasesDTOs;
-
     }
 
     // 입력한 상태에 맞는 발주 목록만 출력
@@ -173,7 +177,7 @@ public class PurchaseService {
             // purchaseDTO에서 문자열로 받은 status를 enum으로 변환
             PurchaseStatus status;
             try {
-                // 수정: purchaseDTO.getPurchaseStatus()가 enum의 name 또는 label이 될 수 있음
+                // 수 purchaseDTO.getPurchaseStatus()가 enum의 name 또는 label이 될 수 있음
                 status = getStatusFromString(purchaseDTO.getPurchaseStatus());
             } catch (IllegalArgumentException e) {
                 // 기본값으로 '대기' 상태 설정
@@ -281,6 +285,25 @@ public class PurchaseService {
         }
 
     }
-
+    
+    // 발주 ID로 발주 항목 목록 조회
+//    public List<PurchaseItemDTO> getPurchaseItemsByPurchaseId(Integer purchaseId) {
+//        List<PurchaseItem> purchaseItems = purchaseItemRepository.findByPurchasePurchaseId(purchaseId);
+//        List<PurchaseItemDTO> purchaseItemDTOs = new ArrayList<>();
+//
+//        for (PurchaseItem item : purchaseItems) {
+//            PurchaseItemDTO dto = new PurchaseItemDTO(
+//                item.getPurchaseItemId(),
+//                item.getPurchase().getPurchaseId(),
+//                item.getProductId(),
+//                item.getProductName(),
+//                item.getPrice(),
+//                item.getQuantity()
+//            );
+//            purchaseItemDTOs.add(dto);
+//        }
+//
+//        return purchaseItemDTOs;
+//    }
 
 }

@@ -3,6 +3,8 @@ package com.ohgiraffers.warehousemanagement.wms.purchases.model.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "purchases")
@@ -13,12 +15,12 @@ public class Purchase {
 //    private Supplier supplier;
 //    //Purchase 엔티티에 연결된 실제 거래처 정보를 담는 필드
 //
-//
-//   // 링크 테이블로 연결되어 있음 여러개의 발주가 여러개의 상품을 가질수도 여러개의 상품이 여러개의 발주를 가질수도 있음
-//     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
-//      private List<PurchaseItem> items = new ArrayList<>();
-//
-//
+
+   // 링크 테이블로 연결되어 있음 여러개의 발주가 여러개의 상품을 가질수도 여러개의 상품이 여러개의 발주를 가질수도 있음
+     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
+     private List<PurchaseItem> items = new ArrayList<>();
+
+
 //    @OneToOne(mappedBy = "purchase") // UserProfile에서 참조하는 쪽에서 mappedBy 사용
 //    private Storages storages; //입고에서 참고 함
 
@@ -46,8 +48,14 @@ public class Purchase {
     @Column(name = "purchase_updated_at")
     private LocalDate purchaseUpdatedAt;
 
+
+    // 비고란
     @Column(name = "notes")
     private String notes;
+
+
+//    @ManyToOne(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Integer userId;
 
     public Purchase() {}
 
@@ -57,9 +65,11 @@ public class Purchase {
                     Integer purchaseId,
                     Integer userId, LocalDate purchaseDate, LocalDate purchaseDueDate,
                     PurchaseStatus purchaseStatus, LocalDate purchaseCreatedAt,
-                    LocalDate purchase_updated_at, String notes) { //Supplier supplier, List<PurchaseItem> items, Storages storages,
+                    LocalDate purchase_updated_at, String notes) {
+        //Supplier supplier, Storages storages,
+
+
 //        this.supplier = supplier;
-//        this.items = items;
 //        this.storages = storages;
         this.purchaseId = purchaseId;
         this.userId = userId;
@@ -81,13 +91,13 @@ public class Purchase {
 //        this.supplier = supplier;
 //    }
 //
-//    public List<PurchaseItem> getItems() {
-//        return items;
-//    }
-//
-//    public void setItems(List<PurchaseItem> items) {
-//        this.items = items;
-//    }
+    public List<PurchaseItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<PurchaseItem> items) {
+        this.items = items;
+    }
 //
 //    public Storages getStorages() {
 //        return storages;
@@ -169,7 +179,7 @@ public class Purchase {
                 ", userId=" + userId +
                 ", purchaseDate=" + purchaseDate +
 //              ", supplier=" + supplier +
-//                ", items=" + items +
+                ", items=" + items +
 //                ", storages=" + storages +
                 ", purchaseDueDate=" + purchaseDueDate +
                 ", purchaseStatus='" + purchaseStatus + '\'' +

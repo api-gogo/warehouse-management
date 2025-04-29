@@ -2,11 +2,13 @@ package com.ohgiraffers.warehousemanagement.wms.purchases.controller;
 
 
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseDTO;
-
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseItemDTO;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseStatus;
 import com.ohgiraffers.warehousemanagement.wms.purchases.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -110,21 +112,27 @@ public class PurchaseController {
     @GetMapping("/{id}")
     public String getPurchaseById(@PathVariable Integer id, Model model) {
         PurchaseDTO purchaseDTO = purchaseService.getPurchaseById(id);
-        model.addAttribute("selectedPurchase", purchaseDTO);
+        model.addAttribute("purchase", purchaseDTO);
         model.addAttribute("pageTitle", "발주 상세 정보");
-        model.addAttribute("cardTitle", "발주 목록");
-        model.addAttribute("cardDescription", "발주 ID: " + id + "의 상세 정보를 확인할 수 있습니다.");
-
         
-        // 총 금액 계산
-//        if (purchaseDTO != null && purchaseDTO.getPurchaseItems() != null) {
-//            double totalAmount = purchaseDTO.getPurchaseItems().stream()
-//                .mapToDouble(item -> item.getPrice() * item.getQuantity())
-//                .sum();
-//            model.addAttribute("totalAmount", totalAmount);
-//        }
+        // 발주 항목 조회 및 총 금액 계산
+//        List<PurchaseItemDTO> purchaseItems = purchaseService.getPurchaseItemsByPurchaseId(id);
+//        model.addAttribute("purchaseItems", purchaseItems);
 //
-        return "purchases/purchases"; // 경로를 purchases 템플릿으로 직접 이동
+//        // 총 금액과 총 수량 계산
+//        if (purchaseItems != null && !purchaseItems.isEmpty()) {
+//            int totalAmount = purchaseItems.stream()
+//                .mapToInt(item -> item.getPrice() * item.getQuantity())
+//                .sum();
+//            int totalQuantity = purchaseItems.stream()
+//                .mapToInt(PurchaseItemDTO::getQuantity)
+//                .sum();
+//
+//            model.addAttribute("totalAmount", totalAmount);
+//            model.addAttribute("totalQuantity", totalQuantity);
+//        }
+        
+        return "purchases/purchase-detail"; // 새로운 상세 페이지로 이동
     }
 
 
@@ -152,7 +160,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message","발주 등록에 실패하였습니다. 다시 시도해주세요.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
 
 
@@ -179,7 +187,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message", "발주 수정에 실패했습니다.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
 
 
@@ -193,11 +201,9 @@ public class PurchaseController {
         } catch (IllegalArgumentException e) {
             rdtat.addFlashAttribute("message", "삭제할 발주를 찾을 수 없습니다.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
 
-
-// deletePurchase
 
     //발주 완료(발주완료)
     // 관리자만 발주완료로 변경가능
@@ -212,7 +218,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message","발주 완료가 실패 했습니다.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
 
     //발주 거절(발주 거절)
@@ -225,7 +231,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message","발주 거절이 실패 했습니다.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
 
 
@@ -239,7 +245,7 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message", "발주 취소가 실패했습니다.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
     
     // GET 방식의 취소 처리 추가 (페이지에서 링크 클릭용)
@@ -252,34 +258,9 @@ public class PurchaseController {
         } else {
             rdtat.addFlashAttribute("message", "발주 취소가 실패했습니다.");
         }
-        return "redirect:/purchases/purchases";
+        return "redirect:/purchases";
     }
-    
-    // 입고 처리 페이지 이동
-    @GetMapping("/receive/{id}")
-    public String receivePurchase(@PathVariable Integer id, Model model) {
-        PurchaseDTO purchaseDTO = purchaseService.getPurchaseById(id);
-        model.addAttribute("selectedPurchase", purchaseDTO);
-        model.addAttribute("pageTitle", "발주 입고 처리");
-        model.addAttribute("cardTitle", "발주 입고 처리");
-        model.addAttribute("cardDescription", "발주 상품의 입고 처리를 진행할 수 있습니다.");
-        
-        return "purchases/purchase-receive"; // 입고 처리 템플릿
-    }
-    
-    // 입고 처리 실행
-    @PostMapping("/receive/{id}")
-    public String processReceive(@PathVariable Integer id, RedirectAttributes rdtat) {
-        boolean receiveResult = purchaseService.completePurchase(id); // 기존 완료 메서드 재활용
-        
-        if (receiveResult) {
-            rdtat.addFlashAttribute("message", "발주 입고 처리가 완료되었습니다.");
-        } else {
-            rdtat.addFlashAttribute("message", "발주 입고 처리에 실패했습니다.");
-        }
-        
-        return "redirect:/purchases/purchases";
-    }
+
 
 
 }

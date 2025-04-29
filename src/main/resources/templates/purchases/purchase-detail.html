@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS - 발주 상세 정보</title>
+    <!-- 폰트어썸 아이콘 (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 기본 스타일 - 최소화 */
+        * {margin: 0; padding: 0; box-sizing: border-box;}
+        body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f9fafb; color: #111827; line-height: 1.5;}
+        a {text-decoration: none; color: inherit;}
+        ul {list-style: none;}
+        button {background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;}
+
+        /* 레이아웃 */
+        .page-content {padding: 1.5rem; min-height: 100vh;}
+        .card {background-color: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); margin-bottom: 1.5rem;}
+        .card-header {padding: 1rem; border-bottom: 1px solid #e5e7eb;}
+        .card-title {font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem;}
+        .card-description {font-size: 0.875rem; color: #6b7280;}
+        .card-content {padding: 1rem;}
+
+        /* 버튼 스타일 */
+        .btn {display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; border-radius: 0.25rem; transition: all 0.2s;}
+        .btn-primary {background-color: #3b82f6; color: white;}
+        .btn-primary:hover {background-color: #2563eb;}
+        .btn-outline {background-color: transparent; border: 1px solid #e5e7eb; color: #111827;}
+        .btn-outline:hover {background-color: #f9fafb;}
+        .btn-danger {background-color: #ef4444; color: white;}
+        .btn-danger:hover {background-color: #dc2626;}
+        .btn-sm {padding: 0.25rem 0.5rem; font-size: 0.75rem;}
+        .btn i {margin-right: 0.5rem;}
+
+        /* 테이블 */
+        .table-container {overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 1rem;}
+        .table {width: 100%; border-collapse: collapse;}
+        .table th, .table td {padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;}
+        .table th {font-weight: 500; color: #6b7280; background-color: #f9fafb; font-size: 0.875rem;}
+        .table tr:last-child td {border-bottom: none;}
+        .table td {font-size: 0.875rem;}
+        .table .text-right {text-align: right;}
+        
+        /* 상태 배지 */
+        .badge {display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; border: 1px solid transparent;}
+        .badge-outline {border-color: #e5e7eb;}
+        .badge-success {background-color: rgba(16, 185, 129, 0.1); color: #065f46;}
+        .badge-warning {background-color: rgba(245, 158, 11, 0.1); color: #92400e;}
+        .badge-info {background-color: rgba(99, 102, 241, 0.1); color: #4f46e5;}
+        .badge-danger {background-color: rgba(239, 68, 68, 0.1); color: #b91c1c;}
+
+        /* 유틸리티 클래스 */
+        .flex {display: flex;}
+        .items-center {align-items: center;}
+        .justify-between {justify-content: space-between;}
+        .justify-end {justify-content: flex-end;}
+        .space-x-2 > * + * {margin-left: 0.5rem;}
+        .font-medium {font-weight: 500;}
+        .page-title {font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;}
+        .text-lg {font-size: 1.125rem;}
+        .font-bold {font-weight: 700;}
+        .text-gray-700 {color: #374151;}
+        .mt-4 {margin-top: 1rem;}
+        .mb-2 {margin-bottom: 0.5rem;}
+        .mb-4 {margin-bottom: 1rem;}
+        .py-2 {padding-top: 0.5rem; padding-bottom: 0.5rem;}
+        .px-4 {padding-left: 1rem; padding-right: 1rem;}
+        .border-t {border-top: 1px solid #e5e7eb;}
+        .text-right {text-align: right;}
+    </style>
+</head>
+<body>
+
+<!-- 페이지 콘텐츠 영역 - 발주 상세 정보 페이지 -->
+<main class="page-content">
+    <div class="flex items-center justify-between">
+        <h1 class="page-title">발주 상세 정보</h1>
+        <div class="flex items-center space-x-2">
+            <a th:href="@{/purchases}" class="btn btn-outline btn-sm">
+                <i class="fas fa-arrow-left"></i>
+                목록으로
+            </a>
+        </div>
+    </div>
+
+    <!-- 발주 정보 카드 -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">발주 기본 정보</h2>
+            <p class="card-description" th:text="'발주 ID: ' + ${purchase.purchaseId}">발주 ID: 123</p>
+        </div>
+        <div class="card-content">
+            <div class="table-container">
+                <table class="table">
+                    <tr>
+                        <th>발주 ID</th>
+                        <td th:text="${purchase.purchaseId}">123</td>
+                        <th>담당자</th>
+                        <td th:text="${purchase.userId}">김담당</td>
+                    </tr>
+                    <tr>
+                        <th>발주일</th>
+                        <td th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd')}">2024-04-20</td>
+                        <th>납기일</th>
+                        <td th:text="${#temporals.format(purchase.purchaseDueDate, 'yyyy-MM-dd')}">2024-04-30</td>
+                    </tr>
+                    <tr>
+                        <th>상태</th>
+                        <td>
+                            <span class="badge badge-outline" 
+                                  th:classappend="${
+                                    purchase.purchaseStatus == '발주대기' ? 'badge-info' : 
+                                    purchase.purchaseStatus == '발주완료' ? 'badge-success' : 
+                                    purchase.purchaseStatus == '발주거절' ? 'badge-danger' : 'badge-warning'
+                                  }"
+                                  th:text="${purchase.purchaseStatus}">발주대기</span>
+                        </td>
+                        <th>생성일</th>
+                        <td th:text="${#temporals.format(purchase.purchaseCreatedAt, 'yyyy-MM-dd')}">2024-04-20</td>
+                    </tr>
+                    <tr>
+                        <th>수정일</th>
+                        <td th:text="${purchase.purchaseUpdatedAt != null ? #temporals.format(purchase.purchaseUpdatedAt, 'yyyy-MM-dd') : '-'}">-</td>
+                        <th>비고</th>
+                        <td th:text="${purchase.purchaseNotes ?: '-'}">-</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- 발주 상태에 따른 버튼 표시 -->
+            <div class="flex justify-end space-x-2 mt-4">
+                <!-- 발주 대기 상태일 때만 표시되는 버튼들 -->
+                <div th:if="${purchase.purchaseStatus == '발주대기'}" class="flex space-x-2">
+                    <a th:href="@{/purchases/update/{id}(id=${purchase.purchaseId})}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-edit"></i> 수정
+                    </a>
+                    <form th:action="@{/purchases/complete/{id}(id=${purchase.purchaseId})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('발주를 완료 처리하시겠습니까?')">
+                            <i class="fas fa-check"></i> 완료
+                        </button>
+                    </form>
+                    <form th:action="@{/purchases/reject/{id}(id=${purchase.purchaseId})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('발주를 거절 처리하시겠습니까?')">
+                            <i class="fas fa-times"></i> 거절
+                        </button>
+                    </form>
+                    <a th:href="@{/purchases/cancel/{id}(id=${purchase.purchaseId})}" class="btn btn-outline btn-sm" 
+                       onclick="return confirm('정말 취소하시겠습니까?')">
+                        <i class="fas fa-ban"></i> 취소
+                    </a>
+                </div>
+                
+                <!-- 모든 상태에서 항상 표시되는 삭제 버튼 -->
+                <form th:action="@{/purchases/delete/{id}(id=${purchase.purchaseId})}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('정말 발주를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
+                        <i class="fas fa-trash-alt"></i> 삭제
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상품 목록 카드 -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">발주 상품 목록</h2>
+            <p class="card-description">이 발주에 포함된 상품 목록입니다.</p>
+        </div>
+        <div class="card-content">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>상품 ID</th>
+                            <th>상품명</th>
+                            <th>단가</th>
+                            <th>수량</th>
+                            <th class="text-right">합계</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 상품 목록 데이터가 있는 경우 -->
+                        <tr th:each="item : ${purchaseItems}" th:if="${purchaseItems != null && !purchaseItems.empty}">
+                            <td th:text="${item.productId}">1001</td>
+                            <td th:text="${item.productName}">상품명</td>
+                            <td th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'">10,000원</td>
+                            <td th:text="${item.quantity}">5</td>
+                            <td class="text-right" th:text="${#numbers.formatInteger(item.price * item.quantity, 0, 'COMMA')} + '원'">50,000원</td>
+                        </tr>
+                        <!-- 상품 목록 데이터가 없는 경우 -->
+                        <tr th:if="${purchaseItems == null || purchaseItems.empty}">
+                            <td colspan="5" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 총 금액 표시 -->
+            <div class="flex justify-end py-2 px-4 border-t mt-4">
+                <div class="text-right">
+                    <div class="mb-2 text-gray-700">총 상품 수량: <span th:text="${totalQuantity ?: 0}">0</span>개</div>
+                    <div class="text-lg font-bold">총 금액: <span th:text="${#numbers.formatInteger(totalAmount ?: 0, 0, 'COMMA')} + '원'">0원</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

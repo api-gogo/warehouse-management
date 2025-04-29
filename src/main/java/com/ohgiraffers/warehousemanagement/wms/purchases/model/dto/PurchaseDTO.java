@@ -1,7 +1,11 @@
 package com.ohgiraffers.warehousemanagement.wms.purchases.model.dto;
 
 
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PurchaseDTO {
     private Integer purchaseId;
@@ -12,6 +16,10 @@ public class PurchaseDTO {
     private LocalDate purchaseUpdatedAt;
     private LocalDate purchaseCreatedAt;
     private String purchaseNotes;
+
+
+    private List<PurchaseItemDTO> items = new ArrayList<>();
+
 
 //    private Supplier supplier;
 //    private List<PurchaseItem> items = new ArrayList<>();
@@ -35,14 +43,6 @@ public class PurchaseDTO {
 //        this.supplier = supplier;
 //        this.items = items;
 //        this.storages = storages;
-    }
-
-    public String getPurchaseNotes() {
-        return purchaseNotes;
-    }
-
-    public void setPurchaseNotes(String purchaseNotes) {
-        this.purchaseNotes = purchaseNotes;
     }
 
     public Integer getPurchaseId() {
@@ -89,7 +89,7 @@ public class PurchaseDTO {
         return purchaseUpdatedAt;
     }
 
-    public void setPurchaseUpdatedAt(LocalDate purchase_updated_at) {
+    public void setPurchaseUpdatedAt(LocalDate purchaseUpdatedAt) {
         this.purchaseUpdatedAt = purchaseUpdatedAt;
     }
 
@@ -97,32 +97,25 @@ public class PurchaseDTO {
         return purchaseCreatedAt;
     }
 
-    public void setPurchaseCreatedAt(LocalDate purchase_created_at) {
+    public void setPurchaseCreatedAt(LocalDate purchaseCreatedAt) {
         this.purchaseCreatedAt = purchaseCreatedAt;
     }
-    //    public Supplier getSupplier() {
-//        return supplier;
-//    }
-//
-//    public void setSupplier(Supplier supplier) {
-//        this.supplier = supplier;
-//    }
-//
-//    public List<PurchaseItem> getItems() {
-//        return items;
-//    }
-//
-//    public void setItems(List<PurchaseItem> items) {
-//        this.items = items;
-//    }
-//
-//    public Storages getStorages() {
-//        return storages;
-//    }
-//
-//    public void setStorages(Storages storages) {
-//        this.storages = storages;
-//    }
+
+    public String getPurchaseNotes() {
+        return purchaseNotes;
+    }
+
+    public void setPurchaseNotes(String purchaseNotes) {
+        this.purchaseNotes = purchaseNotes;
+    }
+
+    public List<PurchaseItemDTO> getItems() {
+        return items;
+    }
+
+    public void setItems(List<PurchaseItemDTO> items) {
+        this.items = items;
+    }
 
     @Override
     public String toString() {
@@ -136,7 +129,7 @@ public class PurchaseDTO {
                 ", purchase_created_at=" + purchaseCreatedAt +
                 ", purchase_notes='" + purchaseNotes + '\'' +
 //                ", supplier=" + supplier +
-//                ", items=" + items +
+                ", items=" + items +
 //                ", storages=" + storages +
                 '}';
     }
