@@ -4,9 +4,9 @@ import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.Inspectio
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -27,11 +25,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class InspectionControllerTest {
     private static final Logger log = LoggerFactory.getLogger(InspectionControllerTest.class);
     private final InspectionServiceImpl inspectionService;
+    private InspectionResponseDTO inspection;
 
     @Autowired
     public InspectionControllerTest(InspectionServiceImpl inspectionService) {
         this.inspectionService = inspectionService;
     }
+
+    @BeforeEach
+    void setUp() {
+        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK);
+        inspection = inspectionService.createInspection(dto);
+    }
+
 
     @Test
     @DisplayName("등록 테스트")
@@ -43,6 +49,35 @@ class InspectionControllerTest {
         log.info(inspection.toString());
 
         assertNotNull(inspection, "등록에 성공해야 합니다!");
+    }
+
+    @Test
+    @DisplayName("수정 테스트")
+    void updateInspection() {
+        InspectionRequestDTO dto = new InspectionRequestDTO(
+                inspection.getUserId(), inspection.getTransactionId(),
+                InspectionTransactionType.INSPECTION, inspection.getInspectionQuantity(),
+                inspection.getAcceptedQuantity(), inspection.getDefectiveQuantity(),
+                InspectionStatus.stringToInspectionStatus(inspection.getInspectionStatus()));
+        dto.setAcceptedQuantity(49);
+        dto.setDefectiveQuantity(1);
+        inspectionService.updateInspection(inspection.getInspectionId(), dto);
+    }
+
+    @Test
+    @DisplayName("수정 사항 없음 테스트[예외 발생]")
+    void updateInspection_NotFound() {
+        InspectionRequestDTO dto = new InspectionRequestDTO(
+                inspection.getUserId(), inspection.getTransactionId(),
+                InspectionTransactionType.INSPECTION, inspection.getInspectionQuantity(),
+                inspection.getAcceptedQuantity(), inspection.getDefectiveQuantity(),
+                InspectionStatus.stringToInspectionStatus(inspection.getInspectionStatus()));
+
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            inspectionService.updateInspection(inspection.getInspectionId(), dto);
+        });
+
+        Assertions.assertEquals("변경사항이 없습니다!", exception.getMessage());
     }
 
     @Test
@@ -78,17 +113,17 @@ class InspectionControllerTest {
     @Test
     @DisplayName("단일 조회 테스트")
     void getInspectionById() {
-        InspectionResponseDTO inspection = inspectionService.getInspectionById(94);
+        InspectionResponseDTO inspection = inspectionService.getInspectionById(this.inspection.getInspectionId());
         log.info("조회된 inspection : {}", inspection);
 
-        Assertions.assertEquals(43, inspection.getInspectionQuantity());
+        Assertions.assertEquals(this.inspection.getInspectionQuantity(), inspection.getInspectionQuantity());
     }
 
     @Test
     @DisplayName("단일 조회 테스트[예외 발생]")
     void getInspectionById_NotFound() {
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            inspectionService.getInspectionById(9999);
+            inspectionService.getInspectionById(9999L);
         });
 
         Assertions.assertEquals("존재하지 않는 검수 ID입니다! \n" +
