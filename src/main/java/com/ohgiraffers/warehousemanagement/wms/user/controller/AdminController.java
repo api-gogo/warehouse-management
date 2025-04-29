@@ -2,7 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.user.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.AdminService;
-import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
+import com.ohgiraffers.warehousemanagement.wms.user.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,12 +21,12 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public AdminController(AdminService adminService, UserService userService) {
+    public AdminController(AdminService adminService, UserServiceImpl userServiceImpl) {
         this.adminService = adminService;
-        this.userService = userService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @GetMapping("/users")
@@ -59,12 +59,12 @@ public class AdminController {
 
         model.addAttribute("search", search);
 
-        return "admin/users";
+        return "admin/users/list";
     }
 
     @GetMapping("/users/{userId}")
     public String showUserDetail(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.findById(userId);
+        UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
             String message = null;
@@ -72,12 +72,12 @@ public class AdminController {
             model.addAttribute("message", message);
         }
         model.addAttribute("user", userDTO);
-        return "admin/user-detail";
+        return "admin/users/detail";
     }
 
     @GetMapping("/users/{userId}/edit")
     public String showUserEditForm(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.findById(userId);
+        UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
             String message = null;
@@ -86,7 +86,7 @@ public class AdminController {
             return "redirect:/admin/users";
         }
         model.addAttribute("user", userDTO);
-        return "admin/user-edit";
+        return "admin/users/edit";
     }
 
     @PatchMapping("/users/{userId}")
@@ -250,7 +250,7 @@ public class AdminController {
 
         model.addAttribute("search", search);
 
-        return "admin/user-approvals";
+        return "admin/users/approvals";
     }
 
     @PostMapping("/users/approve-batch")

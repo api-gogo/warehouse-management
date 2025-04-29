@@ -3,7 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.auth.service;
 import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
-import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
+import com.ohgiraffers.warehousemanagement.wms.user.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,16 +16,16 @@ import java.util.Objects;
 @Service
 public class AuthService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public AuthService(UserService userService) {
-        this.userService = userService;
+    public AuthService(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
     public UserDetails loadUserByUsername(String userCode) throws UsernameNotFoundException {
-        LoginUserDTO loginUserDTO = userService.findByUserCode(userCode);
+        LoginUserDTO loginUserDTO = userServiceImpl.findByUserCode(userCode);
 
         if (Objects.isNull(loginUserDTO)) {
             throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
