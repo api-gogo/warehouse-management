@@ -17,7 +17,7 @@ public class Inspection {
     @Id
     @Column(name = "inspection_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer inspectionId;
+    private Long inspectionId;
 
     @Column(name = "user_id", nullable = false)
     @Comment("검수자")
@@ -83,11 +83,11 @@ public class Inspection {
 
 
 
-    public Integer getInspectionId() {
+    public Long getInspectionId() {
         return inspectionId;
     }
 
-    public void setInspectionId(Integer inspectionId) {
+    public void setInspectionId(Long inspectionId) {
         this.inspectionId = inspectionId;
     }
 
