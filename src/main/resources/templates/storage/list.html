@@ -1,0 +1,27 @@
+<!-- list.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>입고 목록</title>
+</head>
+<body>
+<h1>입고 목록</h1>
+<a th:href="@{/storage/create}">신규 입고 등록</a>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>발주 ID</th><th>입고 상태</th><th>입고일</th><th>상세</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="storage : ${storages}">
+        <td th:text="${storage.storageId}"></td>
+        <td th:text="${storage.purchaseId}"></td>
+        <td th:text="${storage.storageStatus}"></td>
+        <td th:text="${storage.storageDate}"></td>
+        <td><a th:href="@{'/storage/' + ${storage.storageId}}">보기</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
