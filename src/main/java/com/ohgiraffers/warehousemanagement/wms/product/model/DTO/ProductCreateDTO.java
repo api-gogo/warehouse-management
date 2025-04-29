@@ -1,29 +1,33 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.DTO;
 
-/*
-* product_id
-* product_created_at,
-* product_updated_at,
-* product_deleted_at,
-* is_deleted
-* 를 제외한 상품 추가용 DTO
-* **/
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
+
 public class ProductCreateDTO {
 
-    private Integer categoryId; // 카테고리 번호
-    private Integer supplierId; // 거래처 ID
-    private Integer userId; // 담당자
-    private String productName; // 품명
-    private Integer expirationDate; // 유통기한
-    private String storageMethod; // 보관방법
-    private Integer pricePerBox; // 박스당 단가
-    private Integer quantityPerBox; // 박스당 개수
+    private Integer productId;          // 상품 ID
+    private Integer categoryId;         // 카테고리 ID
+    private Integer supplierId;         // 공급업체 ID
+    private Integer userId;             // 담당자 ID
+    private String productName;         // 상품 이름
+    private Integer expirationDate;     // 유통기한 (일수)
+    private String storageMethod;       // 보관 방법
+    private Integer pricePerBox;        // 박스당 단가
+    private Integer quantityPerBox;     // 박스당 수량
+    private LocalDateTime productCreatedAt; // 생성 시간
+    private Boolean isDeleted;          // 삭제 상태
 
-    // 생성자
+    // 기본 생성자
     public ProductCreateDTO() {}
 
-    public ProductCreateDTO(Integer categoryId, Integer supplierId, Integer userId, String productName,
-                            Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox) {
+    // 모든 필드를 포함한 생성자
+    public ProductCreateDTO(Integer productId, Integer categoryId, Integer supplierId, Integer userId, String productName,
+                            Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox,
+                            LocalDateTime productCreatedAt, Boolean isDeleted) {
+        this.productId = productId;
         this.categoryId = categoryId;
         this.supplierId = supplierId;
         this.userId = userId;
@@ -32,9 +36,20 @@ public class ProductCreateDTO {
         this.storageMethod = storageMethod;
         this.pricePerBox = pricePerBox;
         this.quantityPerBox = quantityPerBox;
+        this.productCreatedAt = productCreatedAt;
+        this.isDeleted = isDeleted;
     }
 
-    // Getter Setter
+    // Getter와 Setter 메서드
+
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
     public Integer getCategoryId() {
         return categoryId;
     }
@@ -43,6 +58,9 @@ public class ProductCreateDTO {
         this.categoryId = categoryId;
     }
 
+    @NotNull(message = "공급업체 ID는 필수 입력 항목입니다.")
+    @Min(value = 1, message = "공급업체 ID는 1 이상이어야 합니다.")
+    @Max(value = 2147483647, message = "공급업체 ID는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getSupplierId() {
         return supplierId;
     }
@@ -98,32 +116,49 @@ public class ProductCreateDTO {
         this.storageMethod = storageMethod;
     }
 
+    @NotNull(message = "박스당 단가는 필수 입력 항목입니다.")
+    @Min(value = 0, message = "박스당 단가는 음수일 수 없습니다.")
+    @Max(value = 2147483647, message = "박스당 단가는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getPricePerBox() {
         return pricePerBox;
     }
 
     public void setPricePerBox(Integer pricePerBox) {
-        if (pricePerBox == null) {
-            throw new IllegalArgumentException("박스당 단가는 null일 수 없습니다.");
-        }
         this.pricePerBox = pricePerBox;
     }
 
+    @NotNull(message = "박스당 개수는 필수 입력 항목입니다.")
+    @Min(value = 0, message = "박스당 개수는 음수일 수 없습니다.")
+    @Max(value = 2147483647, message = "박스당 개수는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getQuantityPerBox() {
         return quantityPerBox;
     }
 
     public void setQuantityPerBox(Integer quantityPerBox) {
-        if (quantityPerBox == null) {
-            throw new IllegalArgumentException("박스당 개수는 null일 수 없습니다.");
-        }
         this.quantityPerBox = quantityPerBox;
+    }
+
+    public LocalDateTime getProductCreatedAt() {
+        return productCreatedAt;
+    }
+
+    public void setProductCreatedAt(LocalDateTime productCreatedAt) {
+        this.productCreatedAt = productCreatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     @Override
     public String toString() {
         return "ProductCreateDTO{" +
-                "categoryId=" + categoryId +
+                "productId=" + productId +
+                ", categoryId=" + categoryId +
                 ", supplierId=" + supplierId +
                 ", userId=" + userId +
                 ", productName='" + productName + '\'' +
@@ -131,6 +166,8 @@ public class ProductCreateDTO {
                 ", storageMethod='" + storageMethod + '\'' +
                 ", pricePerBox=" + pricePerBox +
                 ", quantityPerBox=" + quantityPerBox +
+                ", productCreatedAt=" + productCreatedAt +
+                ", isDeleted=" + isDeleted +
                 '}';
     }
 }

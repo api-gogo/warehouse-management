@@ -11,64 +11,65 @@
           <span>대시보드</span>
         </a>
       </li>
-      <li th:class="${activeMenu == 'user' ? 'active' : ''}" th:if="${#authorization.expression('hasAuthority(''관리자'')')}">
+      <li th:class="${activeMenu == 'user' ? 'active' : ''}" 
+          th:if="${#authorization.expression('hasAuthority(''관리자'')') && #authentication.principal.userStatus == '재직중'}">
         <a th:href="@{/admin/users}">
           <i class="fas fa-users"></i>
           <span>사용자 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'storage' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/storages}">
           <i class="fas fa-truck-loading"></i>
           <span>입고 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'shipment' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/shipments}">
           <i class="fas fa-truck"></i>
           <span>출고 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'inventory' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/inventories}">
           <i class="fas fa-box"></i>
           <span>재고 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'inspection' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/inspections}">
           <i class="fas fa-clipboard-check"></i>
           <span>검수 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'return' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/returns}">
           <i class="fas fa-undo"></i>
           <span>반품 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'purchase' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/purchases}">
           <i class="fas fa-file-invoice"></i> <span>발주 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'sales' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/sales}">
           <i class="fas fa-receipt"></i> <span>수주 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'product' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/products}">
           <i class="fas fa-boxes-stacked"></i> <span>상품 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'supplier' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/suppliers}">
           <i class="fas fa-truck"></i> <span>거래처 관리</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'store' ? 'active' : ''}">
-        <a href="#">
+        <a th:href="@{/stores}">
           <i class="fas fa-store"></i>
           <span>점포 관리</span>
         </a>
@@ -95,9 +96,12 @@
     <button id="sidebar-toggle" class="sidebar-toggle">
       <i class="fas fa-bars"></i>
     </button>
-    <div class="search-container">
-      <i class="fas fa-search"></i>
-      <input type="search" placeholder="검색..." class="search-input">
+    <div class="user-welcome" th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
+      <span class="welcome-text">
+        <span class="user-name" th:text="${#authentication.principal.userRealName}">사용자</span>님 
+        (<span class="user-part" th:text="${#authentication.principal.userPart}">부서</span>, 
+        <span class="user-role" th:text="${#authentication.principal.userRole}">직책</span>), 환영합니다.
+      </span>
     </div>
   </div>
   <div class="header-right">
@@ -119,7 +123,7 @@
           <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">로그아웃</a>
           <form id="logout-form" action="/auth/logout" method="post" style="display: none;"></form>
         </th:block>
-        
+
         <!-- 비로그인 사용자에게만 보이는 메뉴 -->
         <th:block th:unless="${#authorization != null && #authorization.expression('isAuthenticated()')}">
           <a href="/auth/login">로그인</a>
@@ -147,7 +151,7 @@
       if (themeToggle) {
         // 로컬 스토리지에서 다크 모드 상태 확인
         const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        
+
         // 초기 다크 모드 상태 적용
         if (isDarkMode) {
           document.body.classList.add('dark-mode');
@@ -160,7 +164,7 @@
 
         themeToggle.addEventListener('click', function() {
           document.body.classList.toggle('dark-mode');
-          
+
           // 다크 모드 상태 저장
           const isDarkMode = document.body.classList.contains('dark-mode');
           localStorage.setItem('darkMode', isDarkMode);

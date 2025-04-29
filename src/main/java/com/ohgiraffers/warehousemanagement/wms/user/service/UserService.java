@@ -1,8 +1,8 @@
 package com.ohgiraffers.warehousemanagement.wms.user.service;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
-import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserRole;
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,30 +28,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UserDTO> getAllUsers() {
-        List<UserDTO> users = new ArrayList<>();
-
-        for (User user : userRepository.findAll()) {
-            UserDTO userDTO = new UserDTO(
-                    user.getUserId(),
-                    user.getUserCode(),
-                    user.getUserName(),
-                    user.getUserEmail(),
-                    user.getUserPhone(),
-                    user.getUserPart().getPart(),
-                    user.getUserRole().getRole(),
-                    user.getUserStatus().getStatus(),
-                    user.getUserCreatedAt(),
-                    user.getUserUpdatedAt(),
-                    user.getUserDeletedAt()
-            );
-            users.add(userDTO);
-        }
-
-        return users;
-    }
-
-    public LoginUserDTO findbyUserCode(String userCode) {
+    public LoginUserDTO getUserByUserCode(String userCode) {
         Optional<User> user = userRepository.findByUserCode(userCode);
 
         return user.map(u -> new LoginUserDTO(
@@ -92,10 +67,10 @@ public class UserService {
         if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
             return -1;
         }
-        if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
+        else if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
             return -2;
         }
-        if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
+        else if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
             return -3;
         }
 
@@ -118,66 +93,40 @@ public class UserService {
     }
 
     @Transactional
-    public boolean updateProfile(Integer userId,UserDTO userDTO) {
+    public boolean updateProfile(Integer userId, UserDTO userDTO) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
         }
 
+        // 비밀번호가 제공된 경우 업데이트
         if (userDTO.getUserPass() != null && !userDTO.getUserPass().trim().isEmpty()) {
             user.setUserPass(passwordEncoder.encode(userDTO.getUserPass()));
         }
 
+        // 일반 필드 업데이트
         user.setUserEmail(userDTO.getUserEmail());
         user.setUserPhone(userDTO.getUserPhone());
         user.setUserUpdatedAt(LocalDateTime.now());
+        
+        // 승인거부 상태인 경우 승인대기로 변경
+        if (user.getUserStatus() == UserStatus.승인거부) {
+            user.setUserStatus(UserStatus.승인대기);
+        }
+        
         userRepository.save(user);
         return true;
     }
 
-    @Transactional
-    public boolean updateUser(Integer userId,UserDTO userDTO) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
+    public LogUserDTO getLogUserByUserId(Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
 
-        user.setUserEmail(userDTO.getUserEmail());
-        user.setUserPhone(userDTO.getUserPhone());
-        user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
-        user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
-        user.setUserStatus(UserStatus.valueOf(userDTO.getUserStatus()));
-        user.setUserUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        return true;
-    }
-
-    @Transactional
-    public boolean approveUser(Integer userId,UserDTO userDTO) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
-
-        user.setUserPart(UserPart.valueOf(userDTO.getUserPart()));
-        user.setUserRole(UserRole.valueOf(userDTO.getUserRole()));
-        user.setUserStatus(UserStatus.재직중);
-        user.setUserUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        return true;
-    }
-
-    @Transactional
-    public boolean rejectUser(Integer userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
-
-        user.setUserStatus(UserStatus.승인거부);
-        user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
-        userRepository.save(user);
-        return true;
+        return user.map(u -> new LogUserDTO(
+                u.getUserId(),
+                u.getUserName(),
+                u.getUserPart().getPart(),
+                u.getUserRole().getRole(),
+                u.getUserStatus().getStatus()
+        )).orElse(null);
     }
 }

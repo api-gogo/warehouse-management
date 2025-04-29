@@ -1,159 +1,139 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 회원정보 수정</title>
-  <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
-  <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
-  <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/update.css">
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>회원정보 수정</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/user/update.css">
+  </th:block>
 </head>
 <body>
-<div class="layout" th:with="activeMenu='profile'">
-  <!-- 네비게이션 사이드바 포함 -->
-  <div th:replace="~{navigation :: aside}"></div>
-
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 포함 -->
-    <div th:replace="~{navigation :: header}"></div>
-
-    <!-- 페이지 콘텐츠 영역 -->
-    <main class="page-content">
-      <div class="update-container">
-        <div class="update-header">
-          <h1 class="update-title">회원정보 수정</h1>
-          <p class="update-subtitle">수정할 정보를 입력해주세요.</p>
-        </div>
-
-        <!-- 알림 메시지 -->
-        <div th:if="${message != null}" class="alert alert-info" role="alert">
-          <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
-        </div>
-
-        <div class="update-body">
-          <form th:action="@{/user/update}" method="post" id="updateForm">
-            <input type="hidden" name="userCode" th:value="${user.userCode}">
-            <input type="hidden" name="passwordVerified" value="true">
-            
-            <div class="form-section">
-              <h3 class="section-title">기본 정보</h3>
-              
-              <div class="info-row">
-                <div class="info-item">
-                  <div class="info-label">사원번호</div>
-                  <div class="info-value static" th:text="${user.userCode}"></div>
-                </div>
-                
-                <div class="info-item">
-                  <div class="info-label">이름</div>
-                  <div class="info-value static" th:text="${user.userName}"></div>
-                </div>
-                
-                <div class="info-item">
-                  <div class="info-label">부서</div>
-                  <div class="info-value static" th:text="${user.userPart}"></div>
-                </div>
-                
-                <div class="info-item">
-                  <div class="info-label">직책</div>
-                  <div class="info-value static" th:text="${user.userRole}"></div>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="userEmail" class="form-label">
-                  <i class="fas fa-envelope me-2"></i>이메일
-                </label>
-                <input type="email" class="form-control" id="userEmail" name="userEmail" 
-                       th:value="${user.userEmail}" placeholder="이메일을 입력하세요" required>
-              </div>
-              
-              <div class="form-group">
-                <label for="userPhone" class="form-label">
-                  <i class="fas fa-phone me-2"></i>전화번호
-                </label>
-                <input type="tel" class="form-control" id="userPhone" name="userPhone" 
-                       th:value="${user.userPhone}" placeholder="전화번호 (예: 010-1234-5678)" 
-                       pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요." required>
-              </div>
-            </div>
-            
-            <div class="form-section">
-              <h3 class="section-title">비밀번호 변경</h3>
-              <p class="section-description">새 비밀번호를 입력해주세요. 변경하지 않으려면 비워두세요.</p>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="userPass" class="form-label">
-                    <i class="fas fa-key me-2"></i>새 비밀번호
-                  </label>
-                  <input type="password" class="form-control" id="userPass" name="userPass"
-                         placeholder="새 비밀번호">
-                  <div class="form-text">8자 이상의 영문, 숫자, 특수문자 조합을 권장합니다.</div>
-                </div>
-                
-                <div class="form-group">
-                  <label for="confirmUserPass" class="form-label">
-                    <i class="fas fa-check-circle me-2"></i>새 비밀번호 확인
-                  </label>
-                  <input type="password" class="form-control" id="confirmUserPass" name="confirmUserPass"
-                         placeholder="새 비밀번호 확인">
-                </div>
-              </div>
-            </div>
-            
-            <div class="update-actions">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i>변경사항 저장
-              </button>
-              <a th:href="@{/user/profile}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left me-2"></i>취소
-              </a>
-            </div>
-          </form>
-        </div>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='profile'">
+    <div class="update-container">
+      <div class="update-header">
+        <h1 class="update-title">회원정보 수정</h1>
+        <p class="update-subtitle">수정할 정보를 입력해주세요.</p>
       </div>
-    </main>
-  </div>
-</div>
 
-<!-- 스크립트 포함 -->
-<div th:replace="~{navigation :: scripts}"></div>
+      <div class="update-body">
+        <form th:action="@{/user/profile}" method="post" id="updateForm">
+          <input type="hidden" name="_method" value="patch" />
+          <input type="hidden" name="userCode" th:value="${user.userCode}">
+          <input type="hidden" name="passwordVerified" value="true">
+          
+          <div class="form-section">
+            <h3 class="section-title">기본 정보</h3>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <div class="info-label">사원번호</div>
+                <div class="info-value static" th:text="${user.userCode}"></div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">이름</div>
+                <div class="info-value static" th:text="${user.userName}"></div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">부서</div>
+                <div class="info-value static" th:text="${user.userPart}"></div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">직책</div>
+                <div class="info-value static" th:text="${user.userRole}"></div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="userEmail" class="form-label">
+                <i class="fas fa-envelope me-2"></i>이메일
+              </label>
+              <input type="email" class="form-control" id="userEmail" name="userEmail" 
+                     th:value="${user.userEmail}" placeholder="이메일을 입력하세요" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="userPhone" class="form-label">
+                <i class="fas fa-phone me-2"></i>전화번호
+              </label>
+              <input type="tel" class="form-control" id="userPhone" name="userPhone" 
+                     th:value="${user.userPhone}" placeholder="전화번호 (예: 010-1234-5678)" 
+                     pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요." required>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h3 class="section-title">비밀번호 변경</h3>
+            <p class="section-description">새 비밀번호를 입력해주세요. 변경하지 않으려면 비워두세요.</p>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="userPass" class="form-label">
+                  <i class="fas fa-key me-2"></i>새 비밀번호
+                </label>
+                <input type="password" class="form-control" id="userPass" name="userPass"
+                       placeholder="새 비밀번호">
+                <div class="form-text">8자 이상의 영문, 숫자, 특수문자 조합을 권장합니다.</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="confirmUserPass" class="form-label">
+                  <i class="fas fa-check-circle me-2"></i>새 비밀번호 확인
+                </label>
+                <input type="password" class="form-control" id="confirmUserPass" name="confirmUserPass"
+                       placeholder="새 비밀번호 확인">
+              </div>
+            </div>
+          </div>
+          
+          <div class="update-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>변경사항 저장
+            </button>
+            <a th:href="@{/user/profile}" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>취소
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </th:block>
+  
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('updateForm');
+        const userPass = document.getElementById('userPass');
+        const confirmUserPass = document.getElementById('confirmUserPass');
 
-<!-- 비밀번호 확인 스크립트 -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('updateForm');
-    const userPass = document.getElementById('userPass');
-    const confirmUserPass = document.getElementById('confirmUserPass');
-
-    form.addEventListener('submit', function(event) {
-      // 비밀번호 입력 확인
-      if (userPass.value.trim() !== '') {
-        // 새 비밀번호와 확인이 일치하는지 확인
-        if (userPass.value !== confirmUserPass.value) {
-          event.preventDefault();
-          alert('새 비밀번호가 일치하지 않습니다.');
-          confirmUserPass.focus();
-          return;
-        }
-        
-        // 비밀번호 길이 체크
-        if (userPass.value.length < 8) {
-          event.preventDefault();
-          alert('비밀번호는 8자 이상이어야 합니다.');
-          userPass.focus();
-          return;
-        }
-      }
-    });
-  });
-</script>
+        form.addEventListener('submit', function(event) {
+          // 비밀번호 입력 확인
+          if (userPass.value.trim() !== '') {
+            // 새 비밀번호와 확인이 일치하는지 확인
+            if (userPass.value !== confirmUserPass.value) {
+              event.preventDefault();
+              alert('새 비밀번호가 일치하지 않습니다.');
+              confirmUserPass.focus();
+              return;
+            }
+            
+            // 비밀번호 길이 체크
+            if (userPass.value.length < 8) {
+              event.preventDefault();
+              alert('비밀번호는 8자 이상이어야 합니다.');
+              userPass.focus();
+              return;
+            }
+          }
+        });
+      });
+    </script>
+  </th:block>
 </body>
 </html>

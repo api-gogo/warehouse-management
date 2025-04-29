@@ -1,15 +1,18 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.entity;
 
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.Inventory;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
-@Where(clause = "is_deleted = true") // 삭제상태 -> 1인 경우만 조회가능
+@Where(clause = "is_deleted = false") // 삭제상태 -> 1인 경우만 조회가능
 public class Product {
 
     //상품번호
@@ -73,6 +76,9 @@ public class Product {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+
+    @OneToMany(mappedBy = "product")
+    private List<Inventory> inventories = new ArrayList<>();
 
     //생성자
     public Product() {}

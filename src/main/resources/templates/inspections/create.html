@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>WMS - 검수 등록</title>
+    <link rel="stylesheet" href="/common.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .required-mark::after {
+            content: " *";
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="layout" th:with="activeMenu='inspections'">
+    <div th:replace="~{navigation :: aside}"></div>
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+        <!-- 헤더 포함 -->
+        <div th:replace="~{navigation :: header}"></div>
+        <main class="page-content">
+            <!-- 알림 메시지 -->
+            <div th:if="${message != null}" class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+            </div>
+
+            <div class="common-container">
+                <div class="common-header">
+                    <h1 class="common-title">검수 등록</h1>
+                    <div class="common-actions">
+                        <a th:href="@{/inspections}" class="btn btn-outline-primary back-button">
+                            <i class="fas fa-arrow-left me-2"></i> 목록으로
+                        </a>
+                    </div>
+                </div>
+
+                <div class="common-content">
+                    <!-- 등록 폼 시작 -->
+                    <form th:action="@{/inspections/create}" method="post">
+
+                        <!-- 담당자 ID -->
+                        <div class="form-group mb-4">
+                            <label for="userId" class="required-mark">담당자 ID</label>
+                            <input type="text" id="userId" name="userId" class="form-control" placeholder="담당자 ID를 입력하세요" required>
+                        </div>
+
+                        <!-- 검수 유형 -->
+                        <div class="form-group mb-4">
+                            <label for="transactionType" class="required-mark">검수 유형</label>
+                            <select id="transactionType" name="transactionType" class="form-control" required>
+                                <option value="INSPECTION">상시</option>
+                                <option value="PURCHASE">발주</option>
+                                <option value="SALES">수주</option>
+                                <option value="STORAGE">입고반품</option>
+                                <option value="SHIPMENT">출고반품</option>
+                            </select>
+                        </div>
+
+                        <!-- 거래 ID (transactionType이 '상시'가 아닐 때만 표시) -->
+                        <div id="transactionIdContainer" class="form-group mb-4" style="display: none;">
+                            <label for="transactionId" class="required-mark">거래 ID</label>
+                            <input type="text" id="transactionId" name="transactionId" class="form-control" placeholder="거래 ID를 입력하세요">
+                        </div>
+
+                        <!-- 검수 수량 -->
+                        <div class="form-group mb-4">
+                            <label for="inspectionQuantity" class="required-mark">검수 수량</label>
+                            <input type="number" id="inspectionQuantity" name="inspectionQuantity" class="form-control" min="1" placeholder="검수 수량을 입력하세요" required>
+                        </div>
+
+                        <!-- 불량 수량 -->
+                        <div class="form-group mb-4">
+                            <label for="defectiveQuantity" class="required-mark">불량 수량</label>
+                            <input type="number" id="defectiveQuantity" name="defectiveQuantity" class="form-control" min="0" placeholder="불량 수량을 입력하세요" required>
+                        </div>
+
+                        <!-- 양품 수량 (자동 계산) -->
+                        <div class="form-group mb-4">
+                            <label for="acceptedQuantity">정상 수량[자동 입력]</label>
+                            <input type="number" id="acceptedQuantity" name="acceptedQuantity" class="form-control" readonly required>
+                        </div>
+
+                        <!-- 검수 상태 -->
+                        <div class="form-group mb-4">
+                            <label for="inspectionStatus" class="required-mark">검수 상태</label>
+                            <select id="inspectionStatus" name="inspectionStatus" class="form-control" required>
+                                <option value="OK">이상 없음</option>
+                                <option value="DEFECTIVE">이상 있음</option>
+                                <option value="HOLD">보류</option>
+                            </select>
+                        </div>
+
+                        <!-- 검수일 -->
+                        <div class="form-group mb-4">
+                            <label for="inspectionDate" class="required-mark">검수일</label>
+                            <input type="date" id="inspectionDate" name="inspectionDate" class="form-control" required>
+                        </div>
+
+                        <!-- 등록/취소 버튼 -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> 등록
+                            </button>
+                            <a th:href="@{/inspections}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> 취소
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- 꼭 필요한 최소 JavaScript: 양품 수량 자동 계산 및 거래 ID 표시 제어 -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const inspectionQuantityInput = document.getElementById('inspectionQuantity');
+                    const defectiveQuantityInput = document.getElementById('defectiveQuantity');
+                    const acceptedQuantityInput = document.getElementById('acceptedQuantity');
+                    const transactionTypeSelect = document.getElementById('transactionType');
+                    const transactionIdContainer = document.getElementById('transactionIdContainer');
+                    const transactionId = document.getElementById('transactionId');
+                    
+                    // 초기 검수일을 오늘 날짜로 설정
+                    document.getElementById('inspectionDate').valueAsDate = new Date();
+                    
+                    // 양품 수량 자동 계산 함수
+                    function calculateAcceptedQuantity() {
+                        const inspectionQty = parseInt(inspectionQuantityInput.value) || 0;
+                        const defectiveQty = parseInt(defectiveQuantityInput.value) || 0;
+                        
+                        // 검수 수량보다 불량 수량이 더 많을 경우 조정
+                        if (defectiveQty > inspectionQty) {
+                            defectiveQuantityInput.value = inspectionQty;
+                            acceptedQuantityInput.value = 0;
+                        } else {
+                            acceptedQuantityInput.value = inspectionQty - defectiveQty;
+                        }
+                    }
+                    
+                    // 거래 ID 표시 제어 함수
+                    function toggleTransactionId() {
+                        if (transactionTypeSelect.value === 'INSPECTION') {
+                            transactionIdContainer.style.display = 'none';
+                            transactionId.value = null;
+                            document.getElementById('transactionId').required = false;
+                        } else {
+                            transactionIdContainer.style.display = 'block';
+                            document.getElementById('transactionId').required = true;
+                        }
+                    }
+                    
+                    // 이벤트 리스너 등록
+                    inspectionQuantityInput.addEventListener('input', calculateAcceptedQuantity);
+                    defectiveQuantityInput.addEventListener('input', calculateAcceptedQuantity);
+                    transactionTypeSelect.addEventListener('change', toggleTransactionId);
+                    
+                    // 초기 계산 및 표시 상태 설정
+                    calculateAcceptedQuantity();
+                    toggleTransactionId();
+                });
+            </script>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>

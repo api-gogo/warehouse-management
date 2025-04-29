@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">WMS</title>
+
+  <!-- 공통 CSS (모든 CSS 포함) -->
+  <link rel="stylesheet" href="/common.css">
+  <!-- 폰트어썸 아이콘 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- 페이지별 추가 CSS 삽입 영역 -->
+  <th:block layout:fragment="css"></th:block>
+</head>
+<body class="auth-body">
+<div class="auth-container">
+  <div class="auth-logo">
+    <h1>WMS System</h1>
+  </div>
+
+  <!-- 알림 메시지 -->
+  <div th:if="${message != null}" class="alert alert-info" role="alert">
+    <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+  </div>
+
+  <!-- 페이지별 콘텐츠 삽입 영역 -->
+  <th:block layout:fragment="content"></th:block>
+
+  <div class="auth-footer">
+    <p>&copy; 2024 WMS System. All rights reserved.</p>
+  </div>
+</div>
+
+<!-- 다크모드 관련 스크립트 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 로컬 스토리지에서 다크 모드 상태 확인
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+    // 초기 다크 모드 상태 적용
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    }
+
+    // 다크모드 토글 버튼 추가 (선택적)
+    const authContainer = document.querySelector('.auth-container');
+    if (authContainer) {
+      const themeToggleBtn = document.createElement('button');
+      themeToggleBtn.id = 'auth-theme-toggle';
+      themeToggleBtn.className = 'theme-toggle-btn';
+      themeToggleBtn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+      
+      // 버튼 스타일
+      themeToggleBtn.style.position = 'absolute';
+      themeToggleBtn.style.top = '10px';
+      themeToggleBtn.style.right = '10px';
+      themeToggleBtn.style.background = 'transparent';
+      themeToggleBtn.style.border = 'none';
+      themeToggleBtn.style.fontSize = '1.2rem';
+      themeToggleBtn.style.cursor = 'pointer';
+      
+      authContainer.style.position = 'relative';
+      authContainer.appendChild(themeToggleBtn);
+      
+      // 토글 이벤트 리스너
+      themeToggleBtn.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        
+        // 다크 모드 상태 저장
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+        
+        // 아이콘 변경
+        const icon = this.querySelector('i');
+        if (icon) {
+          if (isDarkMode) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+          } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+          }
+        }
+      });
+    }
+  });
+</script>
+
+<!-- 페이지별 추가 스크립트 삽입 영역 -->
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

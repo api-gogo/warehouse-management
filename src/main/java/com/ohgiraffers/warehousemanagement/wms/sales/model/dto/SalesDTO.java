@@ -4,6 +4,7 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class SalesDTO {
     private Integer salesId;
@@ -14,6 +15,11 @@ public class SalesDTO {
     private SalesStatus salesStatus;
     private LocalDateTime salesCreatedAt;
     private LocalDateTime salesUpdatedAt;
+    private List<Integer> productIds;
+    private List<String> productNames; // 상품명
+    private List<Integer> quantity;
+    private List<Integer> pricePerBox; // 박스당단가
+    private List<Integer> totalPrice; // 총액
 
     public SalesDTO() {
     }
@@ -93,6 +99,46 @@ public class SalesDTO {
         this.salesUpdatedAt = salesUpdatedAt;
     }
 
+    public List<Integer> getProductIds() {
+        return productIds;
+    }
+
+    public void setProductIds(List<Integer> productIds) {
+        this.productIds = productIds;
+    }
+
+    public List<Integer> getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(List<Integer> quantity) {
+        this.quantity = quantity;
+    }
+
+    public List<String> getProductNames() {
+        return productNames;
+    }
+
+    public void setProductNames(List<String> productNames) {
+        this.productNames = productNames;
+    }
+
+    public List<Integer> getPricePerBox() {
+        return pricePerBox;
+    }
+
+    public void setPricePerBox(List<Integer> pricePerBox) {
+        this.pricePerBox = pricePerBox;
+    }
+
+    public List<Integer> getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(List<Integer> totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     @Override
     public String toString() {
         return "SalesDTO{" +
@@ -104,6 +150,9 @@ public class SalesDTO {
                 ", salesStatus=" + salesStatus +
                 ", salesCreatedAt=" + salesCreatedAt +
                 ", salesUpdatedAt=" + salesUpdatedAt +
+                ", productIds=" + productIds +
+                ", productNames=" + productNames +
+                ", quantity=" + quantity +
                 '}';
     }
 }

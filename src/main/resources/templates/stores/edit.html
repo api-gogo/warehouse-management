@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>점포 수정</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/common.css">
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='store'">
+    <div class="common-container">
+      <div class="common-header">
+        <div class="header-left">
+          <a th:href="@{/stores/{id}(id=${store.storeId})}" class="back-button">
+            <i class="fas fa-arrow-left"></i> 상세보기로
+          </a>
+          <h1 class="common-title">점포 수정</h1>
+        </div>
+      </div>
+
+      <div class="common-content">
+        <form th:action="@{/stores/{id}/edit(id=${store.storeId})}" method="post" th:object="${store}" class="needs-validation" novalidate>
+          <!-- 점포 정보 섹션 -->
+          <div class="detail-section">
+            <h2 class="section-title">점포 정보</h2>
+            <p class="section-description">점포의 기본 정보를 수정해주세요.</p>
+            
+            <!-- 히든 필드: ID -->
+            <input type="hidden" th:field="*{storeId}">
+            
+            <div class="info-grid">
+              <div class="form-group">
+                <label for="storeName" class="form-label">점포명</label>
+                <input type="text" class="form-control" id="storeName" th:field="*{storeName}" placeholder="점포명 입력" required>
+                <div class="invalid-feedback">점포명을 입력해주세요.</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="storeAddress" class="form-label">주소</label>
+                <input type="text" class="form-control" id="storeAddress" th:field="*{storeAddress}" placeholder="주소 입력" required>
+                <div class="invalid-feedback">주소를 입력해주세요.</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 담당자 정보 섹션 -->
+          <div class="detail-section">
+            <h2 class="section-title">담당자 정보</h2>
+            <p class="section-description">점포 담당자의 상세 정보를 수정해주세요.</p>
+            
+            <div class="info-grid">
+              <div class="form-group">
+                <label for="storeManagerName" class="form-label">담당자명</label>
+                <input type="text" class="form-control" id="storeManagerName" th:field="*{storeManagerName}" placeholder="담당자명 입력" required>
+                <div class="invalid-feedback">담당자명을 입력해주세요.</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="storeManagerPhone" class="form-label">연락처</label>
+                <input type="text" class="form-control" id="storeManagerPhone" th:field="*{storeManagerPhone}" placeholder="연락처 입력 (예: 010-1234-5678)" required>
+                <div class="invalid-feedback">연락처를 입력해주세요.</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="storeManagerEmail" class="form-label">이메일</label>
+                <input type="email" class="form-control" id="storeManagerEmail" th:field="*{storeManagerEmail}" placeholder="이메일 입력" required>
+                <div class="invalid-feedback">이메일 주소를 입력해주세요.</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 하단 버튼 영역 -->
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>저장
+            </button>
+            <a th:href="@{/stores/{id}(id=${store.storeId})}" class="btn btn-outline-secondary">
+              <i class="fas fa-times me-2"></i>취소
+            </a>
+            <button type="button" class="btn btn-danger delete-button" th:data-id="${store.storeId}">
+              <i class="fas fa-trash me-2"></i>삭제
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 폼 유효성 검사 활성화
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.from(forms).forEach(form => {
+          form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+          }, false);
+        });
+
+        // 전화번호 포맷팅
+        const phoneInput = document.getElementById('storeManagerPhone');
+        phoneInput.addEventListener('input', function() {
+          let value = phoneInput.value.replace(/\D/g, ''); // 숫자만 남기기
+          
+          if (value.length > 3 && value.length <= 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3);
+          } else if (value.length > 7) {
+            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+          }
+          
+          phoneInput.value = value;
+        });
+        
+        // 삭제 버튼 이벤트
+        const deleteButton = document.querySelector('.delete-button');
+        
+        if (deleteButton) {
+          deleteButton.addEventListener('click', function() {
+            const storeId = this.dataset.id;
+            
+            if (confirm('해당 점포를 삭제하시겠습니까?')) {
+              // POST 요청을 위한 Form 생성
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/stores/${storeId}/delete`;
+              
+              // CSRF 토큰 추가 (Spring Security 사용 시)
+              const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+              const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+              
+              if (csrfToken && csrfHeader) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = csrfHeader;
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+              }
+              
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        }
+      });
+    </script>
+  </th:block>
+</body>
+</html>

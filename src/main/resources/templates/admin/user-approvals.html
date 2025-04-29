@@ -1,254 +1,373 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WMS - 사용자 승인 관리</title>
-  <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/common.css">
-  <!-- 네비게이션 CSS -->
-  <link rel="stylesheet" href="/css/navigation.css">
-  <!-- 페이지 CSS -->
-  <link rel="stylesheet" href="/css/admin.css">
-  <!-- 폰트어썸 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>사용자 승인 관리</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/common.css">
+  </th:block>
 </head>
 <body>
-<div class="layout" th:with="activeMenu='admin-users'">
-  <!-- 네비게이션 사이드바 포함 -->
-  <div th:replace="~{navigation :: aside}"></div>
-
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 헤더 포함 -->
-    <div th:replace="~{navigation :: header}"></div>
-
-    <!-- 페이지 콘텐츠 영역 -->
-    <main class="page-content">
-      <!-- 알림 메시지 -->
-      <div th:if="${message != null}" class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='user'">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">사용자 승인 관리</h1>
+        <div class="common-actions">
+          <div class="search-box">
+            <input type="text" id="userSearch" placeholder="이름, 사번, 전화번호 검색..." class="search-input" th:value="${search}">
+            <button class="search-button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+            <i class="fas fa-users me-2"></i>사용자 목록
+          </a>
+          <button class="btn btn-primary" id="selectAllButton">
+            <i class="fas fa-check-square me-2"></i>모두 선택
+          </button>
+        </div>
       </div>
-      
-      <div class="admin-container">
-        <div class="admin-header">
-          <div class="header-left">
-            <a th:href="@{/admin/users}" class="back-button">
-              <i class="fas fa-arrow-left"></i> 사용자 목록으로
+
+      <div class="common-tabs">
+        <div class="approval-stats">
+          <span class="stats-item">
+            <i class="fas fa-user-clock"></i> 승인 대기: <span class="pending-count" th:text="${pendingCount}">0</span>
+          </span>
+          <span class="stats-item">
+            <i class="fas fa-check-circle"></i> 선택됨: <span id="selectedCount">0</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="common-content">
+        <form id="batchApprovalForm" th:action="@{/admin/users/approve-batch}" method="post">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+              <tr>
+                <th width="40px">
+                  <input type="checkbox" id="checkAll" class="select-all-checkbox">
+                </th>
+                <th>이름</th>
+                <th>사번</th>
+                <th>전화번호</th>
+                <th>부서</th>
+                <th>직책</th>
+                <th>가입일</th>
+                <th>상태</th>
+                <th>액션</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="user : ${pendingUsers}">
+                <td>
+                  <input type="checkbox" name="selectedUsers" th:value="${user.userId}" class="user-checkbox">
+                </td>
+                <td th:text="${user.userName}"></td>
+                <td th:text="${user.userCode}"></td>
+                <td th:text="${user.userPhone}"></td>
+                <td th:text="${user.userPart}"></td>
+                <td th:text="${user.userRole}"></td>
+                <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                  <span class="status-badge status-pending">승인대기</span>
+                </td>
+                <td class="actions">
+                  <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <button type="button" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button type="button" class="action-button reject-button" th:data-id="${user.userId}" title="거부">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <button type="button" class="action-button blacklist-button" th:data-id="${user.userId}" title="영구 차단">
+                    <i class="fas fa-ban"></i>
+                  </button>
+                </td>
+              </tr>
+              <!-- 데이터가 없을 경우 -->
+              <tr th:if="${#lists.isEmpty(pendingUsers)}">
+                <td colspan="10" class="no-data">승인 대기 중인 사용자가 없습니다.</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 페이지네이션 (필요시) -->
+          <div class="pagination" th:if="${totalPages != null && totalPages > 1}">
+            <a th:href="@{/admin/users/approvals(page=0, size=${size}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+              <i class="fas fa-angle-double-left"></i>
             </a>
-            <h1 class="admin-title">사용자 승인 관리</h1>
+            <a th:href="@{/admin/users/approvals(page=${currentPage - 1}, size=${size}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+              <i class="fas fa-angle-left"></i>
+            </a>
+
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+              <a th:href="@{/admin/users/approvals(page=${i}, size=${size}, search=${search})}"
+                 class="page-link"
+                 th:text="${i + 1}"
+                 th:classappend="${currentPage == i ? 'active' : ''}">1</a>
+            </th:block>
+
+            <a th:href="@{/admin/users/approvals(page=${currentPage + 1}, size=${size}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+              <i class="fas fa-angle-right"></i>
+            </a>
+            <a th:href="@{/admin/users/approvals(page=${totalPages - 1}, size=${size}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+              <i class="fas fa-angle-double-right"></i>
+            </a>
           </div>
           
-          <div class="admin-actions">
-            <span class="badge pending-count" th:text="${'승인 대기: ' + pendingCount + '명'}"></span>
-            <button class="btn btn-primary" id="selectAllButton">
-              <i class="fas fa-check-square me-2"></i>모두 선택
-            </button>
-            <button class="btn btn-success" id="batchApproveButton" disabled>
-              <i class="fas fa-check-double me-2"></i>일괄 승인
-            </button>
-          </div>
-        </div>
-        
-        <div class="admin-content">
-          <form id="batchApprovalForm" th:action="@{/admin/users/approve-batch}" method="post">
-            <div class="table-responsive">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th width="40px">
-                      <input type="checkbox" id="checkAll" class="select-all-checkbox">
-                    </th>
-                    <th>이름</th>
-                    <th>사번</th>
-                    <th>이메일</th>
-                    <th>전화번호</th>
-                    <th>신청 부서</th>
-                    <th>가입일</th>
-                    <th>상세조회</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr th:each="user : ${pendingUsers}">
-                    <td>
-                      <input type="checkbox" name="selectedUsers" th:value="${user.userId}" class="user-checkbox">
-                    </td>
-                    <td th:text="${user.userName}"></td>
-                    <td th:text="${user.userCode}"></td>
-                    <td th:text="${user.userEmail}"></td>
-                    <td th:text="${user.userPhone}"></td>
-                    <td th:text="${user.userPart}"></td>
-                    <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
-                    <td class="actions">
-                      <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
-                        <i class="fas fa-eye"></i>
-                      </a>
-                      <button type="button" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
-                        <i class="fas fa-check"></i>
-                      </button>
-                      <button type="button" class="action-button reject-button" th:data-id="${user.userId}" title="거부">
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <!-- 데이터가 없을 경우 -->
-                  <tr th:if="${#lists.isEmpty(pendingUsers)}">
-                    <td colspan="8" class="no-data">승인 대기 중인 사용자가 없습니다.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-            <div class="batch-approval-options" th:if="${not #lists.isEmpty(pendingUsers)}">
-              <h3 class="section-title">일괄 승인 설정</h3>
-              <div class="batch-options-grid">
-                <div class="form-group">
-                  <label class="form-label">부서 지정</label>
-                  <select class="form-select" name="batchPart">
-                    <option value="재고" selected>재고</option>
-                    <option value="입고">입고</option>
-                    <option value="출고">출고</option>
-                    <option value="반품">반품</option>
-                    <option value="발주">발주</option>
-                    <option value="수주">수주</option>
-                    <option value="상품">상품</option>
-                  </select>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label">직책 지정</label>
-                  <select class="form-select" name="batchRole">
-                    <option value="사원" selected>사원</option>
-                    <option value="매니저">매니저</option>
-                    <option value="관리자">관리자</option>
-                  </select>
-                </div>
-                
-                <div class="form-group full-width">
-                  <label class="form-label">비고</label>
-                  <textarea class="form-control" name="batchNote" placeholder="일괄 승인에 대한 메모를 입력하세요 (선택 사항)"></textarea>
-                </div>
+          <div class="batch-actions" th:if="${not #lists.isEmpty(pendingUsers)}">
+            <h3 class="section-title">일괄 처리</h3>
+            <div class="batch-options-grid">
+              <div class="form-group">
+                <label class="form-label">부서 지정</label>
+                <select class="form-select" name="batchPart" id="batchPartSelect">
+                  <option value="통합">통합</option>
+                  <option value="입고">입고</option>
+                  <option value="출고">출고</option>
+                  <option value="재고" selected>재고</option>
+                  <option value="검수">검수</option>
+                  <option value="반품">반품</option>
+                  <option value="발주">발주</option>
+                  <option value="수주">수주</option>
+                  <option value="상품">상품</option>
+                </select>
               </div>
               
-              <div class="form-actions">
-                <button type="submit" class="btn btn-success" id="submitBatchApproval" disabled>
-                  <i class="fas fa-user-check me-2"></i>선택한 사용자 일괄 승인
-                </button>
-                <button type="button" class="btn btn-outline-danger" id="batchRejectButton" disabled>
-                  <i class="fas fa-user-times me-2"></i>선택한 사용자 일괄 거부
-                </button>
+              <div class="form-group">
+                <label class="form-label">직책 지정</label>
+                <select class="form-select" name="batchRole" id="batchRoleSelect">
+                  <option value="사원" selected>사원</option>
+                  <option value="매니저">매니저</option>
+                  <option value="관리자">관리자</option>
+                </select>
               </div>
             </div>
-          </form>
-        </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-success" id="submitBatchApproval" disabled>
+                <i class="fas fa-user-check me-2"></i>선택한 사용자 일괄 승인
+              </button>
+              <button type="button" class="btn btn-danger" id="batchRejectButton" disabled>
+                <i class="fas fa-user-times me-2"></i>선택한 사용자 일괄 거부
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-    </main>
-  </div>
-</div>
+    </div>
+  </th:block>
+  
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 체크박스 관련 변수
+        const checkAllBox = document.getElementById('checkAll');
+        const userCheckboxes = document.querySelectorAll('.user-checkbox');
+        const submitBatchApproval = document.getElementById('submitBatchApproval');
+        const batchRejectButton = document.getElementById('batchRejectButton');
+        const selectedCountDisplay = document.getElementById('selectedCount');
+        
+        // 부서-직책 연동 처리
+        const batchPartSelect = document.getElementById('batchPartSelect');
+        const batchRoleSelect = document.getElementById('batchRoleSelect');
+        
+        if (batchPartSelect && batchRoleSelect) {
+          // 부서 선택에 따른 직책 옵션 제어
+          const options = Array.from(batchRoleSelect.options); // 초기 옵션 저장
+          
+          function updateRoleOptions() {
+            if (batchPartSelect.value === '통합') {
+              // 관리자 외 옵션 숨기기 및 비활성화
+              options.forEach(option => {
+                if (option.value !== '관리자') {
+                  option.style.display = 'none'; // 숨김 처리
+                  option.disabled = true; // 선택 불가 처리
+                } else {
+                  option.style.display = ''; // 관리자 옵션은 보이게
+                  option.disabled = false;
+                }
+              });
+              batchRoleSelect.value = '관리자'; // 자동으로 관리자 선택
+            } else {
+              // 통합 부서가 아니면 모든 옵션 복원 및 활성화
+              options.forEach(option => {
+                option.style.display = '';
+                option.disabled = false;
+              });
+            }
+          }
 
-<!-- 스크립트 포함 -->
-<div th:replace="~{navigation :: scripts}"></div>
-
-<!-- 페이지 특화 스크립트 -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // 체크박스 관련 변수
-    const checkAllBox = document.getElementById('checkAll');
-    const userCheckboxes = document.querySelectorAll('.user-checkbox');
-    const batchApproveButton = document.getElementById('batchApproveButton');
-    const submitBatchApproval = document.getElementById('submitBatchApproval');
-    const batchRejectButton = document.getElementById('batchRejectButton');
-    
-    // 선택된 항목이 있는지 확인하고 버튼 상태 업데이트
-    function updateButtonState() {
-      const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-      batchApproveButton.disabled = checkedCount === 0;
-      submitBatchApproval.disabled = checkedCount === 0;
-      batchRejectButton.disabled = checkedCount === 0;
-      
-      // 모든 체크박스가 선택되었는지 확인
-      checkAllBox.checked = checkedCount === userCheckboxes.length && checkedCount !== 0;
-    }
-    
-    // 전체 선택 체크박스 이벤트
-    if (checkAllBox) {
-      checkAllBox.addEventListener('change', function() {
+          batchPartSelect.addEventListener('change', updateRoleOptions);
+          // 페이지 로드 시 초기 상태 확인 및 적용
+          updateRoleOptions();
+        }
+        
+        // 선택된 항목이 있는지 확인하고 버튼 상태 업데이트
+        function updateButtonState() {
+          const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+          submitBatchApproval.disabled = checkedCount === 0;
+          batchRejectButton.disabled = checkedCount === 0;
+          
+          // 선택된 항목 수 표시 업데이트
+          if (selectedCountDisplay) {
+            selectedCountDisplay.textContent = checkedCount;
+          }
+          
+          // 모든 체크박스가 선택되었는지 확인
+          if (checkAllBox) {
+            checkAllBox.checked = checkedCount === userCheckboxes.length && checkedCount !== 0;
+          }
+        }
+        
+        // 전체 선택 체크박스 이벤트
+        if (checkAllBox) {
+          checkAllBox.addEventListener('change', function() {
+            userCheckboxes.forEach(checkbox => {
+              checkbox.checked = this.checked;
+            });
+            updateButtonState();
+          });
+        }
+        
+        // 개별 체크박스 이벤트
         userCheckboxes.forEach(checkbox => {
-          checkbox.checked = this.checked;
+          checkbox.addEventListener('change', updateButtonState);
         });
+        
+        // 모두 선택 버튼 이벤트
+        const selectAllButton = document.getElementById('selectAllButton');
+        if (selectAllButton) {
+          selectAllButton.addEventListener('click', function() {
+            const allChecked = document.querySelectorAll('.user-checkbox:checked').length === userCheckboxes.length;
+            userCheckboxes.forEach(checkbox => {
+              checkbox.checked = !allChecked;
+            });
+            updateButtonState();
+          });
+        }
+        
+        // 통합 관리자 권한 부여 경고 메시지
+        const adminWarningMessage = "주의: 선택한 사용자들에게 '통합 관리자' 권한을 부여합니다.\n이 권한은 시스템 전체에 접근하고 수정할 수 있는 강력한 권한입니다.\n정말로 진행하시겠습니까?";
+        
+        // 일괄 승인 폼 제출 이벤트
+        const batchApprovalForm = document.getElementById('batchApprovalForm');
+        if (batchApprovalForm) {
+          batchApprovalForm.addEventListener('submit', function(e) {
+            const selectedPart = batchPartSelect.value;
+            const selectedRole = batchRoleSelect.value;
+            const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+            
+            if (checkedCount === 0) {
+              e.preventDefault();
+              alert('승인할 사용자를 선택해주세요.');
+              return;
+            }
+            
+            // 통합 부서인데 관리자가 아닌 경우
+            if (selectedPart === '통합' && selectedRole !== '관리자') {
+              e.preventDefault();
+              alert('통합 부서는 관리자 직책만 가질 수 있습니다.');
+              batchRoleSelect.value = '관리자';
+              return;
+            }
+            
+            // 통합 관리자 권한 부여 시 경고
+            if (selectedPart === '통합' && selectedRole === '관리자') {
+              if (!confirm(adminWarningMessage)) {
+                e.preventDefault();
+                return;
+              }
+            }
+            
+            // 최종 확인
+            if (!confirm(`선택한 ${checkedCount}명의 사용자를 '${selectedPart}' 부서의 '${selectedRole}' 직책으로 승인하시겠습니까?`)) {
+              e.preventDefault();
+              return;
+            }
+          });
+        }
+        
+        // 일괄 거부 버튼 이벤트
+        if (batchRejectButton) {
+          batchRejectButton.addEventListener('click', function() {
+            const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+            
+            if (checkedCount > 0 && confirm(`선택한 ${checkedCount}명의 사용자 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
+              const form = document.getElementById('batchApprovalForm');
+              form.action = '/admin/users/reject-batch';
+              form.submit();
+            }
+          });
+        }
+        
+        // 개별 승인 버튼 이벤트
+        const approveButtons = document.querySelectorAll('.approve-button');
+        approveButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            
+            if (confirm('해당 사용자의 가입을 승인하시겠습니까?')) {
+              window.location.href = `/admin/users/approve/${userId}`;
+            }
+          });
+        });
+        
+        // 개별 거부 버튼 이벤트
+        const rejectButtons = document.querySelectorAll('.reject-button');
+        rejectButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            
+            if (confirm('해당 사용자의 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+              window.location.href = `/admin/users/reject/${userId}`;
+            }
+          });
+        });
+        
+        // 영구 차단(블랙리스트) 처리 버튼
+        const blacklistButtons = document.querySelectorAll('.blacklist-button');
+        blacklistButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('주의: 해당 사용자를 영구 차단하시겠습니까? 이 작업은 되돌릴 수 없습니다.\n영구 차단된 사용자는 로그인이 불가능합니다.')) {
+              // 폼 생성 및 제출
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/blacklist`;
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        });
+        
+        // 검색 기능
+        const searchInput = document.getElementById('userSearch');
+        const searchButton = document.querySelector('.search-button');
+
+        searchButton.addEventListener('click', function() {
+          const searchTerm = searchInput.value.trim();
+          window.location.href = `/admin/users/approvals?search=${searchTerm}`;
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            const searchTerm = searchInput.value.trim();
+            window.location.href = `/admin/users/approvals?search=${searchTerm}`;
+          }
+        });
+        
+        // 페이지 로드 시 초기 상태 설정
         updateButtonState();
       });
-    }
-    
-    // 개별 체크박스 이벤트
-    userCheckboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', updateButtonState);
-    });
-    
-    // 모두 선택 버튼 이벤트
-    const selectAllButton = document.getElementById('selectAllButton');
-    if (selectAllButton) {
-      selectAllButton.addEventListener('click', function() {
-        const allChecked = document.querySelectorAll('.user-checkbox:checked').length === userCheckboxes.length;
-        userCheckboxes.forEach(checkbox => {
-          checkbox.checked = !allChecked;
-        });
-        updateButtonState();
-      });
-    }
-    
-    // 일괄 승인 버튼 이벤트
-    if (batchApproveButton) {
-      batchApproveButton.addEventListener('click', function() {
-        const form = document.getElementById('batchApprovalForm');
-        const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-        
-        if (checkedCount > 0) {
-          form.scrollIntoView({ behavior: 'smooth' });
-          submitBatchApproval.focus();
-        }
-      });
-    }
-    
-    // 일괄 거부 버튼 이벤트
-    if (batchRejectButton) {
-      batchRejectButton.addEventListener('click', function() {
-        const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
-        
-        if (checkedCount > 0 && confirm(`선택한 ${checkedCount}명의 사용자 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-          const form = document.getElementById('batchApprovalForm');
-          form.action = '/admin/users/reject-batch';
-          form.submit();
-        }
-      });
-    }
-    
-    // 개별 승인 버튼 이벤트
-    const approveButtons = document.querySelectorAll('.approve-button');
-    approveButtons.forEach(button => {
-      button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const userId = this.dataset.id;
-        
-        if (confirm('해당 사용자의 가입을 승인하시겠습니까?')) {
-          window.location.href = `/admin/users/approve/${userId}`;
-        }
-      });
-    });
-    
-    // 개별 거부 버튼 이벤트
-    const rejectButtons = document.querySelectorAll('.reject-button');
-    rejectButtons.forEach(button => {
-      button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const userId = this.dataset.id;
-        
-        if (confirm('해당 사용자의 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-          window.location.href = `/admin/users/reject/${userId}`;
-        }
-      });
-    });
-  });
-</script>
+    </script>
+  </th:block>
 </body>
 </html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>점포 상세</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/common.css">
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='store'">
+    <div class="common-container">
+      <div class="common-header">
+        <div class="header-left">
+          <a th:href="@{/stores}" class="back-button">
+            <i class="fas fa-arrow-left"></i> 목록으로
+          </a>
+          <h1 class="common-title">점포 상세</h1>
+        </div>
+        <div class="common-actions">
+          <!-- 삭제되지 않은 점포만 수정 버튼 표시 -->
+          <a th:if="${!store.isDeleted}" th:href="@{/stores/{id}/edit(id=${store.storeId})}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>수정
+          </a>
+        </div>
+      </div>
+
+      <div class="common-content">
+        <!-- 점포 기본 정보 -->
+        <div class="detail-section">
+          <h2 class="section-title">점포 정보</h2>
+          
+          <div class="user-profile-header">
+            <div class="user-avatar">
+              <i class="fas fa-building"></i>
+            </div>
+            <div class="user-basic-info">
+              <h3 class="user-name" th:text="${store.storeName}">점포명</h3>
+              <p class="user-code" th:text="${'ID: ' + store.storeId}">ID: 1</p>
+              <!-- 상태 뱃지 -->
+              <div class="user-status">
+                <span class="status-badge"
+                      th:classappend="${!store.isDeleted ? 'status-active' : 'status-resigned'}"
+                      th:text="${!store.isDeleted ? '활성' : '삭제됨'}">활성</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="info-grid">
+            <div class="form-group">
+              <label class="form-label">주소</label>
+              <p class="form-control-static" th:text="${store.storeAddress}">주소 정보</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">등록일</label>
+              <p class="form-control-static" th:text="${#temporals.format(store.storeCreatedAt, 'yyyy-MM-dd HH:mm')}">2023-07-01 09:00</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">최근 수정일</label>
+              <p class="form-control-static" th:text="${store.storeUpdatedAt != null ? #temporals.format(store.storeUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
+            </div>
+            
+            <div class="form-group" th:if="${store.isDeleted}">
+              <label class="form-label">삭제일</label>
+              <p class="form-control-static" th:text="${store.storeDeletedAt != null ? #temporals.format(store.storeDeletedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 담당자 정보 -->
+        <div class="detail-section">
+          <h2 class="section-title">담당자 정보</h2>
+          
+          <div class="info-grid">
+            <div class="form-group">
+              <label class="form-label">담당자명</label>
+              <p class="form-control-static" th:text="${store.storeManagerName}">홍길동</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">연락처</label>
+              <p class="form-control-static" th:text="${store.storeManagerPhone}">010-1234-5678</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">이메일</label>
+              <p class="form-control-static" th:text="${store.storeManagerEmail}">example@example.com</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 하단 버튼 영역 -->
+        <div class="form-actions">
+          <a th:href="@{/stores}" class="btn btn-outline-secondary">
+            <i class="fas fa-list me-2"></i>목록
+          </a>
+          <!-- 삭제되지 않은 점포만 수정 버튼 표시 -->
+          <a th:if="${!store.isDeleted}" th:href="@{/stores/{id}/edit(id=${store.storeId})}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>수정
+          </a>
+          <!-- 삭제되지 않은 점포만 삭제 버튼 표시 -->
+          <button th:if="${!store.isDeleted}" class="btn btn-danger delete-button" th:data-id="${store.storeId}">
+            <i class="fas fa-trash me-2"></i>삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 삭제 버튼 이벤트
+        const deleteButton = document.querySelector('.delete-button');
+        
+        if (deleteButton) {
+          deleteButton.addEventListener('click', function() {
+            const storeId = this.dataset.id;
+            
+            if (confirm('해당 점포를 삭제하시겠습니까?')) {
+              // POST 요청을 위한 Form 생성
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/stores/${storeId}/delete`;
+              
+              // CSRF 토큰 추가 (Spring Security 사용 시)
+              const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+              const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+              
+              if (csrfToken && csrfHeader) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = csrfHeader;
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+              }
+              
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        }
+      });
+    </script>
+  </th:block>
+</body>
+</html>

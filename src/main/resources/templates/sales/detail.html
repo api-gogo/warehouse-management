@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>수주 상세 - WMS</title>
+    <link rel="stylesheet" href="/common.css">
+    <link rel="stylesheet" href="/css/layouts/navigation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="layout" th:with="activeMenu='dashboard'">
+    <div th:replace="~{navigation :: aside}"></div>
+    <div class="main-content">
+        <div th:replace="~{navigation :: header}"></div>
+
+        <main class="page-content">
+            <!-- 알림 메시지 -->
+            <div th:if="${message != null}" class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i> <span th:text="${message}">알림 메시지</span>
+            </div>
+
+            <div class="common-container">
+                <div class="common-header">
+                    <h1 class="common-title">수주 상세</h1>
+                    <div class="common-actions">
+                        <a th:if="${sales.salesStatus.name() == 'PENDING'}"
+                           th:href="@{/sales/update/{salesId}(salesId=${sales.salesId})}"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i> 수주서 수정
+                        </a>
+
+                        <a th:href="@{/sales}" class="btn btn-outline-primary back-button">
+                            <i class="fas fa-arrow-left me-2"></i> 목록으로
+                        </a>
+                    </div>
+                </div>
+
+                <div class="common-content">
+                    <table class="data-table">
+                        <tbody>
+                        <tr>
+                            <th>수주ID</th>
+                            <td colspan="3" th:text="${sales.salesId}">S0001</td> <!-- ✅ colspan -->
+                        </tr>
+                        <tr>
+                            <th>점포명</th>
+                            <td th:text="${sales.storeId}">서울점</td>
+                            <th>점포 주소</th>
+                            <td></td> <!-- 점포주소 -->
+                        </tr>
+                        <tr>
+                            <th>수주담당자</th>
+                            <td th:text="${sales.userId}">홍길동</td>
+                            <th>담당자 전화번호</th>
+                            <td></td> <!-- 전화번호 -->
+                        </tr>
+                        <tr>
+                            <th>수주일</th>
+                            <td colspan="3" th:text="${#temporals.format(sales.salesDate, 'yyyy-MM-dd')}">2025-04-28</td> <!-- ✅ colspan -->
+                        </tr>
+                        <tr>
+                            <th>출고예정일</th>
+                            <td colspan="3" th:text="${#temporals.format(sales.shippingDueDate, 'yyyy-MM-dd')}">2025-04-30</td> <!-- ✅ colspan -->
+                        </tr>
+                        <tr>
+                            <th>수주상태</th>
+                            <td>
+        <span class="status-badge"
+              th:classappend="${sales.salesStatus.name() == 'PENDING' ? 'status-pending' :
+                              (sales.salesStatus.name() == 'APPROVED' ? 'status-active' :
+                              (sales.salesStatus.name() == 'CANCELED' ? 'status-inactive' : ''))}"
+              th:text="${sales.salesStatus.name() == 'PENDING' ? '수주등록' :
+                        (sales.salesStatus.name() == 'APPROVED' ? '수주승인' :
+                        (sales.salesStatus.name() == 'CANCELED' ? '수주취소' : ''))}">
+            등록
+        </span>
+                            </td>
+
+                            <th th:if="${sales.salesStatus.name() == 'PENDING'}">상태 변경</th>
+                            <td th:if="${sales.salesStatus.name() == 'PENDING'}">
+                                <form th:action="@{/sales/update/status/{salesId}(salesId=${sales.salesId})}" method="post"
+                                      style="display: flex; gap: 5px; align-items: center;">
+                                    <input type="hidden" name="_method" value="patch"/>
+                                    <input type="hidden" name="salesId" th:value="${sales.salesId}" />
+
+                                    <button type="submit"
+                                            name="status" value="APPROVED"
+                                            class="btn btn-success btn-sm"
+                                            onclick="return confirm('수주를 승인하시겠습니까?');">
+                                        수주승인
+                                    </button>
+                                    <button type="submit"
+                                            name="status" value="CANCELED"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('수주를 취소하시겠습니까?');">
+                                        수주취소
+                                    </button>
+                                </form>
+                            </td>
+
+                            <!-- 상태가 PENDING이 아닐 때는 colspan으로 2칸 합침 -->
+                            <td colspan="2" th:if="${sales.salesStatus.name() != 'PENDING'}"></td>
+                        </tr>
+                        <tr>
+                            <th>수주등록일</th>
+                            <td colspan="3" th:text="${#temporals.format(sales.salesCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                        <tr>
+                            <th>수주수정일</th>
+                            <td colspan="3" th:text="${sales.salesUpdatedAt != null ? #temporals.format(sales.salesUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!-- 수주 상품 목록 -->
+                    <h2 class="mt-4 mb-2">수주 상품 목록</h2>
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>상품명</th>
+                            <th>수량</th>
+                            <th>박스당 단가</th>
+                            <th>총액</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="name, iterStat : ${sales.productNames}">
+                            <td th:text="${name}">상품명</td>
+                            <td th:text="${sales.quantity[iterStat.index]}">수량</td>
+                            <td th:text="${sales.pricePerBox[iterStat.index]}">단가</td>
+                            <td th:text="${sales.totalPrice[iterStat.index]}">총액</td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(sales.productNames)}">
+                            <td colspan="2" class="no-data">등록된 수주 상품이 없습니다.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>

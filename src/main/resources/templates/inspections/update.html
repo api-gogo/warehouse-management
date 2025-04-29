@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>검수 정보 수정</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/common.css">
+  </th:block>
+  <!-- 페이지별 JS -->
+  <th:block layout:fragment="script">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 검사 수량과 불량 수량 입력 필드 찾기
+        const inspectionQuantityInput = document.getElementById('inspectionQuantity');
+        const defectiveQuantityInput = document.getElementById('defectiveQuantity');
+        const acceptedQuantityInput = document.getElementById('acceptedQuantity');
+        const defectRateInput = document.getElementById('defectRate');
+        
+        // 수량 변경 시 자동 계산 함수
+        function updateQuantities() {
+          const inspectionQuantity = parseInt(inspectionQuantityInput.value) || 0;
+          const defectiveQuantity = parseInt(defectiveQuantityInput.value) || 0;
+          
+          // 정상 수량 = 총 검수 수량 - 불량 수량
+          const acceptedQuantity = Math.max(0, inspectionQuantity - defectiveQuantity);
+          acceptedQuantityInput.value = acceptedQuantity;
+          
+          // 불량률 계산 (%) - 소수점 2자리까지
+          let defectRate = 0;
+          if (inspectionQuantity > 0) {
+            defectRate = (defectiveQuantity * 100 / inspectionQuantity).toFixed(2);
+          }
+          defectRateInput.value = defectRate + '%';
+          
+          // 유효성 검사 - 불량 수량이 총 검수 수량을 초과하지 않도록
+          if (defectiveQuantity > inspectionQuantity) {
+            alert('불량 수량은 총 검수 수량을 초과할 수 없습니다.');
+            defectiveQuantityInput.value = inspectionQuantity;
+            updateQuantities(); // 다시 계산
+          }
+        }
+        
+        // 총 검수 수량 변경 시 정상 수량 자동 업데이트
+        inspectionQuantityInput.addEventListener('input', updateQuantities);
+        
+        // 불량 수량 변경 시 정상 수량 자동 업데이트
+        defectiveQuantityInput.addEventListener('input', updateQuantities);
+        
+        // 폼 제출 전 검증
+        document.getElementById('updateForm').addEventListener('submit', function(e) {
+          const inspectionQuantity = parseInt(inspectionQuantityInput.value) || 0;
+          const defectiveQuantity = parseInt(defectiveQuantityInput.value) || 0;
+          
+          if (inspectionQuantity <= 0) {
+            e.preventDefault();
+            alert('총 검수 수량은 1 이상이어야 합니다.');
+            return false;
+          }
+          
+          if (defectiveQuantity > inspectionQuantity) {
+            e.preventDefault();
+            alert('불량 수량은 총 검수 수량을 초과할 수 없습니다.');
+            return false;
+          }
+        });
+        
+        // 페이지 로드 시 초기 계산
+        updateQuantities();
+      });
+    </script>
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='inspection'">
+    <div class="admin-container">
+      <div class="admin-header">
+        <div class="header-left">
+          <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="back-button">
+            <i class="fas fa-arrow-left"></i> 검수 상세로 돌아가기
+          </a>
+          <h1 class="admin-title">검수 정보 수정</h1>
+        </div>
+      </div>
+
+      <div class="user-detail-container">
+        <div class="user-profile-header">
+          <div class="user-avatar">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <div class="user-basic-info">
+            <h2 class="user-name" th:text="'검수 #' + ${inspection.inspectionId}"></h2>
+            <p class="user-code" th:text="'거래 타입: ' + ${inspection.transactionType}"></p>
+            <div class="user-status">
+              <span class="status-badge"
+                    th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
+                                    (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
+                                    'status-pending')}"
+                    th:text="${inspection.inspectionStatus}">이상 없음</span>
+            </div>
+          </div>
+        </div>
+
+        <form id="updateForm" th:action="@{/inspections/update/{id}(id=${inspection.inspectionId})}" method="post">
+          <div class="user-detail-sections">
+            <div class="detail-section">
+              <h3 class="section-title">기본 정보</h3>
+              <div class="info-grid">
+                <div class="form-group">
+                  <label class="form-label">검수 ID</label>
+                  <input type="text" class="form-control readonly-field" th:value="${inspection.inspectionId}" readonly>
+                  <input type="hidden" name="inspectionId" th:value="${inspection.inspectionId}">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">담당자 ID</label>
+                  <input type="text" class="form-control readonly-field" th:value="${inspection.userId}" readonly>
+                  <input type="hidden" name="userId" th:value="${inspection.userId}">
+                </div>
+
+                  <div class="form-group">
+                      <label class="form-label">거래 유형</label>
+                      <select class="form-control" name="transactionType">
+                        <option value="INSPECTION" th:selected="${inspection.transactionType == '상시'}">상시</option>
+                        <option value="PURCHASE" th:selected="${inspection.transactionType == '발주'}">발주</option>
+                        <option value="SALES" th:selected="${inspection.transactionType == '수주'}">수주</option>
+                        <option value="STORAGE" th:selected="${inspection.transactionType == '입고반품'}">입고반품</option>
+                        <option value="SHIPMENT" th:selected="${inspection.transactionType == '출고반품'}">출고반품</option>
+                      </select>
+                  </div>
+
+                <div class="form-group">
+                  <label class="form-label">거래 유형의 ID</label>
+                  <input type="text" class="form-control" name="transactionId" th:value="${inspection.transactionId}">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">검수 상태</label>
+                  <select class="form-control" name="inspectionStatus">
+                    <option value="OK" th:selected="${inspection.inspectionStatus == '이상 없음'}">이상 없음</option>
+                    <option value="DEFECTIVE" th:selected="${inspection.inspectionStatus == '이상 있음'}">이상 있음</option>
+                    <option value="HOLD" th:selected="${inspection.inspectionStatus == '보류'}">보류</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">검수 날짜</label>
+                  <input type="date" class="form-control" name="inspectionDate" th:value="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}">
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3 class="section-title">수량 정보</h3>
+              <div class="info-grid">
+                <div class="form-group">
+                  <label class="form-label">총 검수 수량</label>
+                  <input type="number" id="inspectionQuantity" class="form-control" name="inspectionQuantity" 
+                         th:value="${inspection.inspectionQuantity}" min="1">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">불량 수량</label>
+                  <input type="number" id="defectiveQuantity" class="form-control" name="defectiveQuantity" 
+                         th:value="${inspection.defectiveQuantity}" min="0">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">정상 수량 (자동 계산)</label>
+                  <input type="number" id="acceptedQuantity" class="form-control readonly-field" 
+                         name="acceptedQuantity" th:value="${inspection.acceptedQuantity}" readonly>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">불량률 (자동 계산)</label>
+                  <input type="text" id="defectRate" class="form-control readonly-field" 
+                         th:value="${inspection.inspectionQuantity > 0 ? #numbers.formatDecimal(inspection.defectiveQuantity * 100 / inspection.inspectionQuantity, 1, 2) + '%' : '0%'}" readonly>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>변경사항 저장
+              </button>
+              <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="btn btn-secondary ms-2">
+                <i class="fas fa-times me-2"></i>취소
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>

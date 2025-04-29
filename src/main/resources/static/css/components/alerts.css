@@ -1,0 +1,208 @@
+/* 
+ * 알림 컴포넌트 - 알림 메시지 관련 스타일
+ */
+.alert {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+}
+
+.alert-heading {
+    color: inherit;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.alert-link {
+    font-weight: 700;
+    color: inherit;
+    text-decoration: underline;
+}
+
+.alert-dismissible {
+    padding-right: 4rem;
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* 알림 변형 */
+.alert-primary {
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
+
+.alert-secondary {
+    color: #383d41;
+    background-color: #e2e3e5;
+    border-color: #d6d8db;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+/* 다크 모드 알림 */
+body.dark-mode .alert-primary {
+    color: #a6caec;
+    background-color: #162436;
+    border-color: #1e3a5a;
+}
+
+body.dark-mode .alert-secondary {
+    color: #d0d1d3;
+    background-color: #2a2c2f;
+    border-color: #3e4145;
+}
+
+body.dark-mode .alert-success {
+    color: #a7d9b3;
+    background-color: #1b352a;
+    border-color: #255036;
+}
+
+body.dark-mode .alert-danger {
+    color: #e5afb5;
+    background-color: #36191e;
+    border-color: #522a30;
+}
+
+body.dark-mode .alert-warning {
+    color: #e2d38a;
+    background-color: #352e12;
+    border-color: #564a19;
+}
+
+body.dark-mode .alert-info {
+    color: #9adae3;
+    background-color: #162c31;
+    border-color: #1d454c;
+}
+
+/* 알림 아이콘 */
+.alert i,
+.alert .alert-icon {
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* 인라인 알림 */
+.alert-inline {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 알림 애니메이션 */
+.alert-fade {
+    opacity: 0;
+    transition: opacity 0.15s linear;
+}
+
+.alert-fade.show {
+    opacity: 1;
+}
+
+/* 토스트 알림 (작은 알림 메시지) */
+.toast {
+    max-width: 350px;
+    overflow: hidden;
+    font-size: 0.875rem;
+    background-color: rgba(255, 255, 255, 0.85);
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    border-radius: 0.25rem;
+}
+
+.toast:not(:last-child) {
+    margin-bottom: 0.75rem;
+}
+
+.toast.showing {
+    opacity: 1;
+}
+
+.toast.show {
+    display: block;
+    opacity: 1;
+}
+
+.toast.hide {
+    display: none;
+}
+
+.toast-header {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    color: #6c757d;
+    background-color: rgba(255, 255, 255, 0.85);
+    background-clip: padding-box;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.toast-body {
+    padding: 0.75rem;
+}
+
+.toast-container {
+    position: fixed;
+    z-index: 1055;
+    padding: 0.75rem;
+}
+
+.toast-container--top-right {
+    top: 0;
+    right: 0;
+}
+
+.toast-container--top-left {
+    top: 0;
+    left: 0;
+}
+
+.toast-container--bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
+.toast-container--bottom-left {
+    bottom: 0;
+    left: 0;
+}

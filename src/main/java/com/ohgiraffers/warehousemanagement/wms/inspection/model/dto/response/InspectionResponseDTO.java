@@ -1,40 +1,38 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response;
 
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.Inspection;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.InspectionStatus;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.InspectionTransactionType;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class InspectionResponseDTO {
-    private Integer inspectionId;
+    private Long inspectionId;
     private Integer userId;
     private Integer transactionId = null;
-    private InspectionTransactionType transactionType;
+    private String transactionType;
     private Integer inspectionQuantity;
     private Integer acceptedQuantity;
     private Integer defectiveQuantity;
-    private InspectionStatus inspectionStatus;
+    private String inspectionStatus;
     private LocalDate inspectionDate;
     private LocalDateTime inspectionUpdatedAt;
 
     protected InspectionResponseDTO() {}
 
-    public InspectionResponseDTO(Integer inspectionId, Integer userId, Integer transactionId,
+    public InspectionResponseDTO(Long inspectionId, Integer userId, Integer transactionId,
                                  InspectionTransactionType transactionType, Integer inspectionQuantity,
                                  Integer acceptedQuantity, Integer defectiveQuantity, InspectionStatus inspectionStatus,
                                  LocalDate inspectionDate, LocalDateTime inspectionUpdatedAt) {
         this.inspectionId = inspectionId;
         this.userId = userId;
         this.transactionId = transactionId;
-        this.transactionType = transactionType;
+        this.transactionType = transactionType.getTransactionType();
         this.inspectionQuantity = inspectionQuantity;
         this.acceptedQuantity = acceptedQuantity;
         this.defectiveQuantity = defectiveQuantity;
-        this.inspectionStatus = inspectionStatus;
+        this.inspectionStatus = inspectionStatus.getInspectionStatus();
         this.inspectionDate = inspectionDate;
         this.inspectionUpdatedAt = inspectionUpdatedAt;
     }
@@ -43,20 +41,20 @@ public class InspectionResponseDTO {
         this.inspectionId = saveInspection.getInspectionId();
         this.userId = saveInspection.getUserId();
         this.transactionId = saveInspection.getTransactionId();
-        this.transactionType = saveInspection.getTransactionType();
+        this.transactionType = saveInspection.getTransactionType().getTransactionType();
         this.inspectionQuantity = saveInspection.getInspectionQuantity();
         this.acceptedQuantity = saveInspection.getAcceptedQuantity();
         this.defectiveQuantity = saveInspection.getDefectiveQuantity();
-        this.inspectionStatus = saveInspection.getInspectionStatus();
+        this.inspectionStatus = saveInspection.getInspectionStatus().getInspectionStatus();
         this.inspectionDate = saveInspection.getInspectionDate();
         this.inspectionUpdatedAt = saveInspection.getInspectionUpdatedAt();
     }
 
-    public Integer getInspectionId() {
+    public Long getInspectionId() {
         return inspectionId;
     }
 
-    public void setInspectionId(Integer inspectionId) {
+    public void setInspectionId(Long inspectionId) {
         this.inspectionId = inspectionId;
     }
 
@@ -76,12 +74,12 @@ public class InspectionResponseDTO {
         this.transactionId = transactionId;
     }
 
-    public InspectionTransactionType getTransactionType() {
+    public String getTransactionType() {
         return transactionType;
     }
 
     public void setTransactionType(InspectionTransactionType transactionType) {
-        this.transactionType = transactionType;
+        this.transactionType = transactionType.getTransactionType();
     }
 
     public Integer getInspectionQuantity() {
@@ -108,12 +106,12 @@ public class InspectionResponseDTO {
         this.defectiveQuantity = defectiveQuantity;
     }
 
-    public InspectionStatus getInspectionStatus() {
+    public String getInspectionStatus() {
         return inspectionStatus;
     }
 
     public void setInspectionStatus(InspectionStatus inspectionStatus) {
-        this.inspectionStatus = inspectionStatus;
+        this.inspectionStatus = inspectionStatus.getInspectionStatus();
     }
 
     public LocalDate getInspectionDate() {

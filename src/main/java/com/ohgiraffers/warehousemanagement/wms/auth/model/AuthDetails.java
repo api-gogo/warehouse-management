@@ -57,7 +57,7 @@ public class AuthDetails implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(part + "_" + role));
             }
         }
-        
+
         return authorities;
     }
 
@@ -80,11 +80,11 @@ public class AuthDetails implements UserDetails {
     }
 
     // 잠겨있는 계정을 확인하는 메서드
-    // 승인거부(REJECTED)나 퇴사(RESIGNED) 상태인 경우 계정 잠금 처리
+    // 블랙 상태인 경우 계정 잠금 처리, 승인거부는 잠금하지 않음
     @Override
     public boolean isAccountNonLocked() {
         String status = loginUserDTO.getUserStatus();
-        return !(UserStatus.승인거부.getStatus().equals(status) || UserStatus.퇴사.getStatus().equals(status));
+        return !UserStatus.블랙.getStatus().equals(status) && !UserStatus.퇴사.getStatus().equals(status);
     }
 
     // 탈퇴 계정 여부를 표현하는 메서드
@@ -94,13 +94,14 @@ public class AuthDetails implements UserDetails {
     }
 
     // 계정 비활성화 여부로 사용자가 사용할 수 없는 상태
-    // 승인대기, 휴직중, 재직중 상태인 경우만 활성화
+    // 승인대기, 휴직중, 재직중, 승인거부 상태인 경우만 활성화
     @Override
     public boolean isEnabled() {
         String status = loginUserDTO.getUserStatus();
         return UserStatus.승인대기.getStatus().equals(status) 
             || UserStatus.휴직중.getStatus().equals(status) 
-            || UserStatus.재직중.getStatus().equals(status);
+            || UserStatus.재직중.getStatus().equals(status)
+            || UserStatus.승인거부.getStatus().equals(status);
     }
 
     // id 반환

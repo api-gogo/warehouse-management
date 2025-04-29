@@ -1,8 +1,12 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
+import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
+import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesItemsRepository;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,20 +16,27 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesServiceImpl implements SalesService {
     private final SalesRepository salesRepository;
+    private final SalesItemsRepository salesItemsRepository;
+    private final ProductService productService;
 
     @Autowired
-    public SalesServiceImpl(SalesRepository salesRepository) {
+    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService) {
         this.salesRepository = salesRepository;
+        this.salesItemsRepository = salesItemsRepository;
+        this.productService = productService;
     }
 
     public List<SalesDTO> getAllSales() {
         // 비즈니스로직 아직 추가안함!!
         List<Sales> findAll = salesRepository.findAll();
         List<SalesDTO> salesLists = new ArrayList<>();
+
+        // 수주 상품 목록 Sales 엔티티에서 꺼냄
         for (Sales salesEntity : findAll) {
             SalesDTO salesDTO = new SalesDTO(
                     salesEntity.getSalesId(),
@@ -37,13 +48,16 @@ public class SalesServiceImpl implements SalesService {
                     salesEntity.getSalesCreatedAt(),
                     salesEntity.getSalesUpdatedAt()
             );
+
             salesLists.add(salesDTO);
         }
         return salesLists;
     }
 
     @Transactional
-    public SalesDTO createSales(SalesDTO salesDTO) {
+    public int createSales(SalesDTO salesDTO) {
+
+        // 수주 정보 저장
         Sales salesEntity = new Sales.Builder()
                 .storeId(salesDTO.getStoreId())
                 .userId(salesDTO.getUserId())
@@ -52,27 +66,46 @@ public class SalesServiceImpl implements SalesService {
                 .salesStatus(SalesStatus.PENDING)
                 .salesCreatedAt(LocalDateTime.now())
                 .build();
-        salesRepository.save(salesEntity);
+        Sales savedSales = salesRepository.save(salesEntity);
 
-        // 저장 후 상세페이지로 보여주기 때문에 dto로 다시 바꿔줬음
-        SalesDTO savedDTO = new SalesDTO(
-                salesEntity.getSalesId(),
-                salesEntity.getStoreId(),
-                salesEntity.getUserId(),
-                salesEntity.getSalesDate(),
-                salesEntity.getShippingDueDate(),
-                salesEntity.getSalesStatus(),
-                salesEntity.getSalesCreatedAt(),
-                salesEntity.getSalesUpdatedAt() == null ? null : salesEntity.getSalesUpdatedAt()
-        );
+        // 수주 리스트 저장
+        List<SalesItem> salesItemList = new ArrayList<>();
+        for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
+            SalesItem salesItem = new SalesItem.Builder()
+                    .salesId(savedSales)
+                    .productId(salesDTO.getProductIds().get(i))
+                    .salesItemsQuantity(salesDTO.getQuantity().get(i))
+                    .build();
+            salesItemList.add(salesItem);
+            salesItemsRepository.save(salesItem);
+        }
 
-        return savedDTO;
+        // 저장 후 상세페이지 보여주기 위해 ID만 반환
+        int salesId = savedSales.getSalesId();
+
+        return salesId;
     }
 
     public SalesDTO getSalesById(Integer salesId) {
         // 익셉션 전역 핸들러 짜야됨
         Sales findSales = salesRepository.findById(salesId).orElseThrow(
                 () -> new NullPointerException("수주 데이터 없음"));
+
+        List<String> productNames = new ArrayList<>();
+        List<Integer> pricePerBoxList = new ArrayList<>();
+        List<Integer> quantityList = new ArrayList<>();
+        List<Integer> totalPriceList = new ArrayList<>();
+
+        for (SalesItem item : findSales.getSalesItems()) {
+            Product product = productService.findProductById(item.getProductId());
+
+            productNames.add(product.getProductName());
+            pricePerBoxList.add(product.getPricePerBox());
+            quantityList.add(item.getSalesItemsQuantity());
+            totalPriceList.add(product.getPricePerBox() * item.getSalesItemsQuantity());
+        }
+
+        List<Integer> quantity = findSales.getSalesItems().stream().map(SalesItem::getSalesItemsQuantity).collect(Collectors.toList());
 
         SalesDTO findDTO = new SalesDTO(
                 findSales.getSalesId(),
@@ -84,6 +117,12 @@ public class SalesServiceImpl implements SalesService {
                 findSales.getSalesCreatedAt(),
                 findSales.getSalesUpdatedAt() == null ? null : findSales.getSalesUpdatedAt()
         );
+
+        findDTO.setProductNames(productNames);
+        findDTO.setQuantity(quantity);
+        findDTO.setPricePerBox(pricePerBoxList);
+        findDTO.setTotalPrice(totalPriceList);
+
         return findDTO;
     }
 
@@ -108,18 +147,47 @@ public class SalesServiceImpl implements SalesService {
         if (!Objects.equals(salesDTO.getShippingDueDate(), findSales.getShippingDueDate())) {
             findSales.setShippingDueDate(salesDTO.getShippingDueDate());
         }
-        
-        if (!Objects.equals(salesDTO.getSalesStatus(), findSales.getSalesStatus())) {
-            findSales.setSalesStatus(salesDTO.getSalesStatus());
-        }
 
         // 수정이 일어났으니 무조건 업데이트시킴
         findSales.setSalesUpdatedAt(LocalDateTime.now());
-
         Sales savedEntity = salesRepository.save(findSales);
+
+        // 수주 물품 목록 삭제하고
+        salesItemsRepository.deleteBySalesId(findSales);
+        // 새로등록할거임
+        List<SalesItem> newItems = new ArrayList<>();
+        for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
+            SalesItem item = new SalesItem.Builder()
+                    .salesId(savedEntity)
+                    .productId(salesDTO.getProductIds().get(i))
+                    .salesItemsQuantity(salesDTO.getQuantity().get(i))
+                    .build();
+            newItems.add(item);
+        }
+        salesItemsRepository.saveAll(newItems);
 
         salesDTO.setSalesUpdatedAt(savedEntity.getSalesUpdatedAt());
         return salesDTO;
+    }
+
+    @Transactional
+    public boolean updateStatusSales(Integer salesId, SalesStatus status) {
+        Sales findSales = salesRepository.findById(salesId).orElseThrow(
+                () -> new NullPointerException("상태를 변경할 수주 데이터 없음"));
+
+        // 등록상태에서만 승인이나 취소 가능
+        if (findSales.getSalesStatus() != SalesStatus.PENDING) {
+            return false; // InvalidTransactionException 처리필요
+        }
+
+        // 승인이랑 취소 상태로만 변경 가능
+        if (status != SalesStatus.APPROVED && status != SalesStatus.CANCELED) {
+            return false; // InvalidTransactionException 처리필요
+        }
+
+        findSales.setSalesStatus(status);
+        findSales.setSalesUpdatedAt(LocalDateTime.now());
+        return true;
     }
 
     @Override
