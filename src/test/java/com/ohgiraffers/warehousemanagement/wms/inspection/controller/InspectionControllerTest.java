@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
-@Rollback
 class InspectionControllerTest {
     private static final Logger log = LoggerFactory.getLogger(InspectionControllerTest.class);
     private final InspectionServiceImpl inspectionService;
@@ -135,6 +133,32 @@ class InspectionControllerTest {
     void createMultiInspection() {
         for(int i = 1; i <= 43; i++) {
             InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, i, i, 0, InspectionStatus.OK);
+            if(i % 2 == 0) {
+                dto.setTransactionType(InspectionTransactionType.PURCHASE);
+                dto.setTransactionId(1);
+            }
+            if(i % 3 == 0) {
+                dto.setTransactionType(InspectionTransactionType.SALES);
+                dto.setTransactionId(2);
+            }
+            if(i % 5 == 0) {
+                dto.setTransactionType(InspectionTransactionType.STORAGE);
+                dto.setTransactionId(3);
+            }
+            if(i % 7 == 0) {
+                dto.setTransactionType(InspectionTransactionType.SHIPMENT);
+                dto.setTransactionId(4);
+            }
+            if(i % 4 == 0) {
+                dto.setInspectionStatus(InspectionStatus.DEFECTIVE);
+            }
+            if(i % 6 == 0) {
+                dto.setInspectionStatus(InspectionStatus.HOLD);
+            }
+            if(i % 3 == 2) {
+                dto.setDefectiveQuantity(i / 4);
+                dto.setAcceptedQuantity(dto.getInspectionQuantity() - (i / 4));
+            }
 
 
             InspectionResponseDTO inspection = inspectionService.createInspection(dto);
