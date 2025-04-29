@@ -6,6 +6,7 @@ import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.Insp
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,9 +48,9 @@ class InspectionControllerTest {
     @Test
     @DisplayName("메인 페이지 조회 테스트")
     void getAllInspections() {
-        Page<Inspection> allInspection = inspectionService.getAllInspection(1, 10);
+        Page<InspectionResponseDTO> allInspection = inspectionService.getAllInspection(1, 10);
 
-        log.info("Inspection\n{}", allInspection.getContent());
+        log.info("조회된 Inspection 목록\n{}", allInspection.getContent());
 
         assertTrue(allInspection.getContent().size() <= 10, "페이징한 개수는 10개보다 작아야 합니다.");
     }
@@ -55,11 +58,41 @@ class InspectionControllerTest {
     @Test
     @DisplayName("태그로 조회 테스트")
     void getAllTagInspections() {
-        Page<Inspection> allTagInspection = inspectionService.getAllInspectionByTag("INSPECTION", 1, 10);
+        Page<InspectionResponseDTO> allTagInspection = inspectionService.getAllInspectionByTag("INSPECTION", 1, 10);
 
-        log.info("Inspection\n{}", allTagInspection.getContent());
+        log.info("조회된 Inspection 목록\n{}", allTagInspection.getContent());
 
         assertTrue(allTagInspection.getContent().size() <= 10, "페이징한 개수는 10개보다 작아야 합니다.");
+    }
+
+    @Test
+    @DisplayName("없는 태그 조회 테스트 [예외 발생]")
+    void getAllTagInspections_NotFound() {
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            inspectionService.getAllInspectionByTag("없는태그",1, 10);
+        });
+
+        Assertions.assertEquals("존재하지 않는 유형입니다!", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("단일 조회 테스트")
+    void getInspectionById() {
+        InspectionResponseDTO inspection = inspectionService.getInspectionById(94);
+        log.info("조회된 inspection : {}", inspection);
+
+        Assertions.assertEquals(43, inspection.getInspectionQuantity());
+    }
+
+    @Test
+    @DisplayName("단일 조회 테스트[예외 발생]")
+    void getInspectionById_NotFound() {
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            inspectionService.getInspectionById(9999);
+        });
+
+        Assertions.assertEquals("존재하지 않는 검수 ID입니다! \n" +
+                "검색 ID : 9999", exception.getMessage());
     }
 
     @Test

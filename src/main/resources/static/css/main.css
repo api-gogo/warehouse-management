@@ -21,6 +21,7 @@
 @import 'layouts/navigation.css';
 @import 'layouts/default-layout.css';
 @import 'layouts/auth-layout.css';
+@import 'layouts/scrollbar.css';
 
 /* Utilities */
 @import 'utilities/spacing.css';

@@ -6,16 +6,16 @@
   <title>사용자 관리</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/common.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='user'">
-    <div class="admin-container">
-      <div class="admin-header">
-        <h1 class="admin-title">사용자 관리</h1>
-        <div class="admin-actions">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">사용자 관리</h1>
+        <div class="common-actions">
           <div class="search-box">
             <input type="text" id="userSearch" placeholder="이름, 사번, 전화번호 검색..." class="search-input" th:value="${search}">
             <button class="search-button">
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div class="admin-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'all'}">
+      <div class="common-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'all'}">
         <button class="tab-button" th:classappend="${currentStatus == 'all' ? 'active' : ''}" data-status="all">전체</button>
         <button class="tab-button" th:classappend="${currentStatus == 'pending' ? 'active' : ''}" data-status="pending">승인 대기 <span class="badge" th:text="${pendingCount}"></span></button>
         <button class="tab-button" th:classappend="${currentStatus == 'active' ? 'active' : ''}" data-status="active">재직중</button>
@@ -45,7 +45,7 @@
         <button class="tab-button" th:classappend="${currentStatus == 'resigned' ? 'active' : ''}" data-status="resigned">퇴사</button>
       </div>
 
-      <div class="admin-content">
+      <div class="common-content">
         <div class="table-responsive">
           <table class="data-table">
             <thead>
@@ -79,6 +79,11 @@
               <td class="actions">
                 <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
                   <i class="fas fa-eye"></i>
+                </a>
+                <a th:if="${user.userStatus == '재직중' || user.userStatus == '휴직중'}" 
+                   th:href="@{/admin/users/{id}/edit(id=${user.userId})}" 
+                   class="action-button" title="수정">
+                  <i class="fas fa-edit"></i>
                 </a>
                 <button th:if="${user.userStatus == '승인대기'}" class="action-button approve-button" th:data-id="${user.userId}" title="승인">
                   <i class="fas fa-check"></i>
@@ -212,9 +217,8 @@
         approveButtons.forEach(button => {
           button.addEventListener('click', function() {
             const userId = this.dataset.id;
-            if (confirm('해당 사용자의 가입을 승인하시겠습니까?')) {
-              window.location.href = `/admin/users/${userId}`;
-            }
+            // 상세 페이지로 리다이렉트하여 승인 정보 입력하도록 함
+            window.location.href = `/admin/users/${userId}`;
           });
         });
 

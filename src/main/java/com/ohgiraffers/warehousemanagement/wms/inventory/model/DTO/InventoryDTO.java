@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO;
 
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
