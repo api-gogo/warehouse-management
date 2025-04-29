@@ -51,7 +51,7 @@ public class InspectionController {
 
     // 검수 등록
     @PostMapping("/create")
-    public String createInspection(@Validated @RequestBody InspectionRequestDTO requestDTO, RedirectAttributes ra) {
+    public String createInspection(@Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
         log.info("POST : /inspections");
         log.info("inspectionRequestDTO : {}", requestDTO);
 
@@ -68,7 +68,7 @@ public class InspectionController {
 
     // 검수 상세 보기
     @GetMapping("/{inspectionId}")
-    public String getInspectionById(@PathVariable int inspectionId, Model model) {
+    public String getInspectionById(@PathVariable Long inspectionId, Model model) {
         log.info("GET : /inspections/{}", inspectionId);
 
         InspectionResponseDTO responseDTO = inspectionServiceImpl.getInspectionById(inspectionId);
@@ -92,7 +92,7 @@ public class InspectionController {
 
     // 검수 수정 페이지 보기
     @GetMapping("/update/{inspectionId}")
-    public String updateInspection(@PathVariable int inspectionId, Model model) {
+    public String updateInspection(@PathVariable Long inspectionId, Model model) {
         log.info("GET : /inspections/update/{}", inspectionId);
 
         InspectionResponseDTO responseDTO = inspectionServiceImpl.getInspectionById(inspectionId);
@@ -104,7 +104,7 @@ public class InspectionController {
 
     // 검수 수정하기
     @PostMapping("/update/{inspectionId}")
-    public String updateInspection(@PathVariable int inspectionId, @Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
+    public String updateInspection(@PathVariable long inspectionId, @Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
         log.info("POST : /inspections/update/{}", inspectionId);
         log.info("inspectionRequestDTO : {}", requestDTO);
 

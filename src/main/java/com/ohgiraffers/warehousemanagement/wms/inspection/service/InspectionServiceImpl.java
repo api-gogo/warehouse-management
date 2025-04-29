@@ -27,7 +27,7 @@ public class InspectionServiceImpl implements InspectionService {
     @Override
     @Transactional
     public InspectionResponseDTO createInspection(InspectionRequestDTO requestDTO) {
-        if(requestDTO.getTransactionId() != null && requestDTO.getTransactionType().equals(InspectionTransactionType.INSPECTION)) {
+        if(requestDTO.getTransactionId() != null && !requestDTO.getTransactionType().equals(InspectionTransactionType.INSPECTION)) {
             Optional<Inspection> findInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
                     requestDTO.getTransactionType(), requestDTO.getTransactionId()
             );
@@ -62,7 +62,7 @@ public class InspectionServiceImpl implements InspectionService {
             throw new IllegalArgumentException("존재하지 않는 유형입니다!");
     }
 
-    public InspectionResponseDTO getInspectionById(int inspectionId) {
+    public InspectionResponseDTO getInspectionById(Long inspectionId) {
         Optional<Inspection> findInspection = inspectionRepository.findById(inspectionId);
         if (findInspection.isPresent()) {
             return new InspectionResponseDTO(findInspection.get());
@@ -90,14 +90,13 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     @Transactional
-    public InspectionResponseDTO updateInspection(int inspectionId, InspectionRequestDTO requestDTO) {
+    public InspectionResponseDTO updateInspection(Long inspectionId, InspectionRequestDTO requestDTO) {
         Optional<Inspection> findInspection = inspectionRepository.findById(inspectionId);
         if (findInspection.isPresent()) {
             Inspection inspection = findInspection.get();
             Inspection dtoToInspection = new Inspection(requestDTO);
 
             dtoToInspection.setInspectionId(inspection.getInspectionId());
-            dtoToInspection.setInspectionDate(inspection.getInspectionDate());
             dtoToInspection.setInspectionUpdatedAt(inspection.getInspectionUpdatedAt());
 
             if(inspection.equals(dtoToInspection))
