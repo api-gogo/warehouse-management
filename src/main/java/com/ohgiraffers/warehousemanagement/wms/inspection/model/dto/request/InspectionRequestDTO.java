@@ -2,33 +2,37 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request;
 
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
 public class InspectionRequestDTO {
-    @NotBlank(message = "검수자는 필수입니다!")
+    @NotNull(message = "검수자는 필수입니다!")
     private Integer userId;
 
     private Integer transactionId = null;
 
-    @NotBlank(message = "검수 유형은 필수입니다!")
+    @NotNull(message = "검수 유형은 필수입니다!")
+    @Enumerated(EnumType.STRING)
     private InspectionTransactionType transactionType;
 
-    @NotBlank(message = "검수 수량은 필수입니다!")
+    @NotNull(message = "검수 수량은 필수입니다!")
     @Min(value = 1, message = "수량은 1개 이상이어야 합니다!")
     private Integer inspectionQuantity;
 
-    @NotBlank(message = "정상 수량은 필수입니다!")
+    @NotNull(message = "정상 수량은 필수입니다!")
     @Min(value = 0, message = "수량은 0개 이상이어야 합니다!")
     private Integer acceptedQuantity;
 
-    @NotBlank(message = "불량 수량은 필수입니다!")
+    @NotNull(message = "불량 수량은 필수입니다!")
     @Min(value = 0, message = "수량은 0개 이상이어야 합니다!")
     private Integer defectiveQuantity;
 
-    @NotBlank(message = "검수 상태는 필수입니다!")
+    @NotNull(message = "검수 상태는 필수입니다!")
+    @Enumerated(EnumType.STRING)
     private InspectionStatus inspectionStatus;
 
     protected InspectionRequestDTO() {}

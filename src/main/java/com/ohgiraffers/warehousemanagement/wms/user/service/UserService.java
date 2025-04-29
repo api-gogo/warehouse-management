@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.user.service;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
@@ -106,5 +107,17 @@ public class UserService {
         user.setUserUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
+    }
+
+    public LogUserDTO getLogUserByUserId(Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        return user.map(u -> new LogUserDTO(
+                u.getUserId(),
+                u.getUserName(),
+                u.getUserPart().getPart(),
+                u.getUserRole().getRole(),
+                u.getUserStatus().getStatus()
+        )).orElse(null);
     }
 }

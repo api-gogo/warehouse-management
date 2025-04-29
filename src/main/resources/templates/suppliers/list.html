@@ -31,10 +31,10 @@
 
       <!-- 탭 메뉴 -->
       <div class="common-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'active'}">
-        <button class="tab-button" th:classappend="${currentStatus == 'active' || currentStatus == 'all' ? 'active' : ''}" data-status="active">전체</button>
+        <button class="tab-button" th:classappend="${currentStatus == 'active' ? 'active' : ''}" data-status="active">활성 거래처</button>
         <!-- 발주_관리자와 통합_관리자만 삭제됨 탭 표시 -->
         <button class="tab-button" th:classappend="${currentStatus == 'deleted' ? 'active' : ''}" data-status="deleted" 
-                sec:authorize="hasAnyAuthority('발주_관리자', '통합_관리자')">삭제됨</button>
+                sec:authorize="hasAnyAuthority('발주_관리자', '통합_관리자')">삭제된 거래처</button>
       </div>
 
       <div class="common-content">
@@ -79,7 +79,10 @@
             <tr th:if="${#lists.isEmpty(suppliers)}">
               <td colspan="8" class="no-data">
                 <span th:if="${param.status != null && param.status[0] == 'deleted'}">삭제된 거래처가 없습니다.</span>
-                <span th:unless="${param.status != null && param.status[0] == 'deleted'}">조회된 거래처가 없습니다.</span>
+                <span th:unless="${param.status != null && param.status[0] == 'deleted'}">
+                  <span th:if="${search != null && search != ''}">검색 조건에 맞는 거래처가 없습니다.</span>
+                  <span th:unless="${search != null && search != ''}">활성 상태의 거래처가 없습니다.</span>
+                </span>
               </td>
             </tr>
             </tbody>
@@ -129,8 +132,9 @@
             // 상태값 가져오기
             const status = this.dataset.status;
             
-            // 페이지 이동
-            window.location.href = `/suppliers?status=${status}`;
+            // 페이지 이동 (검색어가 있는 경우 검색어도 유지)
+            const searchTerm = document.getElementById('supplierSearch').value.trim();
+            window.location.href = `/suppliers?status=${status}${searchTerm ? `&search=${searchTerm}` : ''}`;
           });
         });
 

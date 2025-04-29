@@ -32,7 +32,7 @@ public class Supplier {
     private LocalDateTime supplierCreatedAt;
 
     @Column(name = "supplier_updated_at")
-    private LocalDateTime supplierUpdateAt;
+    private LocalDateTime supplierUpdatedAt;
 
     @Column(name = "supplier_deleted_at")
     private LocalDateTime supplierDeletedAt;
@@ -80,8 +80,8 @@ public class Supplier {
         return supplierCreatedAt;
     }
 
-    public LocalDateTime getSupplierUpdateAt() {
-        return supplierUpdateAt;
+    public LocalDateTime getSupplierUpdatedAt() {
+        return supplierUpdatedAt;
     }
 
     public LocalDateTime getSupplierDeletedAt() {
@@ -108,8 +108,8 @@ public class Supplier {
         this.supplierManagerEmail = supplierManagerEmail;
     }
 
-    public void setSupplierUpdateAt(LocalDateTime supplierUpdateAt) {
-        this.supplierUpdateAt = supplierUpdateAt;
+    public void setSupplierUpdatedAt(LocalDateTime supplierUpdatedAt) {
+        this.supplierUpdatedAt = supplierUpdatedAt;
     }
 
     public void setSupplierDeletedAt(LocalDateTime supplierDeletedAt) {

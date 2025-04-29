@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WMS - 출고 반품 등록</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+  <style>
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-right: 1px solid #dee2e6;
+    }
+
+    .sidebar-header {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-menu a {
+      text-decoration: none;
+      color: #212529;
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 5px;
+    }
+
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      background-color: #e9ecef;
+    }
+
+    .sidebar-menu i {
+      margin-right: 10px;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    .required-field::after {
+      content: "*";
+      color: red;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+<!-- 사이드바 -->
+<div class="sidebar">
+  <div class="sidebar-header">WMS System</div>
+  <ul class="sidebar-menu">
+    <li><a href="#"><i class="bi bi-speedometer2"></i> 대시보드</a></li>
+    <li><a href="#"><i class="bi bi-box-seam"></i> 재고 관리</a></li>
+    <li><a href="#"><i class="bi bi-arrow-down-square"></i> 입고 관리</a></li>
+    <li><a href="#"><i class="bi bi-arrow-up-square"></i> 수주 관리</a></li>
+    <li><a href="#"><i class="bi bi-clipboard-check"></i> 검수 관리</a></li>
+    <li><a href="#"><i class="bi bi-building"></i> 공급업체 관리</a></li>
+    <li><a href="#"><i class="bi bi-credit-card"></i> 카테고리 관리</a></li>
+    <li><a href="#"><i class="bi bi-arrow-bar-right"></i> 출고 관리</a></li>
+    <li><a href="#" class="active"><i class="bi bi-arrow-repeat"></i> 반품 관리</a></li>
+    <li><a href="#"><i class="bi bi-people"></i> 사용자 관리</a></li>
+    <li><a href="#"><i class="bi bi-shop"></i> 매장 관리</a></li>
+    <li><a href="#"><i class="bi bi-file-earmark-text"></i> 보고서</a></li>
+    <li><a href="#"><i class="bi bi-gear"></i> 설정</a></li>
+  </ul>
+</div>
+
+<!-- 메인 콘텐츠 -->
+<div class="main-content">
+  <div class="page-header">
+    <h2>출고 반품 등록</h2>
+    <a th:href="@{/returns/outbound}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> 목록으로
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">반품 정보 입력</h5>
+      <p class="card-text text-muted">출고된 상품의 반품 정보를 입력해주세요.</p>
+
+      <form th:action="@{/returns/outbound/regist}" method="post">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="shipmentId" class="form-label required-field">출고 번호</label>
+            <input type="text" class="form-control" id="shipmentId" name="shipmentId" required>
+            <div class="form-text">출고 번호를 입력하면 출고 정보가 자동으로 조회됩니다.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="lotNumber" class="form-label required-field">로트 번호</label>
+            <input type="text" class="form-control" id="lotNumber" name="lotNumber" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="storeId" class="form-label required-field">매장</label>
+            <select class="form-select" id="storeId" name="storeId" required>
+              <option value="" selected disabled>매장 선택</option>
+              <option value="1">서울 매장</option>
+              <option value="2">대구 매장</option>
+              <option value="3">부산 매장</option>
+              <option value="4">인천 매장</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="userId" class="form-label required-field">담당자</label>
+            <select class="form-select" id="userId" name="userId" required>
+              <option value="" selected disabled>담당자 선택</option>
+              <option value="1">김담당</option>
+              <option value="2">이담당</option>
+              <option value="3">박담당</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="returnShipmentQuantity" class="form-label required-field">반품 수량</label>
+            <input type="number" class="form-control" id="returnShipmentQuantity" name="returnShipmentQuantity" min="1" required>
+          </div>
+          <div class="col-md-6">
+            <label for="returnShipmentStatus" class="form-label required-field">반품 상태</label>
+            <select class="form-select" id="returnShipmentStatus" name="returnShipmentStatus" required>
+              <option value="PENDING" selected>반품대기</option>
+              <option value="PROCESSING">반품중</option>
+              <option value="COMPLETED">반품완료</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="returnShipmentContent" class="form-label required-field">반품 사유</label>
+          <textarea class="form-control" id="returnShipmentContent" name="returnShipmentContent" rows="3" required></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <a th:href="@{/returns/outbound}" class="btn btn-outline-secondary">취소</a>
+          <button type="submit" class="btn btn-primary">등록</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
