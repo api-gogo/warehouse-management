@@ -14,6 +14,15 @@ public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
     Optional<Supplier> findBySupplierId(Integer supplierId);
     boolean existsBySupplierId(Integer supplierId);
 
+    Optional<Supplier> findBySupplierName(String supplierName);
+    boolean existsBySupplierName(String supplierName);
+
+    Optional<Supplier> findBySupplierManagerPhone(String supplierManagerPhone);
+    boolean existsBySupplierManagerPhone(String supplierManagerPhone);
+
+    Optional<Supplier> findBySupplierManagerEmail(String supplierManagerEmail);
+    boolean existsBySupplierManagerEmail(String supplierManagerEmail);
+
     @Query("SELECT s FROM Supplier s " +
             "WHERE (s.isDeleted = :status) " +
             "AND (:search IS NULL OR " +

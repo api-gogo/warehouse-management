@@ -5,7 +5,8 @@ public enum UserStatus {
     승인거부("승인거부"),
     재직중("재직중"),
     휴직중("휴직중"),
-    퇴사("퇴사");
+    퇴사("퇴사"),
+    블랙("블랙");
 
     private String status;
 

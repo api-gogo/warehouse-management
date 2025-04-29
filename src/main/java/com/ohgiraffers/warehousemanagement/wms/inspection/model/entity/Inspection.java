@@ -59,7 +59,7 @@ public class Inspection {
 
     public Inspection(Integer userId, Integer transactionId, InspectionTransactionType transactionType,
                       Integer inspectionQuantity, Integer acceptedQuantity, Integer defectiveQuantity,
-                      InspectionStatus inspectionStatus) {
+                      InspectionStatus inspectionStatus, LocalDate inspectionDate) {
         this.userId = userId;
         this.transactionId = transactionId;
         this.transactionType = transactionType;
@@ -67,7 +67,7 @@ public class Inspection {
         this.acceptedQuantity = acceptedQuantity;
         this.defectiveQuantity = defectiveQuantity;
         this.inspectionStatus = inspectionStatus;
-        this.inspectionDate = LocalDate.now();
+        this.inspectionDate = inspectionDate;
     }
 
     public Inspection(InspectionRequestDTO dto) {
@@ -78,7 +78,7 @@ public class Inspection {
         this.acceptedQuantity = dto.getAcceptedQuantity();
         this.defectiveQuantity = dto.getDefectiveQuantity();
         this.inspectionStatus = dto.getInspectionStatus();
-        this.inspectionDate = LocalDate.now();
+        this.inspectionDate = dto.getInspectionDate();
     }
 
 

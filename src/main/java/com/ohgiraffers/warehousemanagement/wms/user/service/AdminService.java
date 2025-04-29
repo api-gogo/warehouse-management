@@ -26,34 +26,39 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
-    public Page<UserDTO> findUsers(String search, String status, Pageable pageable) {
+    public Page<UserDTO> getUsersByPartRoleAndStatus(String search, String partTab, String roleTab, String statusTab, Pageable pageable) {
         UserStatus userStatus = null;
+        UserRole userRole = null;
+        UserPart userPart = null;
         
         // 상태값 변환 로직
-        if (status != null && !status.equals("all")) {
-            switch (status) {
-                case "pending":
-                    userStatus = UserStatus.승인대기;
-                    break;
-                case "active":
-                    userStatus = UserStatus.재직중;
-                    break;  
-                case "inactive":
-                    userStatus = UserStatus.휴직중;
-                    break;
-                case "rejected":
-                    userStatus = UserStatus.승인거부;
-                    break;
-                case "resigned":
-                    userStatus = UserStatus.퇴사;
-                    break;
-                default:
-                    // 기본값은 null로 모든 상태 조회
-                    break;
+        if (statusTab != null && !statusTab.equals("all")) {
+            try {
+                userStatus = UserStatus.valueOf(statusTab);
+            } catch (IllegalArgumentException e) {
+                // 기본값은 null로 모든 상태 조회
             }
         }
         
-        Page<User> userPage = userRepository.findByStatusAndSearch(userStatus, search, pageable);
+        // 역할값 변환 로직
+        if (roleTab != null && !roleTab.equals("all")) {
+            try {
+                userRole = UserRole.valueOf(roleTab);
+            } catch (IllegalArgumentException e) {
+                // 기본값은 null로 모든 역할 조회
+            }
+        }
+        
+        // 부서값 변환 로직
+        if (partTab != null && !partTab.equals("all")) {
+            try {
+                userPart = UserPart.valueOf(partTab);
+            } catch (IllegalArgumentException e) {
+                // 기본값은 null로 모든 부서 조회
+            }
+        }
+        
+        Page<User> userPage = userRepository.findByPartRoleStatusAndSearch(userPart, userRole, userStatus, search, pageable);
 
         return userPage.map(user -> new UserDTO(
                 user.getUserId(),
@@ -71,7 +76,7 @@ public class AdminService {
         ));
     }
 
-    public Page<UserDTO> findPendingUsers(String search, Pageable pageable) {
+    public Page<UserDTO> getPendingUsers(String search, Pageable pageable) {
         Page<User> userPage = userRepository.findByStatusAndSearch(UserStatus.승인대기, search, pageable);
 
         return userPage.map(user -> new UserDTO(
@@ -175,7 +180,6 @@ public class AdminService {
 
         user.setUserStatus(UserStatus.승인거부);
         user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
     }
@@ -201,7 +205,6 @@ public class AdminService {
         for (User user : users) {
             user.setUserStatus(UserStatus.승인거부);
             user.setUserUpdatedAt(now);
-            user.setUserDeletedAt(now);
         }
 
         userRepository.saveAll(users);
@@ -217,7 +220,6 @@ public class AdminService {
 
         user.setUserStatus(UserStatus.휴직중);
         user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
     }
@@ -231,7 +233,6 @@ public class AdminService {
 
         user.setUserStatus(UserStatus.재직중);
         user.setUserUpdatedAt(LocalDateTime.now());
-        user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
     }
@@ -248,5 +249,49 @@ public class AdminService {
         user.setUserDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
+    }
+    
+    /**
+     * 사용자를 블랙 상태로 변경
+     * 지속적으로 부적절한 행동을 하는 사용자를 완전히 차단하기 위한 기능
+     */
+    @Transactional
+    public boolean blacklistUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.블랙);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        user.setUserDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+    
+    /**
+     * 사용자의 상태가 승인거부인 경우 승인대기로 변경
+     * 관리자가 수동으로 승인거부된 사용자에게 재승인 기회를 주기 위한 기능
+     */
+    @Transactional
+    public boolean resetToApprovalPending(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getUserStatus() != UserStatus.승인거부) {
+            return false;
+        }
+
+        user.setUserStatus(UserStatus.승인대기);
+        user.setUserUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
+    
+    /**
+     * 반복적으로 승인을 거부당하는 사용자를 확인하는 메서드
+     * 동일 사용자가 너무 많은 재승인 시도를 하는 경우 블랙리스트 대상자로 표시할 수 있음
+     */
+    public int countRejectionHistory(Integer userId) {
+        // 여기서는 간단하게 구현하지만, 실제로는 승인 거부 이력을 저장하고 조회하는 로직 필요
+        return 0; // 향후 확장을 위한 메서드 스텁
     }
 }

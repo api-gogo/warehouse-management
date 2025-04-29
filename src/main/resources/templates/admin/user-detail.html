@@ -54,7 +54,8 @@
                     th:classappend="${user.userStatus == '재직중' ? 'status-active' :
                                     (user.userStatus == '승인대기' ? 'status-pending' :
                                     (user.userStatus == '승인거부' ? 'status-rejected' :
-                                    (user.userStatus == '휴직중' ? 'status-inactive' : 'status-resigned')))}"
+                                    (user.userStatus == '휴직중' ? 'status-inactive' : 
+                                    (user.userStatus == '블랙' ? 'status-blacklisted' : 'status-resigned'))))}"
                     th:text="${user.userStatus}">재직중</span>
             </div>
           </div>
@@ -159,14 +160,14 @@
                       <label class="form-label">승인 시 부서</label>
                       <select class="form-select" id="approvalPartSelect">
                         <option value="통합">통합</option>
-                        <option value="입고">입고</option>
-                        <option value="출고">출고</option>
-                        <option value="재고">재고</option>
-                        <option value="검수">검수</option>
-                        <option value="반품">반품</option>
-                        <option value="발주">발주</option>
-                        <option value="수주">수주</option>
-                        <option value="상품">상품</option>
+                        <option value="입고" th:selected="${user.userPart == '입고'}">입고</option>
+                        <option value="출고" th:selected="${user.userPart == '출고'}">출고</option>
+                        <option value="재고" th:selected="${user.userPart == '재고'}">재고</option>
+                        <option value="검수" th:selected="${user.userPart == '검수'}">검수</option>
+                        <option value="반품" th:selected="${user.userPart == '반품'}">반품</option>
+                        <option value="발주" th:selected="${user.userPart == '발주'}">발주</option>
+                        <option value="수주" th:selected="${user.userPart == '수주'}">수주</option>
+                        <option value="상품" th:selected="${user.userPart == '상품'}">상품</option>
                       </select>
                     </div>
                   </div>
@@ -174,9 +175,9 @@
                     <div class="form-group field-role">
                       <label class="form-label">승인 시 직책</label>
                       <select class="form-select" id="approvalRoleSelect">
-                        <option value="사원">사원</option>
-                        <option value="매니저">매니저</option>
-                        <option value="관리자">관리자</option>
+                        <option value="사원" th:selected="${user.userRole == '사원'}">사원</option>
+                        <option value="매니저" th:selected="${user.userRole == '매니저'}">매니저</option>
+                        <option value="관리자" th:selected="${user.userRole == '관리자'}">관리자</option>
                       </select>
                     </div>
                   </div>
@@ -209,9 +210,23 @@
                 <i class="fas fa-check-circle me-2"></i>복직 처리
               </button>
               
+              <!-- 승인거부 상태일 때 버튼들 -->
+              <button th:if="${user.userStatus == '승인거부'}" class="btn btn-success reset-to-pending-button" th:data-id="${user.userId}">
+                <i class="fas fa-redo me-2"></i>승인대기로 변경
+              </button>
+              <button th:if="${user.userStatus == '승인거부'}" class="btn btn-danger blacklist-button" th:data-id="${user.userId}">
+                <i class="fas fa-ban me-2"></i>영구 차단
+              </button>
+              
               <!-- 재직중/휴직중 공통 버튼 -->
               <button th:if="${user.userStatus == '휴직중' || user.userStatus == '재직중'}" class="btn btn-danger resign-button" th:data-id="${user.userId}">
                 <i class="fas fa-times-circle me-2"></i>퇴사 처리
+              </button>
+              
+              <!-- 문제 사용자에 대한 블랙리스트 처리 버튼 (재직중, 휴직중, 승인대기 상태) -->
+              <button th:if="${user.userStatus == '재직중' || user.userStatus == '휴직중' || user.userStatus == '승인대기'}" 
+                      class="btn btn-dark blacklist-button" th:data-id="${user.userId}">
+                <i class="fas fa-ban me-2"></i>영구 차단
               </button>
             </div>
           </div>
@@ -364,6 +379,36 @@
               const form = document.createElement('form');
               form.method = 'POST';
               form.action = `/admin/users/${userId}/resign`;
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        }
+        
+        // 영구 차단(블랙리스트) 처리 버튼
+        const blacklistButtons = document.querySelectorAll('.blacklist-button');
+        blacklistButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('주의: 해당 사용자를 영구 차단하시겠습니까? 이 작업은 되돌릴 수 없습니다.\n영구 차단된 사용자는 로그인이 불가능합니다.')) {
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/blacklist`;
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        });
+        
+        // 승인대기로 변경 버튼
+        const resetToPendingButton = document.querySelector('.reset-to-pending-button');
+        if (resetToPendingButton) {
+          resetToPendingButton.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('승인 거부된 사용자를 승인대기 상태로 변경하시겠습니까?\n사용자는 정보를 수정하여 재승인을 요청할 수 있습니다.')) {
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/reset-to-pending`;
               document.body.appendChild(form);
               form.submit();
             }
