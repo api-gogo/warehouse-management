@@ -25,7 +25,7 @@ public enum InspectionTransactionType {
 
     @Override
     public String toString() {
-        return "검수 유형: " + transactionType;
+        return transactionType;
     }
 
     /**
