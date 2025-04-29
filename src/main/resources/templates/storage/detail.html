@@ -1,0 +1,17 @@
+<!-- detail.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>입고 상세</title>
+</head>
+<body>
+<h1>입고 상세</h1>
+<p>ID: <span th:text="${storage.storageId}"></span></p>
+<p>발주 ID: <span th:text="${storage.purchaseId}"></span></p>
+<p>입고 상태: <span th:text="${storage.storageStatus}"></span></p>
+<p>입고일: <span th:text="${storage.storageDate}"></span></p>
+<p>입고 사유: <span th:text="${storage.storageReason}"></span></p>
+<a th:href="@{/storage/list}">목록으로</a>
+<a th:href="@{'/storage/' + ${storage.storageId} + '/edit'}">수정</a>
+</body>
+</html>
