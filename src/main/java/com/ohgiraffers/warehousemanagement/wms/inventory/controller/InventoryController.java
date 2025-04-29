@@ -95,6 +95,6 @@ public class InventoryController {
     @PostMapping("/add")
     public String inventoryAdd(@ModelAttribute InventoryDTO inventoryDTO) {
         inventoryService.createInventory(inventoryDTO);
-        return "redirect:/inventories/list";
+        return "redirect:/inventories";
     }
 }
