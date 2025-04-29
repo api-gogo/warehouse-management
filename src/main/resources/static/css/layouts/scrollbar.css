@@ -1,0 +1,114 @@
+/* 
+ * 커스텀 스크롤바 디자인
+ * 모든 레이아웃에서 사용 가능한 스크롤바 스타일
+ * 회색 계열 색상으로 디자인
+ */
+
+/* 전체 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 8px;  /* 세로 스크롤바 너비 */
+  height: 8px; /* 가로 스크롤바 높이 */
+}
+
+/* 스크롤바 트랙(배경) 스타일 */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 밝은 회색 배경 */
+  border-radius: 4px;
+}
+
+/* 스크롤바 썸(움직이는 부분) 스타일 */
+::-webkit-scrollbar-thumb {
+  background: #c2c2c2; /* 중간 회색 */
+  border-radius: 4px;
+  border: 1px solid #f1f1f1;
+  transition: background 0.3s;
+}
+
+/* 스크롤바 썸 호버 스타일 */
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0; /* 약간 진한 회색 */
+}
+
+/* 스크롤바 활성화 상태 스타일 */
+::-webkit-scrollbar-thumb:active {
+  background: #7e7e7e; /* 진한 회색 */
+}
+
+/* 스크롤바 코너 스타일 */
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* 다크모드에서의 스크롤바 스타일 */
+.dark-mode ::-webkit-scrollbar-track {
+  background: #2c2c2c; /* 어두운 회색 배경 */
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: #5c5c5c; /* 중간 어두운 회색 */
+  border: 1px solid #2c2c2c;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #707070; /* 중간-밝은 회색 */
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:active {
+  background: #8e8e8e; /* 밝은 회색 */
+}
+
+.dark-mode ::-webkit-scrollbar-corner {
+  background: #2c2c2c;
+}
+
+/* Firefox용 스크롤바 스타일 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c2c2 #f1f1f1;
+}
+
+.dark-mode * {
+  scrollbar-color: #5c5c5c #2c2c2c;
+}
+
+/* 특정 요소에 스크롤바 스타일 적용 */
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c2c2 #f1f1f1;
+  overflow-y: auto;
+}
+
+.main-content, .page-content {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c2c2 #f1f1f1;
+  overflow-y: auto;
+}
+
+.auth-container {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c2c2 #f1f1f1;
+  overflow-y: auto;
+}
+
+.dark-mode .sidebar, 
+.dark-mode .main-content, 
+.dark-mode .page-content,
+.dark-mode .auth-container {
+  scrollbar-color: #5c5c5c #2c2c2c;
+}
+
+/* 테이블, 목록 등 내부 요소에 대한 스크롤 스타일 */
+.table-container, 
+.list-container, 
+.dropdown-menu, 
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c2c2 #f1f1f1;
+}
+
+.dark-mode .table-container, 
+.dark-mode .list-container, 
+.dark-mode .dropdown-menu, 
+.dark-mode .modal-content {
+  scrollbar-color: #5c5c5c #2c2c2c;
+}

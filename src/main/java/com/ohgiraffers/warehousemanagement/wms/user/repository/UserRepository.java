@@ -29,7 +29,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "     lower(u.userName) LIKE lower(concat('%', :search, '%')) OR " +
             "     lower(u.userCode) LIKE lower(concat('%', :search, '%')) OR " +
             "     lower(u.userPhone) LIKE lower(concat('%', :search, '%')))")
-    Page<User> findUsersByStatusAndSearch(@Param("status") UserStatus status,
+    Page<User> findByStatusAndSearch(@Param("status") UserStatus status,
                                           @Param("search") String search,
                                           Pageable pageable);
 }

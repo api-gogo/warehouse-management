@@ -6,6 +6,8 @@
     --color-primary: #3b82f6;
     --color-primary-rgb: 59, 130, 246;
     --color-primary-hover: #2563eb;
+    --color-primary-light: #93c5fd;
+    --color-primary-dark: #1d4ed8;
     --color-secondary: #f3f4f6;
     --color-secondary-rgb: 243, 244, 246;
     --color-success: #10b981;
@@ -91,6 +93,11 @@ body.dark-mode {
     --text-muted: #9e9e9e;
     --text-sidebar: #d4d4d4;
     --text-sidebar-active: #ffffff;
+    
+    --dark-color-primary-light: #60a5fa;
+    --dark-color-primary: #3b82f6;
+    --dark-color-primary-dark: #2563eb;
+    --dark-bg-secondary: #1a1a1a;
 
     --border-color: #333333;
 }
