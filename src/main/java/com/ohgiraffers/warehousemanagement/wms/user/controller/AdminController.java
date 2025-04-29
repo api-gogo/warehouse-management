@@ -72,6 +72,20 @@ public class AdminController {
         model.addAttribute("user", userDTO);
         return "/admin/user-detail";
     }
+    
+    @GetMapping("/users/{userId}/edit")
+    public String getUserEdit(@PathVariable Integer userId, Model model) {
+        UserDTO userDTO = userService.getUserByUserId(userId);
+
+        if (userDTO == null) {
+            String message = null;
+            message = "해당 id의 유저 정보가 없습니다.";
+            model.addAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+        model.addAttribute("user", userDTO);
+        return "/admin/user-edit";
+    }
 
     @PatchMapping("/users/{userId}")
     public String updateUser(@PathVariable Integer userId, UserDTO updateUserDTO,

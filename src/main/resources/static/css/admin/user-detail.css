@@ -1,0 +1,256 @@
+/* 사용자 상세/수정 페이지를 위한 추가 스타일 */
+.user-profile-header {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+  border-radius: 50%;
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.5rem;
+}
+
+.user-avatar i {
+  font-size: 2.5rem;
+  color: var(--color-primary);
+}
+
+.detail-section {
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.section-title i {
+  margin-right: 0.75rem;
+  color: var(--color-primary);
+}
+
+/* 필드 구분을 위한 그리드 대신 개별 필드 스타일 사용 */
+.info-grid {
+  display: block;
+}
+
+/* 개별 필드 스타일링 */
+.form-group {
+  margin-bottom: 1rem;
+  padding: 1.25rem 2.5rem 1.25rem 1.25rem; /* 오른쪽 패딩 증가 */
+  background-color: var(--bg-light);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  position: relative;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.form-group:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* 두 개의 필드를 가로로 배치 */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.5rem;
+}
+
+.form-col {
+  flex: 1 0 calc(50% - 1rem);
+  padding: 0 0.5rem;
+  min-width: 250px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control-static {
+  padding: 0.5rem 0;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.form-control, .form-select {
+  background-color: var(--bg-input);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  max-width: calc(100% - 2.5rem); /* 아이콘과 간격 확보 */
+}
+
+.form-select {
+  padding-right: 2.5rem; /* 드롭다운 화살표 공간 확보 */
+  background-position: right 1rem center;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+  outline: none;
+}
+
+.approval-section {
+  background-color: rgba(var(--color-warning-rgb), 0.05);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.2);
+  margin-bottom: 1.5rem;
+}
+
+.section-description {
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.user-basic-info {
+  flex: 1;
+}
+
+.user-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.user-code {
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0.75rem 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1.25rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* 애니메이션 효과 */
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 필드 타입별 아이콘 */
+.form-group::before {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.5rem;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: var(--color-primary);
+  opacity: 0.2;
+  font-size: 1.25rem;
+  z-index: 0;
+}
+
+.form-group.field-name::before {
+  content: "\f007"; /* 사용자 아이콘 */
+}
+
+.form-group.field-code::before {
+  content: "\f2bb"; /* ID 카드 아이콘 */
+}
+
+.form-group.field-email::before {
+  content: "\f0e0"; /* 이메일 아이콘 */
+}
+
+.form-group.field-phone::before {
+  content: "\f095"; /* 전화 아이콘 */
+}
+
+.form-group.field-part::before {
+  content: "\f0b1"; /* 부서 아이콘 */
+}
+
+.form-group.field-role::before {
+  content: "\f505"; /* 직책 아이콘 */
+}
+
+.form-group.field-status::before {
+  content: "\f111"; /* 상태 아이콘 */
+}
+
+.form-group.field-date::before {
+  content: "\f073"; /* 날짜 아이콘 */
+}
+
+/* 미디어 쿼리 */
+@media (max-width: 768px) {
+  .form-row {
+    display: block;
+  }
+  
+  .form-col {
+    min-width: 100%;
+    padding: 0;
+  }
+  
+  .user-profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .user-avatar {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+}

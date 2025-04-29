@@ -1,6 +1,5 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.controller;
 
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionServiceImpl;
@@ -33,24 +32,25 @@ public class InspectionController {
                                    Model model) {
         log.info("GET : /inspections");
         log.info("type : {}", type);
-        Page<Inspection> inspectionList;
+        Page<InspectionResponseDTO> inspectionList;
 
-        if (type != null) {
+        if (type != null && !type.trim().isEmpty()) {
             inspectionList = inspectionServiceImpl.getAllInspectionByTag(type, page, size);
         } else {
             inspectionList = inspectionServiceImpl.getAllInspection(page, size);
         }
+        model.addAttribute("inspectionList", inspectionList);
+        return "inspections/inspections";
+    }
 
-        if (inspectionList.getContent().isEmpty()) {
-            model.addAttribute("inspectionList", "검수 목록이 없습니다.");
-        } else {
-            model.addAttribute("inspectionList", inspectionList);
-        }
-        return "inspections/inspection";
+    // 검수 추가 페이지
+    @GetMapping("/create")
+    public String create() {
+        return "inspections/create";
     }
 
     // 검수 등록
-    @PostMapping
+    @PostMapping("/create")
     public String createInspection(@Validated @RequestBody InspectionRequestDTO requestDTO, RedirectAttributes ra) {
         log.info("POST : /inspections");
         log.info("inspectionRequestDTO : {}", requestDTO);
@@ -76,6 +76,18 @@ public class InspectionController {
         model.addAttribute("inspection", responseDTO);
 
         return "inspections/detail";
+    }
+
+    // 검수 태그 및 태그 아이디로 검색
+    @GetMapping("/{type}/{typeId}")
+    public String getInspectionByTypeAndTypeId(@PathVariable String type, @PathVariable int typeId, Model model) {
+        log.info("GET : /inspections/{}/{}", type, typeId);
+
+        InspectionResponseDTO responseDTO = inspectionServiceImpl.getInspectionByTagAndTagId(type, typeId);
+
+        model.addAttribute("inspection", responseDTO);
+
+        return "inspections/inspections";
     }
 
     // 검수 수정 페이지 보기

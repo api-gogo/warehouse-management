@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.inventory.model.entity;
 
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -12,13 +13,15 @@ public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inventory_id")
-    private long inventoryid;
+    private long inventoryId;
 
     @Column(name = "storage_id")
     private long storageId;
 
-    @Column(name = "product_id")
-    private long productId;
+    // 재고 테이블의 product_id은 상품 테이블의 기본키 참조
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     @Column(name = "lot_number")
     private String lotNumber;
@@ -46,10 +49,11 @@ public class Inventory {
 
     public Inventory() {}
 
-    public Inventory(long inventoryid, long storageId, long productId, String lotNumber, long locationCode, long availableStock, long allocatedStock, long disposedStock, LocalDate inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
-        this.inventoryid = inventoryid;
+
+    public Inventory(long inventoryId, long storageId, Product product, String lotNumber, long locationCode, long availableStock, long allocatedStock, long disposedStock, LocalDate inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
+        this.inventoryId = inventoryId;
         this.storageId = storageId;
-        this.productId = productId;
+        this.product = product;
         this.lotNumber = lotNumber;
         this.locationCode = locationCode;
         this.availableStock = availableStock;
@@ -60,12 +64,12 @@ public class Inventory {
         this.inventoryUpdatedAt = inventoryUpdatedAt;
     }
 
-    public long getInventoryid() {
-        return inventoryid;
+    public long getInventoryId() {
+        return inventoryId;
     }
 
-    public void setInventoryid(long inventoryid) {
-        this.inventoryid = inventoryid;
+    public void setInventoryId(long inventoryId) {
+        this.inventoryId = inventoryId;
     }
 
     public long getStorageId() {
@@ -76,12 +80,12 @@ public class Inventory {
         this.storageId = storageId;
     }
 
-    public long getProductId() {
-        return productId;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProductId(long productId) {
-        this.productId = productId;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public String getLotNumber() {
@@ -151,9 +155,9 @@ public class Inventory {
     @Override
     public String toString() {
         return "Inventory{" +
-                "inventoryid=" + inventoryid +
+                "inventoryId=" + inventoryId +
                 ", storageId=" + storageId +
-                ", productId=" + productId +
+                ", product=" + product +
                 ", lotNumber='" + lotNumber + '\'' +
                 ", locationCode=" + locationCode +
                 ", availableStock=" + availableStock +
@@ -165,4 +169,3 @@ public class Inventory {
                 '}';
     }
 }
-

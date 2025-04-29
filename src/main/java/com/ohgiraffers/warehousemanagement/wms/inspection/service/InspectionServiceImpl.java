@@ -45,16 +45,19 @@ public class InspectionServiceImpl implements InspectionService {
             return new InspectionResponseDTO(saveInspection);
     }
 
-    public Page<Inspection> getAllInspection(int page, int size) {
+    public Page<InspectionResponseDTO> getAllInspection(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return inspectionRepository.findAllByOrderByInspectionIdDesc(pageable);
+        Page<Inspection> inspectionList = inspectionRepository.findAllByOrderByInspectionIdDesc(pageable);
+        return inspectionList.map(InspectionResponseDTO::new);
     }
 
-    public Page<Inspection> getAllInspectionByTag(String type, int page, int size) {
+    public Page<InspectionResponseDTO> getAllInspectionByTag(String type, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        if (InspectionTransactionType.typeContains(type))
-            return inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(type), pageable);
+        if (InspectionTransactionType.typeContains(type)) {
+            Page<Inspection> inspectionList = inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(type), pageable);
+            return inspectionList.map(InspectionResponseDTO::new);
+        }
         else
             throw new IllegalArgumentException("존재하지 않는 유형입니다!");
     }
@@ -71,6 +74,9 @@ public class InspectionServiceImpl implements InspectionService {
 
     @Override
     public InspectionResponseDTO getInspectionByTagAndTagId(String type, int typeId) {
+        if (!InspectionTransactionType.typeContains(type))
+            throw new IllegalArgumentException("존재하지 않는 유형입니다!");
+
         Optional<Inspection> findInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
                 InspectionTransactionType.valueOf(type), typeId);
 

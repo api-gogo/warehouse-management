@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sales")
@@ -26,6 +28,7 @@ public class Sales {
     @Column(name = "shipping_due_date", nullable = false)
     private LocalDate shippingDueDate; // 출고예정일
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "sales_status", nullable = false)
     private SalesStatus salesStatus;
 
@@ -34,6 +37,9 @@ public class Sales {
 
     @Column(name = "sales_updated_at")
     private LocalDateTime salesUpdatedAt;
+
+    @OneToMany(mappedBy = "salesId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SalesItem> salesItems = new ArrayList<>();
 
     public Sales() {
     }
@@ -125,6 +131,10 @@ public class Sales {
 
     public LocalDateTime getSalesUpdatedAt() {
         return salesUpdatedAt;
+    }
+
+    public List<SalesItem> getSalesItems() {
+        return salesItems;
     }
 
     public void setStoreId(Integer storeId) {
