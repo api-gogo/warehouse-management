@@ -15,8 +15,11 @@ public class SalesDTO {
     private SalesStatus salesStatus;
     private LocalDateTime salesCreatedAt;
     private LocalDateTime salesUpdatedAt;
-    private List<Integer> items;
+    private List<Integer> productIds;
+    private List<String> productNames; // 상품명
     private List<Integer> quantity;
+    private List<Integer> pricePerBox; // 박스당단가
+    private List<Integer> totalPrice; // 총액
 
     public SalesDTO() {
     }
@@ -96,12 +99,12 @@ public class SalesDTO {
         this.salesUpdatedAt = salesUpdatedAt;
     }
 
-    public List<Integer> getItems() {
-        return items;
+    public List<Integer> getProductIds() {
+        return productIds;
     }
 
-    public void setItems(List<Integer> items) {
-        this.items = items;
+    public void setProductIds(List<Integer> productIds) {
+        this.productIds = productIds;
     }
 
     public List<Integer> getQuantity() {
@@ -110,6 +113,30 @@ public class SalesDTO {
 
     public void setQuantity(List<Integer> quantity) {
         this.quantity = quantity;
+    }
+
+    public List<String> getProductNames() {
+        return productNames;
+    }
+
+    public void setProductNames(List<String> productNames) {
+        this.productNames = productNames;
+    }
+
+    public List<Integer> getPricePerBox() {
+        return pricePerBox;
+    }
+
+    public void setPricePerBox(List<Integer> pricePerBox) {
+        this.pricePerBox = pricePerBox;
+    }
+
+    public List<Integer> getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(List<Integer> totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     @Override
@@ -123,7 +150,8 @@ public class SalesDTO {
                 ", salesStatus=" + salesStatus +
                 ", salesCreatedAt=" + salesCreatedAt +
                 ", salesUpdatedAt=" + salesUpdatedAt +
-                ", items=" + items +
+                ", productIds=" + productIds +
+                ", productNames=" + productNames +
                 ", quantity=" + quantity +
                 '}';
     }

@@ -21,6 +21,9 @@ public class SalesItem {
     @Column(name = "sales_items_quantity", nullable = false)
     private Integer salesItemsQuantity;
 
+//    @Column(name = "lot_number", nullable = false)
+//    private Integer lotNumber;
+
     public SalesItem() {
     }
 
@@ -28,12 +31,14 @@ public class SalesItem {
         this.salesId = builder.salesId;
         this.productId = builder.productId;
         this.salesItemsQuantity = builder.salesItemsQuantity;
+//        this.lotNumber = builder.lotNumber;
     }
 
     public static class Builder {
         private Sales salesId;
         private Integer productId;
         private Integer salesItemsQuantity;
+//        private Integer lotNumber;
 
         public Builder() {}
 
@@ -52,11 +57,17 @@ public class SalesItem {
             return this;
         }
 
+//        public Builder lotNumber(Integer lotNumber) {
+//            this.lotNumber = lotNumber;
+//            return this;
+//        }
+
         public SalesItem build() {
             SalesItem salesItem = new SalesItem();
             salesItem.salesId = salesId;
             salesItem.productId = productId;
             salesItem.salesItemsQuantity = salesItemsQuantity;
+//            salesItem.lotNumber = lotNumber;
 
             return salesItem;
         }
@@ -78,13 +89,16 @@ public class SalesItem {
         return salesItemsQuantity;
     }
 
+//    public Integer getLotNumber() { return lotNumber; }
+
     @Override
     public String toString() {
-        return "SalesItems{" +
+        return "SalesItem{" +
                 "salesItemsId=" + salesItemsId +
                 ", salesId=" + salesId +
                 ", productId=" + productId +
                 ", salesItemsQuantity=" + salesItemsQuantity +
+                ", lotNumber=" +
                 '}';
     }
 }
