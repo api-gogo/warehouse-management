@@ -26,34 +26,39 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
-    public Page<UserDTO> getUsers(String search, String status, Pageable pageable) {
+    public Page<UserDTO> getUsersByPartRoleAndStatus(String search, String partTab, String roleTab, String statusTab, Pageable pageable) {
         UserStatus userStatus = null;
+        UserRole userRole = null;
+        UserPart userPart = null;
         
         // 상태값 변환 로직
-        if (status != null && !status.equals("all")) {
-            switch (status) {
-                case "pending":
-                    userStatus = UserStatus.승인대기;
-                    break;
-                case "active":
-                    userStatus = UserStatus.재직중;
-                    break;  
-                case "inactive":
-                    userStatus = UserStatus.휴직중;
-                    break;
-                case "rejected":
-                    userStatus = UserStatus.승인거부;
-                    break;
-                case "resigned":
-                    userStatus = UserStatus.퇴사;
-                    break;
-                default:
-                    // 기본값은 null로 모든 상태 조회
-                    break;
+        if (statusTab != null && !statusTab.equals("all")) {
+            try {
+                userStatus = UserStatus.valueOf(statusTab);
+            } catch (IllegalArgumentException e) {
+                // 기본값은 null로 모든 상태 조회
             }
         }
         
-        Page<User> userPage = userRepository.findByStatusAndSearch(userStatus, search, pageable);
+        // 역할값 변환 로직
+        if (roleTab != null && !roleTab.equals("all")) {
+            try {
+                userRole = UserRole.valueOf(roleTab);
+            } catch (IllegalArgumentException e) {
+                // 기본값은 null로 모든 역할 조회
+            }
+        }
+        
+        // 부서값 변환 로직
+        if (partTab != null && !partTab.equals("all")) {
+            try {
+                userPart = UserPart.valueOf(partTab);
+            } catch (IllegalArgumentException e) {
+                // 기본값은 null로 모든 부서 조회
+            }
+        }
+        
+        Page<User> userPage = userRepository.findByPartRoleStatusAndSearch(userPart, userRole, userStatus, search, pageable);
 
         return userPage.map(user -> new UserDTO(
                 user.getUserId(),

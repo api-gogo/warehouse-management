@@ -31,7 +31,10 @@ public class UserController {
     }
 
     @GetMapping("/signup")
-    public void getSignUpForm() {}
+    public String getSignUpForm(Model model) {
+        model.addAttribute("signupUserDTO", new SignupUserDTO());
+        return "user/signup";
+    }
 
     @PostMapping("/signup")
     public String signUpUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model) {

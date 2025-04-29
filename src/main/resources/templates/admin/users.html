@@ -7,6 +7,7 @@
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/common.css">
+    <link rel="stylesheet" href="/css/admin/user-filter.css">
   </th:block>
 </head>
 <body>
@@ -22,27 +23,52 @@
               <i class="fas fa-search"></i>
             </button>
           </div>
-          <select id="statusFilter" class="filter-select" th:with="currentStatus=${param.status != null ? param.status[0] : 'all'}">
-            <option value="all" th:selected="${currentStatus == 'all'}">모든 상태</option>
-            <option value="pending" th:selected="${currentStatus == 'pending'}">승인 대기</option>
-            <option value="active" th:selected="${currentStatus == 'active'}">재직중</option>
-            <option value="inactive" th:selected="${currentStatus == 'inactive'}">휴직중</option>
-            <option value="rejected" th:selected="${currentStatus == 'rejected'}">승인 거부</option>
-            <option value="resigned" th:selected="${currentStatus == 'resigned'}">퇴사</option>
-          </select>
           <a th:href="@{/admin/users/approvals}" class="btn btn-primary">
             <i class="fas fa-user-check me-2"></i>승인 관리
+            <span class="pending-badge" th:text="${pendingCount}" th:if="${pendingCount > 0}"></span>
           </a>
         </div>
       </div>
 
-      <div class="common-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'all'}">
-        <button class="tab-button" th:classappend="${currentStatus == 'all' ? 'active' : ''}" data-status="all">전체</button>
-        <button class="tab-button" th:classappend="${currentStatus == 'pending' ? 'active' : ''}" data-status="pending">승인 대기 <span class="badge" th:text="${pendingCount}"></span></button>
-        <button class="tab-button" th:classappend="${currentStatus == 'active' ? 'active' : ''}" data-status="active">재직중</button>
-        <button class="tab-button" th:classappend="${currentStatus == 'inactive' ? 'active' : ''}" data-status="inactive">휴직중</button>
-        <button class="tab-button" th:classappend="${currentStatus == 'rejected' ? 'active' : ''}" data-status="rejected">승인 거부</button>
-        <button class="tab-button" th:classappend="${currentStatus == 'resigned' ? 'active' : ''}" data-status="resigned">퇴사</button>
+      <!-- 필터 옵션 -->
+      <div class="filters-container">
+        <div class="filter-group">
+          <label class="filter-label" for="partFilter">부서</label>
+          <select id="partFilter" class="filter-select" th:with="currentPart=${param.partTab != null ? param.partTab[0] : 'all'}">
+            <option value="all" th:selected="${currentPart == 'all'}">모든 부서</option>
+            <option value="통합" th:selected="${currentPart == '통합'}">통합</option>
+            <option value="입고" th:selected="${currentPart == '입고'}">입고</option>
+            <option value="출고" th:selected="${currentPart == '출고'}">출고</option>
+            <option value="재고" th:selected="${currentPart == '재고'}">재고</option>
+            <option value="검수" th:selected="${currentPart == '검수'}">검수</option>
+            <option value="반품" th:selected="${currentPart == '반품'}">반품</option>
+            <option value="발주" th:selected="${currentPart == '발주'}">발주</option>
+            <option value="수주" th:selected="${currentPart == '수주'}">수주</option>
+            <option value="상품" th:selected="${currentPart == '상품'}">상품</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label" for="roleFilter">직책</label>
+          <select id="roleFilter" class="filter-select" th:with="currentRole=${param.roleTab != null ? param.roleTab[0] : 'all'}">
+            <option value="all" th:selected="${currentRole == 'all'}">모든 직책</option>
+            <option value="사원" th:selected="${currentRole == '사원'}">사원</option>
+            <option value="매니저" th:selected="${currentRole == '매니저'}">매니저</option>
+            <option value="관리자" th:selected="${currentRole == '관리자'}">관리자</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label" for="statusFilter">상태</label>
+          <select id="statusFilter" class="filter-select" th:with="currentStatus=${param.statusTab != null ? param.statusTab[0] : 'all'}">
+            <option value="all" th:selected="${currentStatus == 'all'}">모든 상태</option>
+            <option value="재직중" th:selected="${currentStatus == '재직중'}">재직중</option>
+            <option value="휴직중" th:selected="${currentStatus == '휴직중'}">휴직중</option>
+            <option value="승인대기" th:selected="${currentStatus == '승인대기'}">승인 대기</option>
+            <option value="승인거부" th:selected="${currentStatus == '승인거부'}">승인 거부</option>
+            <option value="퇴사" th:selected="${currentStatus == '퇴사'}">퇴사</option>
+          </select>
+        </div>
       </div>
 
       <div class="common-content">
@@ -67,7 +93,7 @@
               <td th:text="${user.userPhone}"></td>
               <td th:text="${user.userPart}"></td>
               <td th:text="${user.userRole}"></td>
-              <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd hh:mm')}"></td>
+              <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
               <td>
                   <span class="status-badge"
                         th:classappend="${user.userStatus == '재직중' ? 'status-active' :
@@ -112,24 +138,24 @@
 
         <!-- 페이지네이션 -->
         <div class="pagination" th:if="${totalPages > 1}">
-          <a th:href="@{/admin/users(page=0, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=0, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-left"></i>
           </a>
-          <a th:href="@{/admin/users(page=${currentPage - 1}, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=${currentPage - 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-left"></i>
           </a>
 
           <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/admin/users(page=${i}, size=${size}, status=${param.status}, search=${search})}"
+            <a th:href="@{/admin/users(page=${i}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}"
                class="page-link"
                th:text="${i + 1}"
                th:classappend="${currentPage == i ? 'active' : ''}">1</a>
           </th:block>
 
-          <a th:href="@{/admin/users(page=${currentPage + 1}, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=${currentPage + 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
             <i class="fas fa-angle-right"></i>
           </a>
-          <a th:href="@{/admin/users(page=${totalPages - 1}, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=${totalPages - 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-right"></i>
           </a>
         </div>
@@ -141,30 +167,22 @@
   <th:block layout:fragment="scripts">
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // 탭 전환
-        const tabButtons = document.querySelectorAll('.tab-button');
-        tabButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            // 활성 클래스 제거
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            // 클릭된 버튼에 활성 클래스 추가
-            this.classList.add('active');
-
-            // 상태값 가져오기
-            const status = this.dataset.status;
-            // 상태 필터 업데이트
-            document.getElementById('statusFilter').value = status;
-
-            // 페이지 이동 (실제 구현에서는 AJAX 호출이나 페이지 리로드 처리)
-            window.location.href = `/admin/users?status=${status}`;
-          });
-        });
-
-        // 상태 필터 변경 이벤트
-        document.getElementById('statusFilter').addEventListener('change', function() {
-          const status = this.value;
-          window.location.href = `/admin/users?status=${status}`;
-        });
+        // 필터 변경 이벤트
+        const partFilter = document.getElementById('partFilter');
+        const roleFilter = document.getElementById('roleFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        
+        function updateFilters() {
+          const partValue = partFilter.value;
+          const roleValue = roleFilter.value;
+          const statusValue = statusFilter.value;
+          
+          window.location.href = `/admin/users?partTab=${partValue}&roleTab=${roleValue}&statusTab=${statusValue}`;
+        }
+        
+        partFilter.addEventListener('change', updateFilters);
+        roleFilter.addEventListener('change', updateFilters);
+        statusFilter.addEventListener('change', updateFilters);
 
         // 검색 기능
         const searchBox = document.querySelector('.search-box');
@@ -173,15 +191,21 @@
 
         searchButton.addEventListener('click', function() {
           const searchTerm = searchInput.value.trim();
-          const currentStatus = document.querySelector('.tab-button.active').dataset.status || 'all';
-          window.location.href = `/admin/users?search=${searchTerm}&status=${currentStatus}`;
+          const partValue = partFilter.value;
+          const roleValue = roleFilter.value;
+          const statusValue = statusFilter.value;
+          
+          window.location.href = `/admin/users?search=${searchTerm}&partTab=${partValue}&roleTab=${roleValue}&statusTab=${statusValue}`;
         });
 
         searchInput.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
             const searchTerm = searchInput.value.trim();
-            const currentStatus = document.querySelector('.tab-button.active').dataset.status || 'all';
-            window.location.href = `/admin/users?search=${searchTerm}&status=${currentStatus}`;
+            const partValue = partFilter.value;
+            const roleValue = roleFilter.value;
+            const statusValue = statusFilter.value;
+            
+            window.location.href = `/admin/users?search=${searchTerm}&partTab=${partValue}&roleTab=${roleValue}&statusTab=${statusValue}`;
           }
         });
 

@@ -11,19 +11,19 @@
     <div class="signup-form">
       <h2 class="signup-title">회원가입</h2>
 
-      <form th:action="@{/user/signup}" method="post">
+      <form th:action="@{/user/signup}" method="post" th:object="${signupUserDTO}">
         <div class="mb-3">
           <label for="userName" class="form-label">
             <i class="fas fa-user me-2"></i>이름
           </label>
-          <input type="text" class="form-control" id="userName" name="userName" placeholder="이름을 입력하세요" required autofocus>
+          <input type="text" class="form-control" id="userName" th:field="*{userName}" placeholder="이름을 입력하세요" required autofocus>
         </div>
 
         <div class="mb-3">
           <label for="userEmail" class="form-label">
             <i class="fas fa-envelope me-2"></i>이메일
           </label>
-          <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="이메일을 입력하세요" required>
+          <input type="email" class="form-control" id="userEmail" th:field="*{userEmail}" placeholder="이메일을 입력하세요" required>
         </div>
 
         <div class="mb-3">
@@ -34,7 +34,7 @@
                   type="tel"
                   class="form-control"
                   id="userPhone"
-                  name="userPhone"
+                  th:field="*{userPhone}"
                   placeholder="전화번호 (예: 010-1234-5678)"
                   required
                   pattern="^\d{3}-\d{4}-\d{4}$"
@@ -46,7 +46,7 @@
           <label for="userCode" class="form-label">
             <i class="fas fa-id-card me-2"></i>사원번호
           </label>
-          <input type="text" class="form-control" id="userCode" name="userCode" placeholder="사원번호를 입력하세요" required>
+          <input type="text" class="form-control" id="userCode" th:field="*{userCode}" placeholder="사원번호를 입력하세요" required>
           <div class="form-text">사원번호를 로그인 시 아이디로 사용됩니다.</div>
         </div>
 
@@ -54,7 +54,7 @@
           <label for="userPass" class="form-label">
             <i class="fas fa-lock me-2"></i>비밀번호
           </label>
-          <input type="password" class="form-control" id="userPass" name="userPass" placeholder="비밀번호를 입력하세요" required>
+          <input type="password" class="form-control" id="userPass" th:field="*{userPass}" placeholder="비밀번호를 입력하세요" required>
           <div class="form-text">8자 이상의 영문, 숫자, 특수문자 조합을 권장합니다.</div>
         </div>
 
@@ -69,7 +69,7 @@
           <label for="userPart" class="form-label">
             <i class="fas fa-users me-2"></i>부서
           </label>
-          <select class="form-select" id="userPart" name="userPart" required>
+          <select class="form-select" id="userPart" th:field="*{userPart}" required>
             <option value="" disabled selected>-- 부서를 선택해주세요 --</option> 
             <option value="입고">입고</option>
             <option value="출고">출고</option>
