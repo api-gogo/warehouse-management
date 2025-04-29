@@ -5,7 +5,6 @@ import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnStor
 import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.Storages;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnStorageRepository;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.StorageRepository;
-import com.ohgiraffers.warehousemanagement.wms.shipment.model.repository.ShipmentsRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +15,20 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReturningStoreService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReturningStoreService.class);
     private final ReturnStorageRepository returnStorageRepository;
-    private final ShipmentsRepository shipmentsRepository;
-    private final StorageRepository storageRepository;
+    //private final ShipmentRepository shipmentRepository;
+    private final StorageRepository storageRepository; // 생성에서 필요함
 
     @Autowired
-    public ReturningStoreService(ReturnStorageRepository returnStorageRepository, ShipmentsRepository shipmentsRepository, StorageRepository storageRepository) {
+    public ReturningStoreService(ReturnStorageRepository returnStorageRepository) {
         this.returnStorageRepository = returnStorageRepository;
-        this.shipmentsRepository = shipmentsRepository;
+        //this.shipmentRepository = shipmentsRepository;
         this.storageRepository = storageRepository;
     }
 //전체조회 -> PK값 있어야됨
@@ -52,7 +52,7 @@ public class ReturningStoreService {
 
     }
 
-    //등록 -> PK 값 필요x
+    //등록 -> PK 값 필요x --> 고치기 외래키 써야됨
     @Transactional
     public ReturnStorageDTO CreateReturning(ReturnStorageDTO returnStorageDTO) {
         /*나중에 입고의 엔티티 클래스로 바꿔줘야됨@@@@@@*/
@@ -104,8 +104,20 @@ public class ReturningStoreService {
     }
 
     @Transactional
-    public void updateReturning(@Valid ReturnStorageDTO returnStorageDTO) {
+    public boolean updateReturning(@Valid ReturnStorageDTO returnStorageDTO) {
 
+        Optional<ReturnStorage> existReturnOpt = returnStorageRepository.findById(returnStorageDTO.getReturnStorageId());
+        if(existReturnOpt.isEmpty()) {
+            return false;
+        }
+
+        ReturnStorage existReturn = existReturnOpt.get();
+
+        existReturn.setReturnStoragesCreatedAt(LocalDateTime.now());
+
+        returnStorageRepository.save(existReturn);
+
+        return true;
     }
     //수정->수정일
 }

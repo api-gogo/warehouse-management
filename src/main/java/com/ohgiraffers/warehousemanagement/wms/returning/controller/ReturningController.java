@@ -27,10 +27,10 @@ public class ReturningController {
     //(반품서) 전체 조회
     //getALlReturning메서드 호출해서 데이터들(List) 받아오기
     @GetMapping
-    public ModelAndView getALLReturning(ModelAndView mv) {
+    public ModelAndView getAllReturning(ModelAndView mv) {
 
        //서비스의 getALLReturning 호출
-                 List<ReturnShipmentDTO> rsDTOs =  returningService.getALLReturning();
+                 List<ReturnShipmentDTO> rsDTOs =  returningService.getAllReturning();
                  mv.addObject("findAll", rsDTOs);
                  mv.setViewName("returns/outbound/returningList");
 
@@ -45,7 +45,7 @@ public class ReturningController {
 
     //등록 --> 등록일 달아주기, 리다이렉트로 다시 돌아가기..
     @PostMapping("/regist")
-    public String createReturning(@ModelAttribute ReturnShipmentDTO returnShipmentDTO) {
+    public String createReturning(@Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO) {
         ReturnShipmentDTO rsDTO = returningService.createReturning(returnShipmentDTO); //담기만 한 상태
 
         return "redirect:/returns/outbound/"+rsDTO.getReturnShipmentId(); //흠..********** 로직도 추가
@@ -107,7 +107,7 @@ public class ReturningController {
     public ModelAndView updateReturningById(@PathVariable("return_shipment_id") Integer returnShipmentId, ModelAndView mv)
     {
             ReturnShipmentDTO returnShipmentDTO = returningService.getReturningById(returnShipmentId);
-            returnShipmentDTO.setReturnShipmentId(returnShipmentId);
+           // returnShipmentDTO.setReturnShipmentId(returnShipmentId);
             mv.addObject("detail", returnShipmentDTO);
             mv.setViewName("returns/outbound/update_view");
             return mv;
@@ -134,7 +134,7 @@ public class ReturningController {
         }
 
         returnShipmentDTO.setReturnShipmentId(returnShipmentId);//--> 이거는 필요, html폼에서 작성하는건 아니니까
-        returnShipmentDTO.setShipmentId(shipmentId); //ShipmentId를 롱타입으로 어떻게 바꿀까
+        returnShipmentDTO.setShipmentId(shipmentId);
         returnShipmentDTO.setStoreId(storeId);
         returnShipmentDTO.setUserId(userId);
         returnShipmentDTO.setLotNumber(lotNumber);

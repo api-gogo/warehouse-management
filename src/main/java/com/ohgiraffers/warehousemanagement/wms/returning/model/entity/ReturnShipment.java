@@ -1,11 +1,13 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.model.entity;
 
 import com.ohgiraffers.warehousemanagement.wms.returning.model.ReturnShipmentStatus;
-import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipments;
+import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipment;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "return_shipments")
@@ -17,9 +19,12 @@ public class ReturnShipment {
     @Column(name ="return_shipment_id",nullable = false)
     private Integer returnShipmentId; //PK값
 
-    @OneToOne(fetch = FetchType.EAGER) //FK값
+    /*@OneToOne(fetch = FetchType.EAGER) //FK값
     @JoinColumn(name = "shipment_id",nullable = false)
-    private Shipments shipmentId; //shipment클래스의 shipment_id를 외래키로 받겠다
+    private Shipment shipmentId; //shipment클래스의 shipment_id를 외래키로 받겠다*/
+
+    @Column(name = "shipment_id",nullable = false)
+    private Integer shipmentId; //나중에 외래키로
 
     @Column(name = "user_id",nullable = false)
     private Integer userId;
@@ -28,30 +33,37 @@ public class ReturnShipment {
 
     @Column(name = "lot_number",nullable = false)
     private String lotNumber;
+
     @Column(name = "return_shipment_quantity",nullable = false)
     private int returnShipmentQuantity;
+
     @Column(name = "return_shipment_content",nullable = false)
     private String returnShipmentContent;
-    @Column(name = "return_shipment_status",nullable = false)
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "return_shipment_status",nullable = false)
     private ReturnShipmentStatus returnShipmentStatus;
 
     @Column(name ="return_shipment_created_at",nullable = false)
     private LocalDateTime returnShipmentCreatedAt;
+
     @Column(name ="return_shipment_updated_at")
     private LocalDateTime returnShipmentUpdatedAt;
+
     @Column(name = "return_shipment_deleted_at")
     private LocalDateTime returnShipmentDeletedAt;
 
     @Column(name = "is_deleted",nullable = false)
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "returnShipmentId",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ReturnShipmentItem> returnShipmentItems = new ArrayList<>(); //출고반품에 대해 리스트로 받아옴
 
     public ReturnShipment() {
     }
 
-    public ReturnShipment(Integer returnShipmentId, Integer userId, Integer storeId, String lotNumber, int returnShipmentQuantity, String returnShipmentContent, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Shipments shipmentId) {
-        this.returnShipmentId = returnShipmentId;
+    public ReturnShipment(Integer returnShipmentId, Integer userId, Integer storeId, String lotNumber, int returnShipmentQuantity, String returnShipmentContent, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
+        this.returnShipmentId = returnShipmentId;//pk값
         this.userId = userId;
         this.storeId = storeId;
         this.lotNumber = lotNumber;
@@ -65,7 +77,7 @@ public class ReturnShipment {
         this.shipmentId = shipmentId;
     }
 
-    public ReturnShipment(Integer storeId,Integer userId,String lotNumber,int returnShipmentQuantity,String returnShipmentContent,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Shipments shipmentId)
+    public ReturnShipment(Integer storeId,Integer userId,String lotNumber,int returnShipmentQuantity,String returnShipmentContent,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
     {
         this.storeId = storeId;
         this.userId = userId;
@@ -75,6 +87,14 @@ public class ReturnShipment {
         this.returnShipmentStatus = returnShipmentStatus;
         this.returnShipmentCreatedAt = returnShipmentCreatedAt;
         this.shipmentId = shipmentId;
+    }
+
+    public List<ReturnShipmentItem> getReturnShipmentItems() {
+        return returnShipmentItems;
+    }
+
+    public void setReturnShipmentItems(List<ReturnShipmentItem> returnShipmentItems) {
+        this.returnShipmentItems = returnShipmentItems;
     }
 
     public Integer getReturnShipmentId() {
@@ -165,11 +185,11 @@ public class ReturnShipment {
         isDeleted = deleted;
     }
 
-    public Shipments getShipmentId() {
+    public Integer getShipmentId() {
         return shipmentId;
     }
 
-    public void setShipmentId(Shipments shipmentId) {
+    public void setShipmentId(Integer shipmentId) {
         this.shipmentId = shipmentId;
     }
 

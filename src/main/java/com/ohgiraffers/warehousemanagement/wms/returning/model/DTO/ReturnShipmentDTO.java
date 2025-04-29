@@ -1,8 +1,10 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.model.DTO;
 
-import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipments;
+
+import com.ohgiraffers.warehousemanagement.wms.returning.model.ReturnShipmentStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ReturnShipmentDTO {
 
@@ -10,10 +12,7 @@ public class ReturnShipmentDTO {
     private Integer storeId;
     private Integer userId;
 
-    private String lotNumber;
-    private int returnShipmentQuantity;
-    private String returnShipmentContent;
-    private String returnShipmentStatus;
+    private ReturnShipmentStatus returnShipmentStatus;
 
     private LocalDateTime returnShipmentCreatedAt;
     private LocalDateTime returnShipmentUpdatedAt;
@@ -21,22 +20,23 @@ public class ReturnShipmentDTO {
 
     private boolean isDeleted;
 
-    private Integer shipmentId;
+    private Integer shipmentId; //FK값
 
+    private List<Integer> lotNumber;
+    private List<Integer> returnShipmentQuantity;
+    private List<ReturnShipmentStatus> returnShipmentContent; //나중에 확인 필요
 
     public ReturnShipmentDTO() {
     }
 
     //매개변수가 있는 생성자
 
+
     //조회 및 수정용 - PK값 있음
-    public ReturnShipmentDTO(Integer returnShipmentId, Integer storeId, Integer userId, String lotNumber, int returnShipmentQuantity, String returnShipmentContent, String returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted , Integer shipmentId) {
+    public ReturnShipmentDTO(Integer returnShipmentId, Integer storeId, Integer userId, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted , Integer shipmentId) {
         this.returnShipmentId = returnShipmentId;//PK
         this.storeId = storeId;
         this.userId = userId;
-        this.lotNumber = lotNumber;
-        this.returnShipmentQuantity = returnShipmentQuantity;
-        this.returnShipmentContent = returnShipmentContent;
         this.returnShipmentStatus = returnShipmentStatus;
         this.returnShipmentCreatedAt = returnShipmentCreatedAt;
         this.returnShipmentUpdatedAt = returnShipmentUpdatedAt;
@@ -44,118 +44,121 @@ public class ReturnShipmentDTO {
         this.isDeleted = isDeleted;
         this.shipmentId = shipmentId;
     }
-    //등록 - PK 값 없음
-
-    public ReturnShipmentDTO(Integer storeId, Integer userId, String lotNumber, int returnShipmentQuantity, String returnShipmentContent, String returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted, Integer shipmentId) {
-        this.storeId = storeId;
-        this.userId = userId;
-        this.lotNumber = lotNumber;
-        this.returnShipmentQuantity = returnShipmentQuantity;
-        this.returnShipmentContent = returnShipmentContent;
-        this.returnShipmentStatus = returnShipmentStatus;
-        this.returnShipmentCreatedAt = returnShipmentCreatedAt;
-        this.returnShipmentUpdatedAt = returnShipmentUpdatedAt;
-        this.returnShipmentDeletedAt = returnShipmentDeletedAt;
-        this.isDeleted = isDeleted;
-        this.shipmentId = shipmentId;
-    }
-
 
     //게터세터
 
+
     public Integer getReturnShipmentId() {
         return returnShipmentId;
-    }
-
-    public Integer getStoreId() {
-        return storeId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public String getLotNumber() {
-        return lotNumber;
-    }
-
-    public int getReturnShipmentQuantity() {
-        return returnShipmentQuantity;
-    }
-
-    public String getReturnShipmentContent() {
-        return returnShipmentContent;
-    }
-
-    public String getReturnShipmentStatus() {
-        return returnShipmentStatus;
-    }
-
-    public LocalDateTime getReturnShipmentCreatedAt() {
-        return returnShipmentCreatedAt;
-    }
-
-    public LocalDateTime getReturnShipmentUpdatedAt() {
-        return returnShipmentUpdatedAt;
-    }
-
-    public LocalDateTime getReturnShipmentDeletedAt() {
-        return returnShipmentDeletedAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public Integer getShipmentId() {
-        return shipmentId;
     }
 
     public void setReturnShipmentId(Integer returnShipmentId) {
         this.returnShipmentId = returnShipmentId;
     }
 
+    public Integer getStoreId() {
+        return storeId;
+    }
+
     public void setStoreId(Integer storeId) {
         this.storeId = storeId;
+    }
+
+    public Integer getUserId() {
+        return userId;
     }
 
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public void setLotNumber(String lotNumber) {
-        this.lotNumber = lotNumber;
+    public ReturnShipmentStatus getReturnShipmentStatus() {
+        return returnShipmentStatus;
     }
 
-    public void setReturnShipmentQuantity(int returnShipmentQuantity) {
-        this.returnShipmentQuantity = returnShipmentQuantity;
-    }
-
-    public void setReturnShipmentContent(String returnShipmentContent) {
-        this.returnShipmentContent = returnShipmentContent;
-    }
-
-    public void setReturnShipmentStatus(String returnShipmentStatus) {
+    public void setReturnShipmentStatus(ReturnShipmentStatus returnShipmentStatus) {
         this.returnShipmentStatus = returnShipmentStatus;
+    }
+
+    public LocalDateTime getReturnShipmentCreatedAt() {
+        return returnShipmentCreatedAt;
     }
 
     public void setReturnShipmentCreatedAt(LocalDateTime returnShipmentCreatedAt) {
         this.returnShipmentCreatedAt = returnShipmentCreatedAt;
     }
 
+    public LocalDateTime getReturnShipmentUpdatedAt() {
+        return returnShipmentUpdatedAt;
+    }
+
     public void setReturnShipmentUpdatedAt(LocalDateTime returnShipmentUpdatedAt) {
         this.returnShipmentUpdatedAt = returnShipmentUpdatedAt;
+    }
+
+    public LocalDateTime getReturnShipmentDeletedAt() {
+        return returnShipmentDeletedAt;
     }
 
     public void setReturnShipmentDeletedAt(LocalDateTime returnShipmentDeletedAt) {
         this.returnShipmentDeletedAt = returnShipmentDeletedAt;
     }
 
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
 
+    public Integer getShipmentId() {
+        return shipmentId;
+    }
+
     public void setShipmentId(Integer shipmentId) {
         this.shipmentId = shipmentId;
+    }
+
+    public List<Integer> getLotNumber() {
+        return lotNumber;
+    }
+
+    public void setLotNumber(List<Integer> lotNumber) {
+        this.lotNumber = lotNumber;
+    }
+
+    public List<Integer> getReturnShipmentQuantity() {
+        return returnShipmentQuantity;
+    }
+
+    public void setReturnShipmentQuantity(List<Integer> returnShipmentQuantity) {
+        this.returnShipmentQuantity = returnShipmentQuantity;
+    }
+
+    public List<ReturnShipmentStatus> getReturnShipmentContent() {
+        return returnShipmentContent;
+    }
+
+    public void setReturnShipmentContent(List<ReturnShipmentStatus> returnShipmentContent) {
+        this.returnShipmentContent = returnShipmentContent;
+    }
+
+    @Override
+    public String toString() {
+        return "ReturnShipmentDTO{" +
+                "returnShipmentId=" + returnShipmentId +
+                ", storeId=" + storeId +
+                ", userId=" + userId +
+                ", returnShipmentStatus='" + returnShipmentStatus + '\'' +
+                ", returnShipmentCreatedAt=" + returnShipmentCreatedAt +
+                ", returnShipmentUpdatedAt=" + returnShipmentUpdatedAt +
+                ", returnShipmentDeletedAt=" + returnShipmentDeletedAt +
+                ", isDeleted=" + isDeleted +
+                ", shipmentId=" + shipmentId +
+                ", lotNumber=" + lotNumber +
+                ", returnShipmentQuantity=" + returnShipmentQuantity +
+                ", returnShipmentContent=" + returnShipmentContent +
+                '}';
     }
 }
