@@ -32,7 +32,7 @@ public class Store {
     private LocalDateTime storeCreatedAt;
 
     @Column(name = "store_updated_at")
-    private LocalDateTime storeUpdateAt;
+    private LocalDateTime storeUpdatedAt;
 
     @Column(name = "store_deleted_at")
     private LocalDateTime storeDeletedAt;
@@ -80,8 +80,8 @@ public class Store {
         return storeCreatedAt;
     }
 
-    public LocalDateTime getStoreUpdateAt() {
-        return storeUpdateAt;
+    public LocalDateTime getStoreUpdatedAt() {
+        return storeUpdatedAt;
     }
 
     public LocalDateTime getStoreDeletedAt() {
@@ -108,8 +108,8 @@ public class Store {
         this.storeManagerEmail = storeManagerEmail;
     }
 
-    public void setStoreUpdateAt(LocalDateTime storeUpdateAt) {
-        this.storeUpdateAt = storeUpdateAt;
+    public void setStoreUpdatedAt(LocalDateTime storeUpdatedAt) {
+        this.storeUpdatedAt = storeUpdatedAt;
     }
 
     public void setStoreDeletedAt(LocalDateTime storeDeletedAt) {

@@ -54,10 +54,10 @@
                 <th>이름</th>
                 <th>사번</th>
                 <th>전화번호</th>
-                <th>이메일</th>
-                <th>신청 부서</th>
-                <th>신청 직책</th>
+                <th>부서</th>
+                <th>직책</th>
                 <th>가입일</th>
+                <th>상태</th>
                 <th>액션</th>
               </tr>
               </thead>
@@ -69,10 +69,12 @@
                 <td th:text="${user.userName}"></td>
                 <td th:text="${user.userCode}"></td>
                 <td th:text="${user.userPhone}"></td>
-                <td th:text="${user.userEmail}"></td>
                 <td th:text="${user.userPart}"></td>
                 <td th:text="${user.userRole}"></td>
-                <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd hh:mm')}"></td>
+                <td th:text="${#temporals.format(user.userCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                  <span class="status-badge status-pending">승인대기</span>
+                </td>
                 <td class="actions">
                   <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="action-button" title="상세보기">
                     <i class="fas fa-eye"></i>
@@ -83,11 +85,14 @@
                   <button type="button" class="action-button reject-button" th:data-id="${user.userId}" title="거부">
                     <i class="fas fa-times"></i>
                   </button>
+                  <button type="button" class="action-button blacklist-button" th:data-id="${user.userId}" title="영구 차단">
+                    <i class="fas fa-ban"></i>
+                  </button>
                 </td>
               </tr>
               <!-- 데이터가 없을 경우 -->
               <tr th:if="${#lists.isEmpty(pendingUsers)}">
-                <td colspan="9" class="no-data">승인 대기 중인 사용자가 없습니다.</td>
+                <td colspan="10" class="no-data">승인 대기 중인 사용자가 없습니다.</td>
               </tr>
               </tbody>
             </table>
@@ -323,6 +328,22 @@
             
             if (confirm('해당 사용자의 가입을 거부하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
               window.location.href = `/admin/users/reject/${userId}`;
+            }
+          });
+        });
+        
+        // 영구 차단(블랙리스트) 처리 버튼
+        const blacklistButtons = document.querySelectorAll('.blacklist-button');
+        blacklistButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            if (confirm('주의: 해당 사용자를 영구 차단하시겠습니까? 이 작업은 되돌릴 수 없습니다.\n영구 차단된 사용자는 로그인이 불가능합니다.')) {
+              // 폼 생성 및 제출
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/admin/users/${userId}/blacklist`;
+              document.body.appendChild(form);
+              form.submit();
             }
           });
         });
