@@ -68,7 +68,7 @@
                                             <i class="fas fa-times"></i> 삭제
                                         </button>
                                     </div>
-                                    <input type="text" name="items[0]" class="form-control mb-2" placeholder="상품명 입력" required>
+                                    <input type="text" name="productIds[0]" class="form-control mb-2" placeholder="상품명 입력" required>
                                     <input type="number" name="quantity[0]" class="form-control" placeholder="수량 입력" min="1" required>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
               <i class="fas fa-times"></i> 삭제
             </button>
           </div>
-          <input type="text" name="items[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
+          <input type="text" name="productIds[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
           <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
         `;
                         document.getElementById('items-container').appendChild(itemRow);
