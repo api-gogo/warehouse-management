@@ -6,16 +6,16 @@
   <title>검수 관리</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/common.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='inspection'">
-    <div class="admin-container">
-      <div class="admin-header">
-        <h1 class="admin-title">검수 관리</h1>
-        <div class="admin-actions">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">검수 관리</h1>
+        <div class="common-actions">
           <div class="search-box">
             <input type="text" id="inspectionSearch" placeholder="검수ID, 검수자ID 검색..." class="search-input">
             <button class="search-button">
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div class="admin-tabs">
+      <div class="common-tabs">
         <button class="tab-button active" data-type="">전체</button>
         <button class="tab-button" data-type="INSPECTION">상시</button>
         <button class="tab-button" data-type="PURCHASE">발주</button>
@@ -45,7 +45,7 @@
         <button class="tab-button" data-type="SHIPMENT">출고반품</button>
       </div>
 
-      <div class="admin-content">
+      <div class="common-content">
         <div class="table-responsive">
           <table class="data-table">
             <thead>
