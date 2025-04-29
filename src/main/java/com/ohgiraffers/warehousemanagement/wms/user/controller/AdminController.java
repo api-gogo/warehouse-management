@@ -30,7 +30,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String getUsers(@RequestParam(required = false) String search,
+    public String listUsers(@RequestParam(required = false) String search,
                            @RequestParam(required = false, defaultValue = "all") String statusTab,
                            @RequestParam(required = false, defaultValue = "all") String roleTab,
                            @RequestParam(required = false, defaultValue = "all") String partTab,
@@ -63,8 +63,8 @@ public class AdminController {
     }
 
     @GetMapping("/users/{userId}")
-    public String getUser(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.getUserByUserId(userId);
+    public String showUserDetail(@PathVariable Integer userId, Model model) {
+        UserDTO userDTO = userService.findById(userId);
 
         if (userDTO == null) {
             String message = null;
@@ -76,8 +76,8 @@ public class AdminController {
     }
 
     @GetMapping("/users/{userId}/edit")
-    public String getUserEdit(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.getUserByUserId(userId);
+    public String showUserEditForm(@PathVariable Integer userId, Model model) {
+        UserDTO userDTO = userService.findById(userId);
 
         if (userDTO == null) {
             String message = null;
@@ -225,7 +225,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/approvals")
-    public String getPendingUsers(@RequestParam(required = false) String search,
+    public String listPendingUsers(@RequestParam(required = false) String search,
                                   @PageableDefault(size = 10) Pageable pageable,
                                   Model model) {
         // 검색어가 빈 문자열일 경우 null로 처리

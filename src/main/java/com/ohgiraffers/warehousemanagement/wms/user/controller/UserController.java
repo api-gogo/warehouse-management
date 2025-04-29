@@ -32,13 +32,13 @@ public class UserController {
     }
 
     @GetMapping("/signup")
-    public String getSignUpForm(Model model) {
+    public String showSignupForm(Model model) {
         model.addAttribute("signupUserDTO", new SignupUserDTO());
         return "user/signup";
     }
 
     @PostMapping("/signup")
-    public String signUpUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model) {
+    public String registerUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model) {
 
         Integer result = userService.registerUser(signupUserDTO);
         String message = null;
@@ -67,11 +67,11 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public String getProfile(Authentication authentication, Model model) {
+    public String showUserProfile(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-                UserDTO userDTO = userService.getUserByUserId(authDetails.getUserId());
+                UserDTO userDTO = userService.findById(authDetails.getUserId());
 
                 model.addAttribute("user", userDTO);
                 return "user/profile";
@@ -83,7 +83,7 @@ public class UserController {
     }
 
     @GetMapping("/password-verify")
-    public String getVerifyForm(Authentication authentication, Model model) {
+    public String showPasswordVerificationForm(Authentication authentication, Model model) {
         // 로그인 상태 확인
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
@@ -125,7 +125,7 @@ public class UserController {
                     return "user/password-verify";
                 }
 
-                UserDTO userDTO = userService.getUserByUserId(authDetails.getUserId());
+                UserDTO userDTO = userService.findById(authDetails.getUserId());
                 model.addAttribute("user", userDTO);
                 return "user/update";
             }
@@ -135,7 +135,7 @@ public class UserController {
     }
 
     @PatchMapping("/profile")
-    public String updateProfile(Authentication authentication, @ModelAttribute UserDTO updateUser,
+    public String updateUserProfile(Authentication authentication, @ModelAttribute UserDTO updateUser,
                                 RedirectAttributes redirectAttributes) {
         String message = null;
 

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserLoggingService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,7 +28,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public LoginUserDTO getUserByUserCode(String userCode) {
+    public LoginUserDTO findByUserCode(String userCode) {
         Optional<User> user = userRepository.findByUserCode(userCode);
 
         return user.map(u -> new LoginUserDTO(
@@ -42,7 +42,7 @@ public class UserService {
         )).orElse(null);
     }
 
-    public UserDTO getUserByUserId(Integer userId) {
+    public UserDTO findById(Integer userId) {
         Optional<User> user = userRepository.findById(userId);
 
         return user.map(u -> new UserDTO(
@@ -118,7 +118,8 @@ public class UserService {
         return true;
     }
 
-    public LogUserDTO getLogUserByUserId(Integer userId) {
+    @Override
+    public LogUserDTO getUserInfoForLogging(Integer userId) {
         Optional<User> user = userRepository.findById(userId);
 
         return user.map(u -> new LogUserDTO(
