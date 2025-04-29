@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>거래처 상세</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/common.css">
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='supplier'">
+    <div class="common-container">
+      <div class="common-header">
+        <div class="header-left">
+          <a th:href="@{/suppliers}" class="back-button">
+            <i class="fas fa-arrow-left"></i> 목록으로
+          </a>
+          <h1 class="common-title">거래처 상세</h1>
+        </div>
+        <div class="common-actions">
+          <!-- 삭제되지 않은 거래처만 수정 버튼 표시 -->
+          <a th:if="${!supplier.isDeleted}" th:href="@{/suppliers/{id}/edit(id=${supplier.supplierId})}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>수정
+          </a>
+        </div>
+      </div>
+
+      <div class="common-content">
+        <!-- 거래처 기본 정보 -->
+        <div class="detail-section">
+          <h2 class="section-title">거래처 정보</h2>
+          
+          <div class="user-profile-header">
+            <div class="user-avatar">
+              <i class="fas fa-building"></i>
+            </div>
+            <div class="user-basic-info">
+              <h3 class="user-name" th:text="${supplier.supplierName}">거래처명</h3>
+              <p class="user-code" th:text="${'ID: ' + supplier.supplierId}">ID: 1</p>
+              <!-- 상태 뱃지 -->
+              <div class="user-status">
+                <span class="status-badge"
+                      th:classappend="${!supplier.isDeleted ? 'status-active' : 'status-resigned'}"
+                      th:text="${!supplier.isDeleted ? '활성' : '삭제됨'}">활성</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="info-grid">
+            <div class="form-group">
+              <label class="form-label">주소</label>
+              <p class="form-control-static" th:text="${supplier.supplierAddress}">주소 정보</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">등록일</label>
+              <p class="form-control-static" th:text="${#temporals.format(supplier.supplierCreatedAt, 'yyyy-MM-dd HH:mm')}">2023-07-01 09:00</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">최근 수정일</label>
+              <p class="form-control-static" th:text="${supplier.supplierUpdatedAt != null ? #temporals.format(supplier.supplierUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
+            </div>
+            
+            <div class="form-group" th:if="${supplier.isDeleted}">
+              <label class="form-label">삭제일</label>
+              <p class="form-control-static" th:text="${supplier.supplierDeletedAt != null ? #temporals.format(supplier.supplierDeletedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 담당자 정보 -->
+        <div class="detail-section">
+          <h2 class="section-title">담당자 정보</h2>
+          
+          <div class="info-grid">
+            <div class="form-group">
+              <label class="form-label">담당자명</label>
+              <p class="form-control-static" th:text="${supplier.supplierManagerName}">홍길동</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">연락처</label>
+              <p class="form-control-static" th:text="${supplier.supplierManagerPhone}">010-1234-5678</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">이메일</label>
+              <p class="form-control-static" th:text="${supplier.supplierManagerEmail}">example@example.com</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 하단 버튼 영역 -->
+        <div class="form-actions">
+          <a th:href="@{/suppliers}" class="btn btn-outline-secondary">
+            <i class="fas fa-list me-2"></i>목록
+          </a>
+          <!-- 삭제되지 않은 거래처만 수정 버튼 표시 -->
+          <a th:if="${!supplier.isDeleted}" th:href="@{/suppliers/{id}/edit(id=${supplier.supplierId})}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>수정
+          </a>
+          <!-- 삭제되지 않은 거래처만 삭제 버튼 표시 -->
+          <button th:if="${!supplier.isDeleted}" class="btn btn-danger delete-button" th:data-id="${supplier.supplierId}">
+            <i class="fas fa-trash me-2"></i>삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 삭제 버튼 이벤트
+        const deleteButton = document.querySelector('.delete-button');
+        
+        if (deleteButton) {
+          deleteButton.addEventListener('click', function() {
+            const supplierId = this.dataset.id;
+            
+            if (confirm('해당 거래처를 삭제하시겠습니까?')) {
+              // POST 요청을 위한 Form 생성
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = `/suppliers/${supplierId}/delete`;
+              
+              // CSRF 토큰 추가 (Spring Security 사용 시)
+              const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+              const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+              
+              if (csrfToken && csrfHeader) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = csrfHeader;
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+              }
+              
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+        }
+      });
+    </script>
+  </th:block>
+</body>
+</html>
