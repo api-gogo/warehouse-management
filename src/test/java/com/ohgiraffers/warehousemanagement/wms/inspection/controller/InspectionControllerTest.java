@@ -17,9 +17,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Rollback
+@Transactional
 class InspectionControllerTest {
     private static final Logger log = LoggerFactory.getLogger(InspectionControllerTest.class);
     private final InspectionServiceImpl inspectionService;
@@ -32,7 +36,7 @@ class InspectionControllerTest {
 
     @BeforeEach
     void setUp() {
-        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK);
+        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK, LocalDate.now());
         inspection = inspectionService.createInspection(dto);
     }
 
@@ -40,7 +44,7 @@ class InspectionControllerTest {
     @Test
     @DisplayName("등록 테스트")
     void createInspection() {
-        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK);
+        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK, LocalDate.now());
 
         InspectionResponseDTO inspection = inspectionService.createInspection(dto);
 
@@ -56,7 +60,8 @@ class InspectionControllerTest {
                 inspection.getUserId(), inspection.getTransactionId(),
                 InspectionTransactionType.INSPECTION, inspection.getInspectionQuantity(),
                 inspection.getAcceptedQuantity(), inspection.getDefectiveQuantity(),
-                InspectionStatus.stringToInspectionStatus(inspection.getInspectionStatus()));
+                InspectionStatus.stringToInspectionStatus(inspection.getInspectionStatus()),
+                inspection.getInspectionDate());
         dto.setAcceptedQuantity(49);
         dto.setDefectiveQuantity(1);
         inspectionService.updateInspection(inspection.getInspectionId(), dto);
@@ -69,7 +74,8 @@ class InspectionControllerTest {
                 inspection.getUserId(), inspection.getTransactionId(),
                 InspectionTransactionType.INSPECTION, inspection.getInspectionQuantity(),
                 inspection.getAcceptedQuantity(), inspection.getDefectiveQuantity(),
-                InspectionStatus.stringToInspectionStatus(inspection.getInspectionStatus()));
+                InspectionStatus.stringToInspectionStatus(inspection.getInspectionStatus()),
+                inspection.getInspectionDate());
 
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             inspectionService.updateInspection(inspection.getInspectionId(), dto);
@@ -132,22 +138,22 @@ class InspectionControllerTest {
     @DisplayName("다중 등록 테스트")
     void createMultiInspection() {
         for(int i = 1; i <= 43; i++) {
-            InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, i, i, 0, InspectionStatus.OK);
+            InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, i, i, 0, InspectionStatus.OK, LocalDate.now());
             if(i % 2 == 0) {
                 dto.setTransactionType(InspectionTransactionType.PURCHASE);
-                dto.setTransactionId(1);
+                dto.setTransactionId(i);
             }
             if(i % 3 == 0) {
                 dto.setTransactionType(InspectionTransactionType.SALES);
-                dto.setTransactionId(2);
+                dto.setTransactionId(i);
             }
             if(i % 5 == 0) {
                 dto.setTransactionType(InspectionTransactionType.STORAGE);
-                dto.setTransactionId(3);
+                dto.setTransactionId(i);
             }
             if(i % 7 == 0) {
                 dto.setTransactionType(InspectionTransactionType.SHIPMENT);
-                dto.setTransactionId(4);
+                dto.setTransactionId(i);
             }
             if(i % 4 == 0) {
                 dto.setInspectionStatus(InspectionStatus.DEFECTIVE);
