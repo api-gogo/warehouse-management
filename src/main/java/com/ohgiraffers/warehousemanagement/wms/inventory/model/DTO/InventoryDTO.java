@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 
 public class InventoryDTO {
     private Long inventoryId;
-
     private Long storageId;
 
     private Long productId;
+    private String productName;
 
     private String lotNumber;
 
@@ -28,12 +28,14 @@ public class InventoryDTO {
     private LocalDateTime inventoryCreatedAt;
     private LocalDateTime inventoryUpdatedAt;
 
-    public InventoryDTO() {}
+    public InventoryDTO() {
+    }
 
-    public InventoryDTO(Long inventoryId, Long storageId, Long productId, String lotNumber, Long locationCode, Long availableStock, Long allocatedStock, Long disposedStock, LocalDate inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
+    public InventoryDTO(Long inventoryId, Long storageId, Long productId, String productName, String lotNumber, Long locationCode, Long availableStock, Long allocatedStock, Long disposedStock, LocalDate inventoryExpiryDate, LocalDateTime inventoryCreatedAt, LocalDateTime inventoryUpdatedAt) {
         this.inventoryId = inventoryId;
         this.storageId = storageId;
         this.productId = productId;
+        this.productName = productName;
         this.lotNumber = lotNumber;
         this.locationCode = locationCode;
         this.availableStock = availableStock;
@@ -66,6 +68,14 @@ public class InventoryDTO {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getLotNumber() {
@@ -104,8 +114,8 @@ public class InventoryDTO {
         return disposedStock;
     }
 
-    public void setDisposedStock(Long dispsosedStock) {
-        this.disposedStock = dispsosedStock;
+    public void setDisposedStock(Long disposedStock) {
+        this.disposedStock = disposedStock;
     }
 
     public LocalDate getInventoryExpiryDate() {
@@ -138,11 +148,12 @@ public class InventoryDTO {
                 "inventoryId=" + inventoryId +
                 ", storageId=" + storageId +
                 ", productId=" + productId +
+                ", productName='" + productName + '\'' +
                 ", lotNumber='" + lotNumber + '\'' +
                 ", locationCode=" + locationCode +
                 ", availableStock=" + availableStock +
                 ", allocatedStock=" + allocatedStock +
-                ", dispsosedStock=" + disposedStock +
+                ", disposedStock=" + disposedStock +
                 ", inventoryExpiryDate=" + inventoryExpiryDate +
                 ", inventoryCreatedAt=" + inventoryCreatedAt +
                 ", inventoryUpdatedAt=" + inventoryUpdatedAt +
