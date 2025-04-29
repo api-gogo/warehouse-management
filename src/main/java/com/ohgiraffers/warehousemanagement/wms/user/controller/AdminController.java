@@ -39,7 +39,7 @@ public class AdminController {
             search = null;
         }
 
-        Page<UserDTO> userPage = adminService.findUsers(search, status, pageable);
+        Page<UserDTO> userPage = adminService.getUsers(search, status, pageable);
 
         if (userPage.isEmpty()) {
             model.addAttribute("message", "조건에 맞는 회원이 없습니다.");
@@ -197,7 +197,7 @@ public class AdminController {
             search = null;
         }
 
-        Page<UserDTO> userPage = adminService.findPendingUsers(search, pageable);
+        Page<UserDTO> userPage = adminService.getPendingUsers(search, pageable);
 
         if (userPage.isEmpty()) {
             model.addAttribute("message", "승인 대기 중인 회원이 없습니다.");

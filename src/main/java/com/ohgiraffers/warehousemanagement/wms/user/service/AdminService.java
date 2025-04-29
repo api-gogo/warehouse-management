@@ -26,7 +26,7 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
-    public Page<UserDTO> findUsers(String search, String status, Pageable pageable) {
+    public Page<UserDTO> getUsers(String search, String status, Pageable pageable) {
         UserStatus userStatus = null;
         
         // 상태값 변환 로직
@@ -71,7 +71,7 @@ public class AdminService {
         ));
     }
 
-    public Page<UserDTO> findPendingUsers(String search, Pageable pageable) {
+    public Page<UserDTO> getPendingUsers(String search, Pageable pageable) {
         Page<User> userPage = userRepository.findByStatusAndSearch(UserStatus.승인대기, search, pageable);
 
         return userPage.map(user -> new UserDTO(

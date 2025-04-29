@@ -27,7 +27,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public LoginUserDTO findUserByUserCode(String userCode) {
+    public LoginUserDTO getUserByUserCode(String userCode) {
         Optional<User> user = userRepository.findByUserCode(userCode);
 
         return user.map(u -> new LoginUserDTO(
@@ -66,10 +66,10 @@ public class UserService {
         if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
             return -1;
         }
-        if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
+        else if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
             return -2;
         }
-        if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
+        else if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
             return -3;
         }
 
