@@ -1,11 +1,128 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+  <title>검수 상세</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/admin.css">
+  </th:block>
 </head>
 <body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='inspection'">
+    <div class="admin-container">
+      <div class="admin-header">
+        <div class="header-left">
+          <a th:href="@{/inspections}" class="back-button">
+            <i class="fas fa-arrow-left"></i> 검수 목록으로
+          </a>
+          <h1 class="admin-title">검수 상세 정보</h1>
+        </div>
 
+        <div class="admin-actions">
+          <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>수정
+          </a>
+        </div>
+      </div>
+
+      <div class="user-detail-container">
+        <div class="user-profile-header">
+          <div class="user-avatar">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <div class="user-basic-info">
+            <h2 class="user-name" th:text="'검수 #' + ${inspection.inspectionId}"></h2>
+            <p class="user-code" th:text="'거래 타입: ' + ${inspection.transactionType}"></p>
+            <div class="user-status">
+              <span class="status-badge"
+                    th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
+                                    (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
+                                    'status-pending')}"
+                    th:text="${inspection.inspectionStatus}">이상 없음</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-detail-sections">
+          <div class="detail-section">
+            <h3 class="section-title">기본 정보</h3>
+            <div class="info-grid">
+              <div class="form-group">
+                <label class="form-label">검수 ID</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.inspectionId}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">담당자 ID</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.userId}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">거래 유형</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.transactionType}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">거래 유형의 ID</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.transactionId != null ? inspection.transactionId : '-'}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">검수 상태</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.inspectionStatus}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">검수 날짜</label>
+                <input type="text" class="form-control readonly-field" th:value="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">최종 수정일</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.inspectionUpdatedAt != null ? #temporals.format(inspection.inspectionUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}" readonly>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="section-title">수량 정보</h3>
+            <div class="info-grid">
+              <div class="form-group">
+                <label class="form-label">총 검수 수량</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.inspectionQuantity + ' 개'}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">정상 수량</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.acceptedQuantity + ' 개'}" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">불량 수량</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.defectiveQuantity + ' 개'}" readonly>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">불량률</label>
+                <input type="text" class="form-control readonly-field" th:value="${inspection.inspectionQuantity > 0 ? #numbers.formatDecimal(inspection.defectiveQuantity * 100 / inspection.inspectionQuantity, 1, 2) + '%' : '0%'}" readonly>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="btn btn-primary">
+              <i class="fas fa-edit me-2"></i>검수 정보 수정
+            </a>
+            <a th:href="@{/inspections}" class="btn btn-secondary ms-2">
+              <i class="fas fa-list me-2"></i>목록으로
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
 </body>
 </html>
