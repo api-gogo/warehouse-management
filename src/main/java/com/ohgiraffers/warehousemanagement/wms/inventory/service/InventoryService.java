@@ -3,12 +3,15 @@ package com.ohgiraffers.warehousemanagement.wms.inventory.service;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.Inventory;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.InventoryRepository;
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
+import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,19 +19,21 @@ import java.util.stream.Collectors;
 @Service
 public class InventoryService {
     private final InventoryRepository inventoryRepository;
+    private final ProductService productService;
 
     @Autowired
-    public InventoryService(InventoryRepository inventoryRepository) {
+    public InventoryService(InventoryRepository inventoryRepository, ProductService productService) {
         this.inventoryRepository = inventoryRepository;
+        this.productService = productService;
     }
 
 
-    // DTO를 Entity로 변환
+    // Entity를 DTO로 변환
     public InventoryDTO convertToDTO(Inventory inventory) {
         InventoryDTO result = new InventoryDTO(
-                inventory.getInventoryid(),
+                inventory.getInventoryId(),
                 inventory.getStorageId(),
-                inventory.getProductId(),
+                inventory.getProduct().getProductId().longValue(), // Product 객체에서 ID를 추출
                 inventory.getLotNumber(),
                 inventory.getLocationCode(),
                 inventory.getAvailableStock(),
@@ -48,9 +53,9 @@ public class InventoryService {
                 .collect(Collectors.toList());
     }
 
+    // 실제 존재하는 상품 ID 여부 확인
     public List<InventoryDTO> findAllInventoriesByProductId(Long productId) {
-        // 실제 존재하는 상품 ID인지 확인
-        Optional<Inventory> inventory = inventoryRepository.findByProductId(productId);
+        Optional<Inventory> inventory = inventoryRepository.findByProductProductId(productId);
         if (inventory.isEmpty()) {
             throw new IllegalArgumentException("해당 상품의 재고가 존재하지 않습니다.");
         } else {
@@ -65,6 +70,12 @@ public class InventoryService {
         return convertToDTO(findInventory);
     }
 
+    public Inventory findTopByProductIdOrderByInventoryExpiryDateAsc(Integer productId){
+        Optional<Inventory> findInventory = inventoryRepository.findTopByProductProductIdOrderByInventoryExpiryDateAsc(productId);
+
+        return findInventory.get();
+    };
+
 
 
 
@@ -73,9 +84,13 @@ public class InventoryService {
         Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() ->
              new RuntimeException("없는 재고 데이터입니다."));
 
-        inventory.setInventoryid(inventoryDTO.getInventoryId());
+        inventory.setInventoryId(inventoryDTO.getInventoryId());
         inventory.setStorageId(inventoryDTO.getStorageId());
-        inventory.setProductId(inventoryDTO.getProductId());
+        
+        // Product 객체를 찾아서 설정
+        Product product = productService.findProductById(inventoryDTO.getProductId().intValue());
+        inventory.setProduct(product);
+        
         inventory.setLotNumber(inventoryDTO.getLotNumber());
         inventory.setLocationCode(inventoryDTO.getLocationCode());
         inventory.setAvailableStock(inventoryDTO.getAvailableStock());
@@ -101,8 +116,12 @@ public class InventoryService {
         // ID를 제외하고 엔티티 생성 (setter 사용)
         Inventory inventory = new Inventory();
         inventory.setStorageId(inventoryDTO.getStorageId());
-        inventory.setProductId(inventoryDTO.getProductId());
-        inventory.setLotNumber(inventoryDTO.getLotNumber());
+        
+        // Product 객체를 찾아서 설정
+        Product product = productService.findProductById(inventoryDTO.getProductId().intValue());
+        inventory.setProduct(product);
+        
+        inventory.setLotNumber(createRotNum(product));
         inventory.setLocationCode(inventoryDTO.getLocationCode());
         inventory.setAvailableStock(inventoryDTO.getAvailableStock());
         inventory.setAllocatedStock(inventoryDTO.getAllocatedStock());
@@ -118,6 +137,40 @@ public class InventoryService {
 
         // 저장된 엔티티를 DTO로 변환하여 반환
         return convertToDTO(savedInventory);
+    }
+
+    public String createRotNum(Product product) {
+        int categoryId = product.getCategory().getCategoryId();
+
+        // 현재 날짜의 월과 일 가져오기
+        LocalDate today = LocalDate.now();
+        int year = today.getYear() % 100;
+        int month = today.getMonthValue();
+
+        // 일련번호 생성
+        int sequence = getNextSequenceForProductToday(product.getProductId());
+
+        // 로트 번호 생성: 카테고리ID(2자리) + 년(2자리) + 월(2자리) + 일련번호(3자리)
+        String lotNumber = String.format("C%02d%02d%02d%03d", categoryId, year, month, sequence);
+
+        return lotNumber;
+    }
+
+    public int getNextSequenceForProductToday(Integer productId) {
+        // 당일 날짜 접두사 생성
+        LocalDate today = LocalDate.now();
+        String datePrefix = String.format("C%%__%02d%02d%%", today.getYear() % 100, today.getMonthValue()); // 예: "C%__2504%"
+
+        // 최대 lot_number 조회
+        String maxLotNumber = inventoryRepository.findMaxLotNumberByProductAndDate(productId, datePrefix);
+
+        if (maxLotNumber == null) {
+            return 1; // 첫 번째 일련번호
+        }
+
+        // lot_number에서 일련번호 추출 (마지막 3자리)
+        String sequencePart = maxLotNumber.substring(maxLotNumber.length() - 3);
+        return Integer.parseInt(sequencePart) + 1; // 다음 일련번호
     }
 
 }
