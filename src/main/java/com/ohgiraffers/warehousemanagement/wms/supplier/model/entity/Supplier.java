@@ -42,12 +42,12 @@ public class Supplier {
 
     protected Supplier() {}
 
-    public Supplier(String supplierManagerEmail, String supplierManagerPhone, String supplierManagerName, String supplierAddress, String supplierName) {
-        this.supplierManagerEmail = supplierManagerEmail;
-        this.supplierManagerPhone = supplierManagerPhone;
-        this.supplierManagerName = supplierManagerName;
-        this.supplierAddress = supplierAddress;
+    public Supplier(String supplierName, String supplierAddress, String supplierManagerName, String supplierManagerPhone, String supplierManagerEmail) {
         this.supplierName = supplierName;
+        this.supplierAddress = supplierAddress;
+        this.supplierManagerName = supplierManagerName;
+        this.supplierManagerPhone = supplierManagerPhone;
+        this.supplierManagerEmail = supplierManagerEmail;
         this.supplierCreatedAt = LocalDateTime.now();
         this.isDeleted = false;
     }
