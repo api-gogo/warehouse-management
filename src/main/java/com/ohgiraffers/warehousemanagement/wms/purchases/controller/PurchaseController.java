@@ -105,9 +105,6 @@ public class PurchaseController {
     }
 
 
-
-
-
     //단일조회
     @GetMapping("/{id}")
     public String getPurchaseById(@PathVariable Integer id, Model model) {
