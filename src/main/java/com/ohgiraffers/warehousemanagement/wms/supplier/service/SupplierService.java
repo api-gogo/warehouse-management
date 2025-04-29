@@ -46,7 +46,24 @@ public class SupplierService {
     }
 
     public SupplierDTO getSupplierBySupplierId(Integer supplierId) {
-        Optional<Supplier> supplier = supplierRepository.findById(supplierId);
+        Optional<Supplier> supplier = supplierRepository.findBySupplierId(supplierId);
+
+        return supplier.map(s -> new SupplierDTO(
+                s.getSupplierId(),
+                s.getSupplierName(),
+                s.getSupplierAddress(),
+                s.getSupplierManagerName(),
+                s.getSupplierManagerPhone(),
+                s.getSupplierManagerEmail(),
+                s.getSupplierCreatedAt(),
+                s.getSupplierUpdatedAt(),
+                s.getSupplierDeletedAt(),
+                s.getDeleted()
+        )).orElse(null);
+    }
+
+    public SupplierDTO getSupplierBySupplierName(String supplierName) {
+        Optional<Supplier> supplier = supplierRepository.findBySupplierName(supplierName);
 
         return supplier.map(s -> new SupplierDTO(
                 s.getSupplierId(),
