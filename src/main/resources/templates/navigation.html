@@ -96,9 +96,12 @@
     <button id="sidebar-toggle" class="sidebar-toggle">
       <i class="fas fa-bars"></i>
     </button>
-    <div class="search-container">
-      <i class="fas fa-search"></i>
-      <input type="search" placeholder="검색..." class="search-input">
+    <div class="user-welcome" th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
+      <span class="welcome-text">
+        <span class="user-name" th:text="${#authentication.principal.userRealName}">사용자</span>님 
+        (<span class="user-part" th:text="${#authentication.principal.userPart}">부서</span>, 
+        <span class="user-role" th:text="${#authentication.principal.userRole}">직책</span>), 환영합니다.
+      </span>
     </div>
   </div>
   <div class="header-right">

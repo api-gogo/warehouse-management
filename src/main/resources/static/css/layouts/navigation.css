@@ -36,6 +36,10 @@
     .sidebar-collapsed .main-content {
         margin-left: 0;
     }
+    
+    .user-welcome {
+        display: none;
+    }
 }
 
 /* ===== 사이드바 ===== */
@@ -196,36 +200,27 @@
     background-color: var(--bg-secondary);
 }
 
-/* 검색 컨테이너 */
-.search-container {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
+/* 사용자 환영 메시지 */
+.user-welcome {
+    margin-left: 0.75rem;
 }
 
-.search-container i {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.5rem 1rem 0.5rem 2.25rem;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 1.5rem;
-    font-size: 0.875rem;
+.welcome-text {
+    font-size: 0.9rem;
     color: var(--text-primary);
-    transition: all 0.2s;
+    font-weight: 400;
 }
 
-.search-input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+.welcome-text .user-name {
+    font-weight: 500;
+    color: var(--color-primary);
+    font-size: 1.2rem;
+}
+
+.welcome-text .user-part,
+.welcome-text .user-role {
+    font-weight: 400;
+    font-size: 0.9rem;
 }
 
 /* 헤더 버튼 */
@@ -292,7 +287,20 @@
         padding: 0 1rem;
     }
     
-    .search-container {
+    .user-welcome {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .welcome-text {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-welcome {
         max-width: 150px;
     }
 }
