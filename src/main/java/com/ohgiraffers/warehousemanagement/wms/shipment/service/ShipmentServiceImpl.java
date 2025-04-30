@@ -126,6 +126,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Shipment cancelled successfully: {}", shipmentId);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Integer getSaleIdByShipmentId(Integer shipmentId) {
+        log.info("Fetching saleId for shipment ID: {}", shipmentId);
+        Shipment shipment = findShipmentById(shipmentId);
+        return shipment.getSaleId();
+    }
+
     private Shipment convertToShipmentEntity(ShipmentCreateDTO dto) {
         Shipment shipment = new Shipment();
         shipment.setSaleId(dto.getSaleId());
