@@ -23,7 +23,8 @@
       </div>
 
       <div class="common-content">
-        <form th:action="@{/stores/{id}/edit(id=${store.storeId})}" method="post" th:object="${store}" class="needs-validation" novalidate>
+        <form th:action="@{/stores/{id}(id=${store.storeId})}" method="post" th:object="${store}" class="needs-validation" novalidate>
+          <input type="hidden" name="_method" value="PATCH">
           <!-- 점포 정보 섹션 -->
           <div class="detail-section">
             <h2 class="section-title">점포 정보</h2>
@@ -35,8 +36,8 @@
             <div class="info-grid">
               <div class="form-group">
                 <label for="storeName" class="form-label">점포명</label>
-                <input type="text" class="form-control" id="storeName" th:field="*{storeName}" placeholder="점포명 입력" required>
-                <div class="invalid-feedback">점포명을 입력해주세요.</div>
+                <input type="text" class="form-control" id="storeName" th:field="*{storeName}" readonly>
+                <input type="hidden" th:field="*{storeName}">
               </div>
               
               <div class="form-group">

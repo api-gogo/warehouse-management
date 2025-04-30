@@ -12,7 +12,7 @@
         </a>
       </li>
       <li th:class="${activeMenu == 'user' ? 'active' : ''}" 
-          th:if="${#authorization.expression('hasAuthority(''관리자'')') && #authentication.principal.userStatus == '재직중'}">
+          th:if="${#authorization.expression('hasAuthority(''통합_관리자'')')}">
         <a th:href="@{/admin/users}">
           <i class="fas fa-users"></i>
           <span>사용자 관리</span>
@@ -98,9 +98,9 @@
     </button>
     <div class="user-welcome" th:if="${#authorization != null && #authorization.expression('isAuthenticated()')}">
       <span class="welcome-text">
-        <span class="user-name" th:text="${#authentication.principal.userRealName}">사용자</span>님 
-        (<span class="user-part" th:text="${#authentication.principal.userPart}">부서</span>, 
-        <span class="user-role" th:text="${#authentication.principal.userRole}">직책</span>), 환영합니다.
+        <span class="user-name" th:text="${#authentication.principal.userRealName}">사용자</span>
+        (<span class="user-part" th:text="${#authentication.principal.userPart}">부서</span>,
+        <span class="user-role" th:text="${#authentication.principal.userRole}">직책</span>)님, 환영합니다.
       </span>
     </div>
   </div>

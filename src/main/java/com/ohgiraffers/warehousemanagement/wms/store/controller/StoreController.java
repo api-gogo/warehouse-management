@@ -98,4 +98,52 @@ public class StoreController {
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/stores";
     }
+
+    @GetMapping("/{storeId}/edit")
+    public String showStoreEditForm(@PathVariable Integer storeId, Model model, RedirectAttributes redirectAttributes) {
+        StoreDTO storeDTO = storeServiceImpl.findById(storeId);
+
+        if (storeDTO == null) {
+            String message = null;
+            message = "해당 id의 거래처가 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/stores/" + storeId;
+        }
+
+        model.addAttribute("store", storeDTO);
+        return "stores/edit";
+    }
+
+    @PatchMapping("/{storeId}")
+    public String updateStore(@PathVariable Integer storeId,
+                                 StoreDTO storeDTO, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = storeServiceImpl.updateStore(storeId, storeDTO);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/stores";
+        }
+
+        message = "거래처 정보가 업데이트 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/stores/" + storeId;
+    }
+
+    @PostMapping("/{storeId}/delete")
+    public String deleteStore(@PathVariable Integer storeId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = storeServiceImpl.deleteStore(storeId);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/stores";
+        }
+
+        message = "거래처가 삭제 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/stores";
+    }
 }

@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -81,6 +83,7 @@ public class StoreServiceImpl implements StoreService {
         )).orElse(null);
     }
 
+    @Transactional
     public Integer createStore(StoreDTO storeDTO) {
 
         if (storeRepository.existsByStoreName(storeDTO.getStoreName())) {
@@ -106,5 +109,36 @@ public class StoreServiceImpl implements StoreService {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    @Transactional
+    public boolean updateStore(Integer storeId, StoreDTO storeDTO) {
+        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+        if (store == null) {
+            return false;
+        }
+
+        store.setStoreAddress(storeDTO.getStoreAddress());
+        store.setStoreManagerName(storeDTO.getStoreManagerName());
+        store.setStoreManagerPhone(storeDTO.getStoreManagerPhone());
+        store.setStoreManagerEmail(storeDTO.getStoreManagerEmail());
+        store.setStoreUpdatedAt(LocalDateTime.now());
+
+        storeRepository.save(store);
+        return true;
+    }
+
+    @Transactional
+    public boolean deleteStore(Integer storeId) {
+        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+        if (store == null) {
+            return false;
+        }
+
+        store.setDeleted(true);
+        store.setStoreUpdatedAt(LocalDateTime.now());
+        store.setStoreDeletedAt(LocalDateTime.now());
+        storeRepository.save(store);
+        return true;
     }
 }
