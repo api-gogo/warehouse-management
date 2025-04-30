@@ -63,7 +63,7 @@ public class InspectionServiceImpl implements InspectionService {
             if(dto.getSearchType() == null || dto.getSearchType().trim().isEmpty()) {
                 inspectionList = inspectionRepository.findAllByOrderByInspectionIdDesc(pageable);
             } else {
-//                inspectionList = inspectionRepository.findAllBySearchOrderByInspectionIdDesc(dto.getSearchType(), dto.getSearch(), pageable);
+                inspectionList = inspectionRepository.findAllBySearchOrderByInspectionIdDesc(dto.getSearchType(), dto.getSearch(), pageable);
             }
 
         return inspectionList.map(InspectionResponseDTO::new);
@@ -71,9 +71,15 @@ public class InspectionServiceImpl implements InspectionService {
 
     public Page<InspectionResponseDTO> getAllInspectionByTag(ParamResponseDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-
+        Page<Inspection> inspectionList = null;
         if (InspectionTransactionType.typeContains(dto.getInspectionType())) {
-            Page<Inspection> inspectionList = inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(dto.getInspectionType()), pageable);
+            if(dto.getSearchType() == null || dto.getSearchType().trim().isEmpty()) {
+                inspectionList = inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(dto.getInspectionType()), pageable);
+            } else {
+                inspectionList = inspectionRepository.findAllByTransactionTypeAndSearchOrderByInspectionIdDesc(
+                        InspectionTransactionType.valueOf(dto.getInspectionType()),
+                        dto.getSearchType(), dto.getSearch(), pageable);
+            }
             return inspectionList.map(InspectionResponseDTO::new);
         }
         else

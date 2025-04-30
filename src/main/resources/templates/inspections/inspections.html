@@ -17,7 +17,7 @@
         <h1 class="common-title">검수 관리</h1>
         <div class="common-actions">
           <div class="search-box">
-            <input type="text" id="inspectionSearch" placeholder="검수ID, 검수자ID 검색..." class="search-input">
+            <input type="text" id="inspectionSearch" placeholder="검수ID, 검수자ID 검색..." class="search-input" th:value="${param.search}" th:if="${param.search != null || param.search != ''}">
             <button class="search-button">
               <i class="fas fa-search"></i>
             </button>
@@ -104,15 +104,15 @@
 
         <!-- 페이지네이션 -->
         <div class="pagination" th:if="${inspectionList != '검수 목록이 없습니다.' && inspectionList.totalPages > 1}">
-          <a th:href="@{/inspections(page=1, size=${inspectionList.size}, inspectionType=${param.inspectionType})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
+          <a th:href="@{/inspections(page=1, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-left"></i>
           </a>
-          <a th:href="@{/inspections(page=${inspectionList.number}, size=${inspectionList.size}, inspectionType=${param.inspectionType})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
+          <a th:href="@{/inspections(page=${inspectionList.number}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-left"></i>
           </a>
 
           <th:block th:each="i : ${#numbers.sequence(0, inspectionList.totalPages - 1)}">
-            <a th:href="@{/inspections(page=${i + 1}, size=${inspectionList.size}, inspectionType=${param.inspectionType})}"
+            <a th:href="@{/inspections(page=${i + 1}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}"
                class="page-link"
                th:text="${i + 1}"
                th:classappend="${inspectionList.number == i ? 'active' : ''}">1</a>
@@ -134,6 +134,7 @@
     <script>
       const params = new URLSearchParams(window.location.search);
       const currentType = params.get('inspectionType');
+      const urlSearchType = params.get('searchType');
       document.addEventListener('DOMContentLoaded', function() {
 
         // 탭 전환
@@ -159,16 +160,17 @@
           });
         });
 
-        // 상태 필터 변경 이벤트
-        // document.getElementById('typeFilter').addEventListener('change', function() {
-        //   const type = this.value;
-        //   window.location.href = `/inspections?type=${type}`;
-        // });
-
         // 검색 기능
         const searchInput = document.getElementById('inspectionSearch');
         const searchType = document.getElementById('typeFilter');
         const searchButton = document.querySelector('.search-button');
+
+        if (urlSearchType && searchType) {
+          const optionExists = Array.from(searchType.options).some(option => option.value === urlSearchType);
+          if (optionExists) {
+            searchType.value = urlSearchType;
+          }
+        }
 
         // 클릭으로 검색하는 경우
         searchButton.addEventListener('click', function() {

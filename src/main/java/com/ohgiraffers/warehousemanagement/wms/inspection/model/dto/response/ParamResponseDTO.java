@@ -3,11 +3,11 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response;
 public class ParamResponseDTO {
     private String inspectionType;
     private String searchType;
-    private Long search;
+    private String search;
 
     protected ParamResponseDTO() {}
 
-    public ParamResponseDTO(String inspectionType, String searchType, Long search) {
+    public ParamResponseDTO(String inspectionType, String searchType, String search) {
         this.inspectionType = inspectionType;
         this.searchType = searchType;
         this.search = search;
@@ -29,11 +29,11 @@ public class ParamResponseDTO {
         this.searchType = searchType;
     }
 
-    public Long getSearch() {
+    public String getSearch() {
         return search;
     }
 
-    public void setSearch(Long search) {
+    public void setSearch(String search) {
         this.search = search;
     }
 }

@@ -31,7 +31,7 @@ public class InspectionController {
     @GetMapping
     public String getAllInspection(@RequestParam(required = false) String inspectionType,
                                    @RequestParam(required = false) String searchType,
-                                   @RequestParam(required = false) Long search,
+                                   @RequestParam(required = false) String search,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size,
                                    Model model) {

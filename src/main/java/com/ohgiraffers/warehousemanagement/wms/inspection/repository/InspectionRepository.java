@@ -16,10 +16,19 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
 
     Page<Inspection> findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType transactionType, Pageable pageable);
 
-//    @Query("SELECT i FROM Inspection i WHERE " +
-//            "(:searchType = 'inspectionId' AND i.inspectionId LIKE %:search%) OR " +
-//            "(:searchType = 'userId' AND i.userId LIKE %:search%) OR " +
-//            "(:searchType = 'transactionId' AND i.transactionId LIKE %:search%) OR " +
-//            "(:searchType = 'inspectionDate' AND i.inspectionDate LIKE :search)")
-//    Page<Inspection> findAllBySearchOrderByInspectionIdDesc(String searchType, Long search, Pageable pageable);
+    @Query("SELECT i FROM Inspection i WHERE " +
+            "(:searchType = 'inspectionId' AND STR(i.inspectionId) = :search) OR " +
+            "(:searchType = 'userId' AND STR(i.user.userId) = :search) OR " +
+            "(:searchType = 'transactionId' AND STR(i.transactionId) = :search) OR " +
+            "(:searchType = 'inspectionDate' AND STR(i.inspectionDate) LIKE CONCAT('%', :search, '%')) " +
+            "ORDER BY i.inspectionId DESC")
+    Page<Inspection> findAllBySearchOrderByInspectionIdDesc(String searchType, String search, Pageable pageable);
+
+    @Query("SELECT i FROM Inspection i WHERE i.transactionType = :inspectionTransactionType AND (" +
+            "(:searchType = 'inspectionId' AND STR(i.inspectionId) = :search) OR " +
+            "(:searchType = 'userId' AND STR(i.user.userId) = :search) OR " +
+            "(:searchType = 'transactionId' AND STR(i.transactionId) = :search) OR " +
+            "(:searchType = 'inspectionDate' AND STR(i.inspectionDate) LIKE CONCAT('%', :search, '%'))" +
+            ") ORDER BY i.inspectionId DESC")
+    Page<Inspection> findAllByTransactionTypeAndSearchOrderByInspectionIdDesc(InspectionTransactionType inspectionTransactionType, String searchType, String search, Pageable pageable);
 }
