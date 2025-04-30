@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -82,6 +83,7 @@ public class SupplierServiceImpl implements SupplierService {
         )).orElse(null);
     }
 
+    @Transactional
     public Integer createSupplier(SupplierDTO supplierDTO) {
 
         if (supplierRepository.existsBySupplierName(supplierDTO.getSupplierName())) {
@@ -109,6 +111,7 @@ public class SupplierServiceImpl implements SupplierService {
         }
     }
 
+    @Transactional
     public boolean updateSupplier(Integer supplierId, SupplierDTO supplierDTO) {
         Supplier supplier = supplierRepository.findBySupplierId(supplierId).orElse(null);
         if (supplier == null) {
@@ -125,6 +128,7 @@ public class SupplierServiceImpl implements SupplierService {
         return true;
     }
 
+    @Transactional
     public boolean deleteSupplier(Integer supplierId) {
         Supplier supplier = supplierRepository.findBySupplierId(supplierId).orElse(null);
         if (supplier == null) {
