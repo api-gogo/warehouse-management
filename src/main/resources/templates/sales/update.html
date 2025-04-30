@@ -60,18 +60,21 @@
                         <div class="form-group mb-4">
                             <label>수주 물품 목록</label>
                             <div id="items-container">
-                                <th:block th:each="item, iterStat : ${salesDTO.items}">
+                                <th:block th:if="${salesDTO.productIds != null}"
+                                          th:each="i : ${#numbers.sequence(0, salesDTO.productIds.size() - 1)}">
                                     <div class="item-row mb-3">
                                         <div class="item-header">
-                                            <strong th:text="'물품 ' + ${iterStat.index + 1}">물품 1</strong>
-                                            <button type="button" class="btn btn-outline-danger btn-sm remove-item" th:style="${salesDTO.items.size() == 1} ? 'display: none;' : ''">
+                                            <strong th:text="'물품 ' + ${i + 1}">물품</strong>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-item"
+                                                    th:style="${salesDTO.productIds.size() == 1} ? 'display: none;' : ''">
                                                 <i class="fas fa-times"></i> 삭제
                                             </button>
                                         </div>
-                                        <input type="text" th:name="|items[${iterStat.index}]|" class="form-control mb-2"
-                                               th:value="${item}" required placeholder="상품명 입력">
-                                        <input type="number" th:name="|quantity[${iterStat.index}]|" class="form-control"
-                                               th:value="${salesDTO.quantity[iterStat.index]}" min="1" required placeholder="수량 입력">
+
+                                        <input type="hidden" th:name="|productIds[${i}]|" th:value="${salesDTO.productIds[i]}" />
+                                        <input type="text" class="form-control mb-2" th:value="${salesDTO.productNames[i]}" readonly placeholder="상품명" />
+                                        <input type="number" th:name="|quantity[${i}]|" class="form-control"
+                                               th:value="${salesDTO.quantity[i]}" min="1" required placeholder="수량 입력" />
                                     </div>
                                 </th:block>
                             </div>
@@ -96,7 +99,7 @@
             </div>
 
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
                     const addItemBtn = document.getElementById('add-item');
                     const itemsContainer = document.getElementById('items-container');
 
@@ -106,52 +109,42 @@
                             const header = row.querySelector('.item-header strong');
                             header.textContent = `물품 ${index + 1}`;
 
-                            const itemInput = row.querySelector('input[name^="items["]');
-                            const quantityInput = row.querySelector('input[name^="quantity["]');
+                            const idInput = row.querySelector('input[name^="productIds["]');
+                            const nameInput = row.querySelector('input[name^="productNames["]');
+                            const qtyInput = row.querySelector('input[name^="quantity["]');
 
-                            if (itemInput) {
-                                itemInput.name = `items[${index}]`;
-                            }
-                            if (quantityInput) {
-                                quantityInput.name = `quantity[${index}]`;
-                            }
+                            if (idInput) idInput.name = `productIds[${index}]`;
+                            if (nameInput) nameInput.name = `productNames[${index}]`;
+                            if (qtyInput) qtyInput.name = `quantity[${index}]`;
 
                             const removeButton = row.querySelector('.remove-item');
-                            if (itemRows.length > 1) {
-                                removeButton.style.display = 'inline-block';
-                            } else {
-                                removeButton.style.display = 'none';
-                            }
+                            removeButton.style.display = (itemRows.length > 1) ? 'inline-block' : 'none';
                         });
                     }
 
-                    let itemIndex = document.querySelectorAll('.item-row').length;
-
-                    addItemBtn.addEventListener('click', function() {
+                    addItemBtn.addEventListener('click', function () {
                         const itemRow = document.createElement('div');
                         itemRow.className = 'item-row mb-3';
                         itemRow.innerHTML = `
-                    <div class="item-header">
-                        <strong>물품 ${itemIndex + 1}</strong>
-                        <button type="button" class="btn btn-outline-danger btn-sm remove-item">
-                            <i class="fas fa-times"></i> 삭제
-                        </button>
-                    </div>
-                    <input type="text" name="items[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
-                    <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
-                    `;
+                <div class="item-header">
+                    <strong>물품</strong>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                        <i class="fas fa-times"></i> 삭제
+                    </button>
+                </div>
+                <input type="hidden" name="productIds[]" class="form-control" value="" />
+                <input type="text" name="productNames[]" class="form-control mb-2" placeholder="상품명" readonly />
+                <input type="number" name="quantity[]" class="form-control" placeholder="수량 입력" min="1" required />
+            `;
                         itemsContainer.appendChild(itemRow);
-                        itemIndex++;
                         updateItemHeaders();
                     });
 
-                    itemsContainer.addEventListener('click', function(event) {
+                    itemsContainer.addEventListener('click', function (event) {
                         if (event.target.closest('.remove-item')) {
-                            const button = event.target.closest('.remove-item');
-                            const itemRow = button.closest('.item-row');
+                            const itemRow = event.target.closest('.item-row');
                             itemRow.remove();
                             updateItemHeaders();
-                            itemIndex = document.querySelectorAll('.item-row').length;
                         }
                     });
 
