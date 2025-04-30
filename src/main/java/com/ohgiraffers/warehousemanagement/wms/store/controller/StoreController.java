@@ -87,14 +87,9 @@ public class StoreController {
             message = "중복된 담당자 이메일이 존재합니다.";
             redirectAttributes.addFlashAttribute("message", message);
             return "redirect:/stores/create";
-        } else if (result == 0) {
-            message = "서버에 오류가 발생하였습니다.";
-            redirectAttributes.addFlashAttribute("message", message);
-            return "redirect:/stores/create";
-        } else {
-            message = "점포 추가가 완료되었습니다.";
         }
 
+        message = "점포 추가가 완료되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/stores";
     }
@@ -105,7 +100,7 @@ public class StoreController {
 
         if (storeDTO == null) {
             String message = null;
-            message = "해당 id의 거래처가 없습니다.";
+            message = "해당 id의 점포가 없습니다.";
             redirectAttributes.addFlashAttribute("message", message);
             return "redirect:/stores/" + storeId;
         }
@@ -118,15 +113,23 @@ public class StoreController {
     public String updateStore(@PathVariable Integer storeId,
                                  StoreDTO storeDTO, RedirectAttributes redirectAttributes) {
         String message = null;
-        boolean result = storeServiceImpl.updateStore(storeId, storeDTO);
+        Integer result = storeServiceImpl.updateStore(storeId, storeDTO);
 
-        if (!result) {
-            message = "거래처 정보를 찾을 수 없습니다.";
+        if (result == -1) {
+            message = "중복된 점포 이름이 존재합니다.";
             redirectAttributes.addFlashAttribute("message", message);
-            return "redirect:/stores";
+            return "redirect:/stores/" + storeId + "/edit";
+        } else if (result == -2) {
+            message = "중복된 담당자 전화번호가 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/stores/" + storeId + "/edit";
+        } else if (result == -3) {
+            message = "중복된 담당자 이메일이 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/stores/" + storeId + "/edit";
         }
-
-        message = "거래처 정보가 업데이트 되었습니다.";
+        
+        message = "점포 정보가 업데이트 되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/stores/" + storeId;
     }
@@ -137,12 +140,12 @@ public class StoreController {
         boolean result = storeServiceImpl.deleteStore(storeId);
 
         if (!result) {
-            message = "거래처 정보를 찾을 수 없습니다.";
+            message = "점포 정보를 찾을 수 없습니다.";
             redirectAttributes.addFlashAttribute("message", message);
             return "redirect:/stores";
         }
 
-        message = "거래처가 삭제 되었습니다.";
+        message = "점포가 삭제 되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/stores";
     }
