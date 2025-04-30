@@ -286,8 +286,8 @@
       <div class="filter-input">
         <form th:action="@{/inventories}" method="get">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="상품명 검색..." name="searchProductId"
-                 th:value="${searchProductId}" class="form-control" />
+          <input type="text" placeholder="상품명 검색..." name="productName"
+                 th:value="${productName}" class="form-control" />
         </form>
       </div>
       <div class="filter-dropdown">
@@ -320,33 +320,20 @@
       <table class="data-table">
         <thead>
         <tr>
-          <th>재고 ID</th>
-          <th>상품 ID</th>
-          <th>로트 번호</th>
-          <th>위치 코드</th>
-          <th>가용 재고</th>
-          <th>유통기한</th>
-          <th>상태</th>
-          <th>관리</th>
+          <th>상품 이름</th>
+          <th>해당 상품의 로트 번호 갯수</th>
+          <th>총 가용 재고</th>
+          <th>총 할당 재고</th>
+          <th>총 폐기 재고</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="inventory : ${inventories}">
-          <td th:text="${inventory.inventoryId}"></td>
-          <td th:text="${inventory.productId}"></td>
-          <td th:text="${inventory.lotNumber}"></td>
-          <td th:text="${inventory.locationCode}"></td>
-          <td th:text="${inventory.availableStock}"></td>
-          <td th:text="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}"></td>
-          <td>
-                <span
-                        th:class="${inventory.availableStock > 100 ? 'status-tag status-normal' : 'status-tag status-low'}"
-                        th:text="${inventory.availableStock > 100 ? '정상' : '부족'}">
-                </span>
-          </td>
-          <td>
-            <a th:href="@{/inventories/detail/{id}(id=${inventory.inventoryId})}" class="action-link">상세</a>
-          </td>
+          <td th:text="${inventory.productName}"></td>
+          <td th:text="${inventory.Count}"></td>
+          <td th:text="${inventory.TotalAvailableStock}"></td>
+          <td th:text="${inventory.TotalAllocatedStock}"></td>
+          <td th:text="${inventory.TotalDisposedStock}"></td>
         </tr>
         </tbody>
       </table>
