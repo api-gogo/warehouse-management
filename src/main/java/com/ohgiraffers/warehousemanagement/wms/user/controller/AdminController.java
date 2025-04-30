@@ -71,7 +71,7 @@ public class AdminController {
             return "redirect:/admin/users";
         }
         
-        model.addAttribute("user", userDTO); // 모델에 "user"라는 이름으로 추가
+        model.addAttribute("user", userDTO);
         return "admin/users/detail";
     }
 
