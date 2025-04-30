@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>출고 상세 정보</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" href="/css/예시.css">
+    </th:block>
     <style>
+        .dark-mode h2 {
+            color: snow;
+        }
+
         body {
             background-color: #f8f9fa;
         }
@@ -28,6 +38,10 @@
     </style>
 </head>
 <body>
+<!-- 페이지 콘텐츠 -->
+<th:block layout:fragment="content" th:with="activeMenu='예시'">
+    <div class="예시-container">
+        <!-- 페이지 내용 -->
 <div class="container">
     <h2>출고 상세 정보</h2>
 
@@ -65,5 +79,14 @@
         </div>
     </div>
 </div>
+    </div>
+</th:block>
+
+<!-- 페이지별 스크립트 -->
+<th:block layout:fragment="scripts">
+    <script>
+        // 스크립트 내용
+    </script>
+</th:block>
 </body>
 </html>
