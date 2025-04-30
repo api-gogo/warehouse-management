@@ -58,7 +58,7 @@ public class AdminService {
             }
         }
         
-        Page<User> userPage = userRepository.findByPartRoleStatusAndSearch(userPart, userRole, userStatus, search, pageable);
+        Page<User> userPage = userRepository.findByFilters(userPart, userRole, userStatus, search, pageable);
 
         return userPage.map(user -> new UserDTO(
                 user.getUserId(),

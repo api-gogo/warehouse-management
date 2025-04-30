@@ -4,7 +4,7 @@ import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
-import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
+import com.ohgiraffers.warehousemanagement.wms.user.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,68 +22,69 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
+    public UserController(UserServiceImpl userServiceImpl, PasswordEncoder passwordEncoder) {
+        this.userServiceImpl = userServiceImpl;
         this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/signup")
-    public String getSignUpForm(Model model) {
+    public String showSignupForm(Model model) {
         model.addAttribute("signupUserDTO", new SignupUserDTO());
-        return "user/signup";
+        return "user/register";
     }
 
     @PostMapping("/signup")
-    public String signUpUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model) {
+    public String registerUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model, RedirectAttributes redirectAttributes) {
 
-        Integer result = userService.registerUser(signupUserDTO);
+        Integer result = userServiceImpl.registerUser(signupUserDTO);
         String message = null;
 
         if (result == -1) {
             message = "중복된 사원번호가 존재합니다.";
             model.addAttribute("message", message);
-            return "user/signup";
+            return "user/register";
         } else if (result == -2) {
             message = "중복된 이메일이 존재합니다.";
             model.addAttribute("message", message);
-            return "user/signup";
+            return "user/register";
         } else if (result == -3) {
             message = "중복된 전화번호가 존재합니다.";
             model.addAttribute("message", message);
-            return "user/signup";
+            return "user/register";
         } else if (result == 0) {
             message = "서버에 오류가 발생하였습니다.";
             model.addAttribute("message", message);
-            return "user/signup";
+            return "user/register";
         } else {
             message = "회원가입이 완료되었습니다.";
-            model.addAttribute("message", message);
-            return "auth/login";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/auth/login";
         }
     }
 
     @GetMapping("/profile")
-    public String getProfile(Authentication authentication, Model model) {
+    public String showUserProfile(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-                UserDTO userDTO = userService.getUserByUserId(authDetails.getUserId());
+                UserDTO userDTO = userServiceImpl.findById(authDetails.getUserId());
 
                 model.addAttribute("user", userDTO);
-                return "user/profile";
+                return "user/detail";
             }
         }
 
-        System.out.println("디버깅용");
         return "redirect:/";
     }
 
     @GetMapping("/password-verify")
-    public String getVerifyForm(Authentication authentication, Model model) {
+    public String showPasswordVerificationForm(Authentication authentication, 
+                                              Model model,
+                                              RedirectAttributes redirectAttributes) {
         // 로그인 상태 확인
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
@@ -92,11 +93,11 @@ public class UserController {
                 
                 // 승인대기 상태는 프로필 수정 불가
                 if (status.equals(UserStatus.승인대기.getStatus())) {
-                    model.addAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
+                    redirectAttributes.addFlashAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
                     return "redirect:/user/profile";
                 }
                 
-                return "user/password-verify";
+                return "user/verify";
             }
         }
         
@@ -104,30 +105,30 @@ public class UserController {
     }
 
     @PostMapping("/password-verify")
-    public String verifyPassword(Authentication authentication, @RequestParam String verifyPassword, Model model) {
-        String message = null;
-
+    public String verifyPassword(Authentication authentication, 
+                                @RequestParam String verifyPassword, 
+                                Model model,
+                                RedirectAttributes redirectAttributes) {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
                 
                 // 승인대기 상태 확인
                 if (authDetails.getUserStatus().equals(UserStatus.승인대기.getStatus())) {
-                    model.addAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
+                    redirectAttributes.addFlashAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
                     return "redirect:/user/profile";
                 }
 
                 String encodedPassword = authDetails.getPassword();
 
                 if (!passwordEncoder.matches(verifyPassword, encodedPassword)) {
-                    message = "비밀번호가 일치하지 않습니다.";
-                    model.addAttribute("message", message);
-                    return "user/password-verify";
+                    model.addAttribute("message", "비밀번호가 일치하지 않습니다.");
+                    return "user/verify";
                 }
 
-                UserDTO userDTO = userService.getUserByUserId(authDetails.getUserId());
+                UserDTO userDTO = userServiceImpl.findById(authDetails.getUserId());
                 model.addAttribute("user", userDTO);
-                return "user/update";
+                return "user/edit";
             }
         }
 
@@ -135,7 +136,7 @@ public class UserController {
     }
 
     @PatchMapping("/profile")
-    public String updateProfile(Authentication authentication, @ModelAttribute UserDTO updateUser,
+    public String updateUserProfile(Authentication authentication, @ModelAttribute UserDTO updateUser,
                                 RedirectAttributes redirectAttributes) {
         String message = null;
 
@@ -144,7 +145,7 @@ public class UserController {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
                 Integer userId = authDetails.getUserId();
                 
-                boolean result = userService.updateProfile(userId, updateUser);
+                boolean result = userServiceImpl.updateProfile(userId, updateUser);
 
                 if (!result) {
                     message = "회원 정보를 찾을 수 없습니다.";

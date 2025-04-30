@@ -2,7 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.user.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.AdminService;
-import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
+import com.ohgiraffers.warehousemanagement.wms.user.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +21,16 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public AdminController(AdminService adminService, UserService userService) {
+    public AdminController(AdminService adminService, UserServiceImpl userServiceImpl) {
         this.adminService = adminService;
-        this.userService = userService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @GetMapping("/users")
-    public String getUsers(@RequestParam(required = false) String search,
+    public String listUsers(@RequestParam(required = false) String search,
                            @RequestParam(required = false, defaultValue = "all") String statusTab,
                            @RequestParam(required = false, defaultValue = "all") String roleTab,
                            @RequestParam(required = false, defaultValue = "all") String partTab,
@@ -59,34 +59,33 @@ public class AdminController {
 
         model.addAttribute("search", search);
 
-        return "admin/users";
+        return "admin/users/list";
     }
 
     @GetMapping("/users/{userId}")
-    public String getUser(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.getUserByUserId(userId);
+    public String showUserDetail(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+        UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            model.addAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
+            return "redirect:/admin/users";
         }
+        
         model.addAttribute("user", userDTO);
-        return "admin/user-detail";
+        return "admin/users/detail";
     }
 
     @GetMapping("/users/{userId}/edit")
-    public String getUserEdit(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.getUserByUserId(userId);
+    public String showUserEditForm(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+        UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            model.addAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
             return "redirect:/admin/users";
         }
+        
         model.addAttribute("user", userDTO);
-        return "admin/user-edit";
+        return "admin/users/edit";
     }
 
     @PatchMapping("/users/{userId}")
@@ -225,7 +224,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/approvals")
-    public String getPendingUsers(@RequestParam(required = false) String search,
+    public String listPendingUsers(@RequestParam(required = false) String search,
                                   @PageableDefault(size = 10) Pageable pageable,
                                   Model model) {
         // 검색어가 빈 문자열일 경우 null로 처리
@@ -250,7 +249,7 @@ public class AdminController {
 
         model.addAttribute("search", search);
 
-        return "admin/user-approvals";
+        return "admin/users/approvals";
     }
 
     @PostMapping("/users/approve-batch")

@@ -1,7 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.supplier.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.supplier.model.dto.SupplierDTO;
-import com.ohgiraffers.warehousemanagement.wms.supplier.service.SupplierService;
+import com.ohgiraffers.warehousemanagement.wms.supplier.service.SupplierServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,15 +15,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/suppliers")
 public class SupplierController {
 
-    private final SupplierService supplierService;
+    private final SupplierServiceImpl supplierServiceImpl;
 
     @Autowired
-    public SupplierController(SupplierService supplierService) {
-        this.supplierService = supplierService;
+    public SupplierController(SupplierServiceImpl supplierServiceImpl) {
+        this.supplierServiceImpl = supplierServiceImpl;
     }
 
     @GetMapping
-    public String getSuppliers(@RequestParam(required = false) String search,
+    public String listSuppliers(@RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "active") String status,
             @PageableDefault(size = 10) Pageable pageable,
             Model model) {
@@ -32,7 +32,7 @@ public class SupplierController {
             search = null;
         }
 
-        Page<SupplierDTO> supplierPage = supplierService.getSuppliers(search, status, pageable);
+        Page<SupplierDTO> supplierPage = supplierServiceImpl.findAll(search, status, pageable);
         if (supplierPage.isEmpty()) {
             model.addAttribute("message", "조건에 맞는 거래처가 없습니다.");
         }
@@ -49,8 +49,8 @@ public class SupplierController {
     }
 
     @GetMapping("/{supplierId}")
-    public String getSupplier(@PathVariable Integer supplierId, Model model) {
-        SupplierDTO supplierDTO = supplierService.getSupplierBySupplierId(supplierId);
+    public String showSupplierDetail(@PathVariable Integer supplierId, Model model) {
+        SupplierDTO supplierDTO = supplierServiceImpl.findById(supplierId);
 
         if (supplierDTO == null) {
             String message = null;
@@ -63,16 +63,16 @@ public class SupplierController {
     }
 
     @GetMapping("/create")
-    public String getCreateForm(Model model) {
+    public String showSupplierForm(Model model) {
         SupplierDTO supplierDTO = new SupplierDTO();
         model.addAttribute("supplier", supplierDTO);
         return "suppliers/create";
     }
 
     @PostMapping("/create")
-    public String createSupplier(@ModelAttribute SupplierDTO supplierDTO, RedirectAttributes redirectAttributes) {
+    public String registerSupplier(@ModelAttribute SupplierDTO supplierDTO, RedirectAttributes redirectAttributes) {
 
-        Integer result = supplierService.createSupplier(supplierDTO);
+        Integer result = supplierServiceImpl.createSupplier(supplierDTO);
         String message = null;
 
         if (result == -1) {
@@ -95,6 +95,52 @@ public class SupplierController {
             message = "거래처 추가가 완료되었습니다.";
         }
 
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers";
+    }
+
+    @GetMapping("/{supplierId}/edit")
+    public String showSupplierEditForm(@PathVariable Integer supplierId, Model model, RedirectAttributes redirectAttributes) {
+        SupplierDTO supplierDTO = supplierServiceImpl.findById(supplierId);
+
+        if (supplierDTO == null) {
+            redirectAttributes.addFlashAttribute("message", "해당 id의 거래처가 없습니다.");
+            return "redirect:/suppliers";
+        }
+
+        model.addAttribute("supplier", supplierDTO);
+        return "suppliers/edit";
+    }
+
+    @PatchMapping("/{supplierId}")
+    public String updateSupplier(@PathVariable Integer supplierId,
+                                 SupplierDTO supplierDTO, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.updateSupplier(supplierId, supplierDTO);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처 정보가 업데이트 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers/" + supplierId;
+    }
+
+    @PostMapping("/{supplierId}/delete")
+    public String deleteSupplier(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.deleteSupplier(supplierId);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처가 삭제 되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/suppliers";
     }

@@ -53,14 +53,14 @@ public class CategoryController {
         return "categories/list";
     }
 
-    // 카테고리 생성 (모달창에서 제출)
+    // 카테고리 생성
     @PostMapping("/create")
     public String createCategory(@ModelAttribute CategoryDTO categoryDTO) {
         categoryService.createCategory(categoryDTO);
         return "redirect:/categories";
     }
 
-    // 카테고리 수정 (모달창에서 제출)
+    // 카테고리 수정
     @PostMapping("/update")
     public String updateCategory(@ModelAttribute CategoryDTO categoryDTO) {
         categoryService.updateCategory(categoryDTO.getCategoryId().intValue(), categoryDTO);

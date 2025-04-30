@@ -4,15 +4,19 @@ public class LogUserDTO {
 
     private Integer userId;
     private String userName;
+    private String userEmail;
+    private String userPhone;
     private String userPart;
     private String userRole;
     private String userStatus;
 
     public LogUserDTO() {}
 
-    public LogUserDTO(Integer userId, String userName, String userPart, String userRole, String userStatus) {
+    public LogUserDTO(Integer userId, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus) {
         this.userId = userId;
         this.userName = userName;
+        this.userEmail = userEmail;
+        this.userPhone = userPhone;
         this.userPart = userPart;
         this.userRole = userRole;
         this.userStatus = userStatus;
@@ -32,6 +36,22 @@ public class LogUserDTO {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public String getUserPart() {
