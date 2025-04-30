@@ -36,6 +36,10 @@
     .sidebar-collapsed .main-content {
         margin-left: 0;
     }
+    
+    .user-welcome {
+        display: none;
+    }
 }
 
 /* ===== 사이드바 ===== */
@@ -228,6 +232,29 @@
     box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
 }
 
+/* 사용자 환영 메시지 */
+.user-welcome {
+    margin-left: 0.75rem;
+}
+
+.welcome-text {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 400;
+}
+
+.welcome-text .user-name {
+    font-weight: 500;
+    color: var(--color-primary);
+    font-size: 1.2rem;
+}
+
+.welcome-text .user-part,
+.welcome-text .user-role {
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
 /* 헤더 버튼 */
 .header-button {
     width: 2.25rem;
@@ -292,7 +319,20 @@
         padding: 0 1rem;
     }
     
-    .search-container {
+    .user-welcome {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .welcome-text {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-welcome {
         max-width: 150px;
     }
 }

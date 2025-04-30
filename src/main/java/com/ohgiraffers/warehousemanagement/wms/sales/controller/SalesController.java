@@ -36,6 +36,7 @@ public class SalesController {
         } else { // 아무것도 없으면 빈 리스트
             mv.addObject("salesLists", new ArrayList<>());
         }
+
         return mv;
     }
     
@@ -47,13 +48,13 @@ public class SalesController {
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
     @PostMapping("/create")
     public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
-        boolean savedDTO = salesServiceImpl.createSales(salesDTO);
+        int salesId = salesServiceImpl.createSales(salesDTO);
         String resultUrl = null;
 
-        if (savedDTO) {
-            rdtat.addFlashAttribute("salesDTO", savedDTO);
+        if (salesId > 0) {
+            rdtat.addFlashAttribute("salesDTO", salesId);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
-            resultUrl = "redirect:/sales";
+            resultUrl = "redirect:/sales/" + salesId;
         } else {
             rdtat.addFlashAttribute("message","수주서 등록에 실패하였습니다. 다시 시도해주세요.");
             resultUrl = "redirect:/sales";
@@ -72,6 +73,7 @@ public class SalesController {
             rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
             mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감
         }
+
         return mv;
     }
 
@@ -118,7 +120,7 @@ public class SalesController {
             rdtat.addFlashAttribute("message","상태 변경에 실패했습니다. 다시 시도해주세요.");
             resultUrl = "redirect:/sales/" + salesId;
         }
+
         return resultUrl;
     }
-
 }

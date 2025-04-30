@@ -52,8 +52,8 @@ public class AuthFailHandler extends SimpleUrlAuthenticationFailureHandler {
             errorMessage = exception.getMessage();
         } else if (exception instanceof AccountStatusException) {
             // 계정 상태 관련 예외
-            if (exception.getMessage().contains("승인거부")) {
-                errorMessage = "승인이 거부된 계정입니다. 관리자에게 문의하세요.";
+            if (exception.getMessage().contains("블랙")) {
+                errorMessage = "차단된 계정입니다. 관리자에게 문의하세요.";
             } else if (exception.getMessage().contains("퇴사")) {
                 errorMessage = "퇴사 처리된 계정입니다. 관리자에게 문의하세요.";
             } else {

@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.user.service;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserPart;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.SignupUserDTO;
@@ -27,7 +28,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public LoginUserDTO findUserByUserCode(String userCode) {
+    public LoginUserDTO getUserByUserCode(String userCode) {
         Optional<User> user = userRepository.findByUserCode(userCode);
 
         return user.map(u -> new LoginUserDTO(
@@ -66,10 +67,10 @@ public class UserService {
         if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
             return -1;
         }
-        if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
+        else if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
             return -2;
         }
-        if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
+        else if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
             return -3;
         }
 
@@ -98,13 +99,21 @@ public class UserService {
             return false;
         }
 
+        // 비밀번호가 제공된 경우 업데이트
         if (userDTO.getUserPass() != null && !userDTO.getUserPass().trim().isEmpty()) {
             user.setUserPass(passwordEncoder.encode(userDTO.getUserPass()));
         }
 
+        // 일반 필드 업데이트
         user.setUserEmail(userDTO.getUserEmail());
         user.setUserPhone(userDTO.getUserPhone());
         user.setUserUpdatedAt(LocalDateTime.now());
+        
+        // 승인거부 상태인 경우 승인대기로 변경
+        if (user.getUserStatus() == UserStatus.승인거부) {
+            user.setUserStatus(UserStatus.승인대기);
+        }
+        
         userRepository.save(user);
         return true;
     }

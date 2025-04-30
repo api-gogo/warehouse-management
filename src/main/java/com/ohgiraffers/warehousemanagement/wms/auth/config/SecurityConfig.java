@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -19,11 +20,11 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AuthFailHandler authFailHanlder;
+    private final AuthFailHandler authFailHandler;
 
     @Autowired
-    public SecurityConfig(AuthFailHandler authFailHanlder) {
-        this.authFailHanlder = authFailHanlder;
+    public SecurityConfig(AuthFailHandler authFailHandler) {
+        this.authFailHandler = authFailHandler;
     }
 
     @Bean
@@ -50,20 +51,27 @@ public class SecurityConfig {
             auth.requestMatchers("/auth/login", "/user/signup", "/auth/fail", "/").permitAll();
 
             // 2. 통합 부서 관리자는 모든 경로에 접근 가능
-            auth.requestMatchers("/**").hasAuthority("통합_관리자");
+            auth.requestMatchers("/admin/**").hasAuthority("통합_관리자");
 
-            // 3. 프로필 및 기본 기능 (재직중 또는 휴직중, 승인대기인 직원만)
-            auth.requestMatchers("/user/profile/**").hasAnyAuthority(
-                    UserStatus.재직중.getStatus(), UserStatus.휴직중.getStatus(), UserStatus.승인대기.getStatus()
+            // 3. 프로필 페이지 접근 권한 (모든 상태 사용자)
+            auth.requestMatchers(HttpMethod.GET, "/user/profile").hasAnyAuthority(
+                    UserStatus.재직중.getStatus(), UserStatus.휴직중.getStatus(),
+                    UserStatus.승인대기.getStatus(), UserStatus.승인거부.getStatus()
             );
 
-            // 4. 프로필 업데이트 (재직중 또는 휴직중인 직원만)
-            auth.requestMatchers("/user/update/**", "/user/password-verify/**").hasAnyAuthority(
-                    UserStatus.재직중.getStatus(), UserStatus.휴직중.getStatus()
+            // 4. 프로필 업데이트 관련 페이지 접근 권한 (승인대기 제외 모든 사용자)
+            auth.requestMatchers(HttpMethod.PATCH, "/user/profile").hasAnyAuthority(
+                    UserStatus.재직중.getStatus(), UserStatus.휴직중.getStatus(),
+                    UserStatus.승인거부.getStatus()
             );
-            
+
+            auth.requestMatchers("/user/password-verify").hasAnyAuthority(
+                    UserStatus.재직중.getStatus(), UserStatus.휴직중.getStatus(),
+                    UserStatus.승인거부.getStatus()
+            );
+
             // ==================== 업무 도메인별 접근 권한 ==================== //
-            
+
             // 5. 전체 조회, 상세 조회 - 개발 중이므로 일시적으로 모든 사용자에게 허용
             auth.requestMatchers("/storages", "/storages/{id}").permitAll();
             auth.requestMatchers("/shipments", "/shipments/{id}").permitAll();
@@ -73,7 +81,7 @@ public class SecurityConfig {
             auth.requestMatchers("/purchases", "/purchases/{id}").permitAll();
             auth.requestMatchers("/sales", "/sales/{id}").permitAll();
             auth.requestMatchers("/products", "/products/{id}").permitAll();
-            
+
             // 6. 각 부서별 작업에 대한 권한 설정 -> 이후 직책별에 맞게 수정 필요
             // 입고 부서
             auth.requestMatchers("/storages/**").hasAnyAuthority("입고_사원", "입고_매니저", "입고_관리자");
@@ -91,7 +99,7 @@ public class SecurityConfig {
             auth.requestMatchers("/sales/**").hasAnyAuthority("수주_사원", "수주_매니저", "수주_관리자");
             // 상품 부서
             auth.requestMatchers("/products/**").hasAnyAuthority("상품_사원", "상품_매니저", "상품_관리자");
-            
+
             // 7. 기타 모든 요청은 인증 필요
             auth.anyRequest().authenticated();
         }).formLogin(login -> {
@@ -99,7 +107,7 @@ public class SecurityConfig {
             login.usernameParameter("userCode");
             login.passwordParameter("userPass");
             login.defaultSuccessUrl("/", true);
-            login.failureHandler(authFailHanlder);
+            login.failureHandler(authFailHandler);
         }).logout(logout -> {
             logout.logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"));
             logout.deleteCookies("JSESSIONID");

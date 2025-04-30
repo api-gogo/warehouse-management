@@ -8,9 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller()
 @RequestMapping("/suppliers")
@@ -33,7 +32,7 @@ public class SupplierController {
             search = null;
         }
 
-        Page<SupplierDTO> supplierPage = supplierService.findSuppliers(search, status, pageable);
+        Page<SupplierDTO> supplierPage = supplierService.getSuppliers(search, status, pageable);
         if (supplierPage.isEmpty()) {
             model.addAttribute("message", "조건에 맞는 거래처가 없습니다.");
         }
@@ -47,5 +46,56 @@ public class SupplierController {
         model.addAttribute("status", status);
 
         return "suppliers/list";
+    }
+
+    @GetMapping("/{supplierId}")
+    public String getSupplier(@PathVariable Integer supplierId, Model model) {
+        SupplierDTO supplierDTO = supplierService.getSupplierBySupplierId(supplierId);
+
+        if (supplierDTO == null) {
+            String message = null;
+            message = "해당 id의 거래처가 없습니다.";
+            model.addAttribute("message", message);
+        }
+
+        model.addAttribute("supplier", supplierDTO);
+        return "suppliers/detail";
+    }
+
+    @GetMapping("/create")
+    public String getCreateForm(Model model) {
+        SupplierDTO supplierDTO = new SupplierDTO();
+        model.addAttribute("supplier", supplierDTO);
+        return "suppliers/create";
+    }
+
+    @PostMapping("/create")
+    public String createSupplier(@ModelAttribute SupplierDTO supplierDTO, RedirectAttributes redirectAttributes) {
+
+        Integer result = supplierService.createSupplier(supplierDTO);
+        String message = null;
+
+        if (result == -1) {
+            message = "중복된 거래처 이름이 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/create";
+        } else if (result == -2) {
+            message = "중복된 담당자 전화번호가 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/create";
+        } else if (result == -3) {
+            message = "중복된 담당자 이메일이 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/create";
+        } else if (result == 0) {
+            message = "서버에 오류가 발생하였습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/create";
+        } else {
+            message = "거래처 추가가 완료되었습니다.";
+        }
+
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers";
     }
 }

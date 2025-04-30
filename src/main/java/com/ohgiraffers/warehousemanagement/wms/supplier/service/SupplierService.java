@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class SupplierService {
 
@@ -18,7 +20,7 @@ public class SupplierService {
         this.supplierRepository = supplierRepository;
     }
 
-    public Page<SupplierDTO> findSuppliers(String search, String status, Pageable pageable) {
+    public Page<SupplierDTO> getSuppliers(String search, String status, Pageable pageable) {
         boolean isDeleted = false;
 
         if (status != null) {
@@ -41,5 +43,66 @@ public class SupplierService {
                 supplier.getSupplierDeletedAt(),
                 supplier.getDeleted()
         ));
+    }
+
+    public SupplierDTO getSupplierBySupplierId(Integer supplierId) {
+        Optional<Supplier> supplier = supplierRepository.findBySupplierId(supplierId);
+
+        return supplier.map(s -> new SupplierDTO(
+                s.getSupplierId(),
+                s.getSupplierName(),
+                s.getSupplierAddress(),
+                s.getSupplierManagerName(),
+                s.getSupplierManagerPhone(),
+                s.getSupplierManagerEmail(),
+                s.getSupplierCreatedAt(),
+                s.getSupplierUpdatedAt(),
+                s.getSupplierDeletedAt(),
+                s.getDeleted()
+        )).orElse(null);
+    }
+
+    public SupplierDTO getSupplierBySupplierName(String supplierName) {
+        Optional<Supplier> supplier = supplierRepository.findBySupplierName(supplierName);
+
+        return supplier.map(s -> new SupplierDTO(
+                s.getSupplierId(),
+                s.getSupplierName(),
+                s.getSupplierAddress(),
+                s.getSupplierManagerName(),
+                s.getSupplierManagerPhone(),
+                s.getSupplierManagerEmail(),
+                s.getSupplierCreatedAt(),
+                s.getSupplierUpdatedAt(),
+                s.getSupplierDeletedAt(),
+                s.getDeleted()
+        )).orElse(null);
+    }
+
+    public Integer createSupplier(SupplierDTO supplierDTO) {
+
+        if (supplierRepository.existsBySupplierName(supplierDTO.getSupplierName())) {
+            return -1;
+        } else if (supplierRepository.existsBySupplierManagerPhone(supplierDTO.getSupplierManagerPhone())) {
+            return -2;
+        } else if (supplierRepository.existsBySupplierManagerEmail(supplierDTO.getSupplierManagerEmail())) {
+            return -3;
+        }
+
+        try {
+            Supplier supplier = new Supplier(
+                    supplierDTO.getSupplierName(),
+                    supplierDTO.getSupplierAddress(),
+                    supplierDTO.getSupplierManagerName(),
+                    supplierDTO.getSupplierManagerPhone(),
+                    supplierDTO.getSupplierManagerEmail()
+            );
+
+            supplierRepository.save(supplier);
+            return supplier.getSupplierId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }

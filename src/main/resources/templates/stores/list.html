@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>점포 관리</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/common.css">
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='store'">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">점포 관리</h1>
+        <div class="common-actions">
+          <div class="search-box">
+            <input type="text" id="storeSearch" placeholder="점포명, 담당자, 연락처 검색..." class="search-input" th:value="${search}">
+            <button class="search-button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <a th:href="@{/stores/create}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>신규 등록
+          </a>
+        </div>
+      </div>
+
+      <!-- 탭 메뉴 -->
+      <div class="common-tabs" th:with="currentStatus=${param.status != null ? param.status[0] : 'active'}">
+        <button class="tab-button" th:classappend="${currentStatus == 'active' ? 'active' : ''}" data-status="active">활성 점포</button>
+        <!-- 발주_관리자와 통합_관리자만 삭제됨 탭 표시 -->
+        <button class="tab-button" th:classappend="${currentStatus == 'deleted' ? 'active' : ''}" data-status="deleted" 
+                sec:authorize="hasAnyAuthority('발주_관리자', '통합_관리자')">삭제된 점포</button>
+      </div>
+
+      <div class="common-content">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>점포명</th>
+              <th>주소</th>
+              <th>담당자</th>
+              <th>연락처</th>
+              <th>이메일</th>
+              <th>등록일</th>
+              <th>액션</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="store : ${stores}">
+              <td th:text="${store.storeId}"></td>
+              <td th:text="${store.storeName}"></td>
+              <td th:text="${store.storeAddress}"></td>
+              <td th:text="${store.storeManagerName}"></td>
+              <td th:text="${store.storeManagerPhone}"></td>
+              <td th:text="${store.storeManagerEmail}"></td>
+              <td th:text="${#temporals.format(store.storeCreatedAt, 'yyyy-MM-dd')}"></td>
+              <td class="actions">
+                <a th:href="@{/stores/{id}(id=${store.storeId})}" class="action-button" title="상세보기">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <!-- 활성 상태일 때만 수정/삭제 버튼 표시 -->
+                <a th:if="${!store.isDeleted}" th:href="@{/stores/{id}/edit(id=${store.storeId})}" class="action-button" title="수정">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button th:if="${!store.isDeleted}" class="action-button danger-button delete-button" 
+                        th:data-id="${store.storeId}" title="삭제">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <!-- 데이터가 없을 경우 -->
+            <tr th:if="${#lists.isEmpty(stores)}">
+              <td colspan="8" class="no-data">
+                <span th:if="${param.status != null && param.status[0] == 'deleted'}">삭제된 점포가 없습니다.</span>
+                <span th:unless="${param.status != null && param.status[0] == 'deleted'}">
+                  <span th:if="${search != null && search != ''}">검색 조건에 맞는 점포가 없습니다.</span>
+                  <span th:unless="${search != null && search != ''}">활성 상태의 점포가 없습니다.</span>
+                </span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" th:if="${totalPages > 1}">
+          <a th:href="@{/stores(page=0, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+            <i class="fas fa-angle-double-left"></i>
+          </a>
+          <a th:href="@{/stores(page=${currentPage - 1}, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+            <i class="fas fa-angle-left"></i>
+          </a>
+
+          <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/stores(page=${i}, size=${size}, status=${param.status}, search=${search})}"
+               class="page-link"
+               th:text="${i + 1}"
+               th:classappend="${currentPage == i ? 'active' : ''}">1</a>
+          </th:block>
+
+          <a th:href="@{/stores(page=${currentPage + 1}, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+            <i class="fas fa-angle-right"></i>
+          </a>
+          <a th:href="@{/stores(page=${totalPages - 1}, size=${size}, status=${param.status}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+            <i class="fas fa-angle-double-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 탭 전환
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            // 활성 클래스 제거
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            // 클릭된 버튼에 활성 클래스 추가
+            this.classList.add('active');
+
+            // 상태값 가져오기
+            const status = this.dataset.status;
+            
+            // 페이지 이동 (검색어가 있는 경우 검색어도 유지)
+            const searchTerm = document.getElementById('storeSearch').value.trim();
+            window.location.href = `/stores?status=${status}${searchTerm ? `&search=${searchTerm}` : ''}`;
+          });
+        });
+
+        // 검색 기능
+        const searchBox = document.querySelector('.search-box');
+        const searchInput = document.getElementById('storeSearch');
+        const searchButton = document.querySelector('.search-button');
+
+        searchButton.addEventListener('click', function() {
+          const searchTerm = searchInput.value.trim();
+          const activeTab = document.querySelector('.tab-button.active');
+          let currentStatus = 'active'; // 기본값
+          
+          if (activeTab) {
+            currentStatus = activeTab.dataset.status;
+          }
+          
+          window.location.href = `/stores?search=${searchTerm}&status=${currentStatus}`;
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            const searchTerm = searchInput.value.trim();
+            const activeTab = document.querySelector('.tab-button.active');
+            let currentStatus = 'active'; // 기본값
+            
+            if (activeTab) {
+              currentStatus = activeTab.dataset.status;
+            }
+            
+            window.location.href = `/stores?search=${searchTerm}&status=${currentStatus}`;
+          }
+        });
+
+        // 삭제 버튼 이벤트
+        const deleteButtons = document.querySelectorAll('.delete-button');
+
+        // POST 요청을 보내는 공통 함수
+        function sendPostRequest(url) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = url;
+          
+          // CSRF 토큰 추가 (Spring Security 사용 시)
+          const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+          const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+          
+          if (csrfToken && csrfHeader) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = csrfHeader;
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+          }
+          
+          document.body.appendChild(form);
+          form.submit();
+        }
+
+        deleteButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const storeId = this.dataset.id;
+            if (confirm('해당 점포를 삭제하시겠습니까?')) {
+              sendPostRequest(`/stores/${storeId}/delete`);
+            }
+          });
+        });
+      });
+    </script>
+  </th:block>
+</body>
+</html>

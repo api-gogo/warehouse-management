@@ -97,15 +97,26 @@
         </div>
         
         <div class="profile-actions">
-          <!-- 승인대기 상태가 아닌 사용자에게만 정보 수정 버튼 표시 -->
-          <a th:if="${user.userStatus != '승인대기'}" th:href="@{/user/password-verify}" class="btn btn-primary">
+          <!-- 승인대기 상태나 승인거부 상태가 아닌 사용자에게 정보 수정 버튼 표시 -->
+          <a th:if="${user.userStatus != '승인대기' && user.userStatus != '승인거부'}" th:href="@{/user/password-verify}" class="btn btn-primary">
             <i class="fas fa-edit me-2"></i>정보 수정
+          </a>
+          
+          <!-- 승인거부 상태인 사용자의 수정 버튼 (수정하면 승인대기 상태로 변경) -->
+          <a th:if="${user.userStatus == '승인거부'}" th:href="@{/user/password-verify}" class="btn btn-warning">
+            <i class="fas fa-redo me-2"></i>정보 수정 및 재승인 요청
           </a>
           
           <!-- 승인대기 상태인 사용자에게 표시되는 메시지 -->
           <div th:if="${user.userStatus == '승인대기'}" class="alert alert-warning mt-3" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <strong>승인 대기 중입니다.</strong> 관리자의 승인 후에 정보 수정이 가능합니다.
+          </div>
+          
+          <!-- 승인거부 상태인 사용자에게 표시되는 메시지 -->
+          <div th:if="${user.userStatus == '승인거부'}" class="alert alert-danger mt-3" role="alert">
+            <i class="fas fa-times-circle me-2"></i>
+            <strong>승인이 거부되었습니다.</strong> 정보를 수정하여 재승인을 요청해 주세요.
           </div>
         </div>
       </div>
