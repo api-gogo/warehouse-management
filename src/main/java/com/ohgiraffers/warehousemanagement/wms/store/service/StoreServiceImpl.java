@@ -141,4 +141,18 @@ public class StoreServiceImpl implements StoreService {
         storeRepository.save(store);
         return true;
     }
+
+    @Transactional
+    public boolean restoreStore(Integer storeId) {
+        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+        if (store == null) {
+            return false;
+        }
+
+        store.setDeleted(false);
+        store.setStoreUpdatedAt(LocalDateTime.now());
+        store.setStoreDeletedAt(null);
+        storeRepository.save(store);
+        return true;
+    }
 }

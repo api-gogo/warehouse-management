@@ -142,4 +142,18 @@ public class SupplierServiceImpl implements SupplierService {
         supplierRepository.save(supplier);
         return true;
     }
+
+    @Transactional
+    public boolean restoreSupplier(Integer supplierId) {
+        Supplier supplier = supplierRepository.findBySupplierId(supplierId).orElse(null);
+        if (supplier == null) {
+            return false;
+        }
+
+        supplier.setDeleted(false);
+        supplier.setSupplierUpdatedAt(LocalDateTime.now());
+        supplier.setSupplierDeletedAt(null);
+        supplierRepository.save(supplier);
+        return true;
+    }
 }

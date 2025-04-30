@@ -149,4 +149,20 @@ public class StoreController {
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/stores";
     }
+
+    @PostMapping("/{storeId}/restore")
+    public String restoreStore(@PathVariable Integer storeId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = storeServiceImpl.restoreStore(storeId);
+
+        if (!result) {
+            message = "점포 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/stores";
+        }
+
+        message = "점포가 복구 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/stores";
+    }
 }

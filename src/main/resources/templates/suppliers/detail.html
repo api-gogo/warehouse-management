@@ -132,6 +132,10 @@
           <button th:if="${!supplier.isDeleted}" class="btn btn-danger delete-button" th:data-id="${supplier.supplierId}">
             <i class="fas fa-trash me-2"></i>삭제
           </button>
+          <!-- 삭제된 거래처만 복구 버튼 표시 -->
+          <button th:if="${supplier.isDeleted}" class="btn btn-success restore-button" th:data-id="${supplier.supplierId}">
+            <i class="fas fa-undo me-2"></i>복구
+          </button>
         </div>
       </div>
     </div>
@@ -144,31 +148,45 @@
     document.addEventListener('DOMContentLoaded', function() {
       // 삭제 버튼 이벤트
       const deleteButton = document.querySelector('.delete-button');
+      // 복구 버튼 이벤트
+      const restoreButton = document.querySelector('.restore-button');
 
+      // POST 요청을 보내는 공통 함수
+      function sendPostRequest(url) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        
+        // CSRF 토큰 추가 (Spring Security 사용 시)
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+        
+        if (csrfToken && csrfHeader) {
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = csrfHeader;
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+      }
+      
       if (deleteButton) {
         deleteButton.addEventListener('click', function() {
           const supplierId = this.dataset.id;
-
           if (confirm('해당 거래처를 삭제하시겠습니까?')) {
-            // POST 요청을 위한 Form 생성
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/suppliers/${supplierId}/delete`;
-
-            // CSRF 토큰 추가 (Spring Security 사용 시)
-            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-
-            if (csrfToken && csrfHeader) {
-              const csrfInput = document.createElement('input');
-              csrfInput.type = 'hidden';
-              csrfInput.name = csrfHeader;
-              csrfInput.value = csrfToken;
-              form.appendChild(csrfInput);
-            }
-
-            document.body.appendChild(form);
-            form.submit();
+            sendPostRequest(`/suppliers/${supplierId}/delete`);
+          }
+        });
+      }
+      
+      if (restoreButton) {
+        restoreButton.addEventListener('click', function() {
+          const supplierId = this.dataset.id;
+          if (confirm('해당 거래처를 복구하시겠습니까?')) {
+            sendPostRequest(`/suppliers/${supplierId}/restore`);
           }
         });
       }

@@ -147,4 +147,20 @@ public class SupplierController {
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/suppliers";
     }
+
+    @PostMapping("/{supplierId}/restore")
+    public String restoreSupplier(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.restoreSupplier(supplierId);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처가 복구 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers";
+    }
 }
