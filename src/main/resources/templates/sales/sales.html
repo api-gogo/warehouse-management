@@ -63,11 +63,11 @@
                             </thead>
                             <tbody>
                             <tr th:each="sales : ${salesLists}">
-                                <td th:text="${sales.salesId}">S0001</td>
-                                <td th:text="${sales.storeId}">서울점</td>
-                                <td th:text="${sales.userId}">홍길동</td>
-                                <td th:text="${#temporals.format(sales.salesDate, 'yyyy-MM-dd')}">2025-04-28</td>
-                                <td th:text="${#temporals.format(sales.shippingDueDate, 'yyyy-MM-dd')}">2025-04-30</td>
+                                <td th:text="${sales.salesId}">수주ID</td>
+                                <td th:text="${sales.storeId}">점포명</td>
+                                <td th:text="${sales.userName}">담당자명</td>
+                                <td th:text="${#temporals.format(sales.salesDate, 'yyyy-MM-dd')}">수주일</td>
+                                <td th:text="${#temporals.format(sales.shippingDueDate, 'yyyy-MM-dd')}">출고예정일</td>
                                 <td>
                                     <span class="status-badge"
                                         th:classappend="${sales.salesStatus.name() == 'PENDING' ? 'status-pending' :
@@ -75,7 +75,7 @@
                                             (sales.salesStatus.name() == 'CANCELED' ? 'status-inactive' : ''))}"
                                         th:text="${sales.salesStatus.name() == 'PENDING' ? '수주등록' :
                                             (sales.salesStatus.name() == 'APPROVED' ? '수주승인' :
-                                            (sales.salesStatus.name() == 'CANCELED' ? '수주취소' : ''))}">등록
+                                            (sales.salesStatus.name() == 'CANCELED' ? '수주취소' : ''))}">상태
                                     </span>
                                 </td>
                                 <td class="actions">

@@ -1,61 +1,65 @@
 package com.ohgiraffers.warehousemanagement.wms.shipment.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shipments")
 public class Shipment {
-    //출고번호
+
+    // 출고번호
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "shipment_id", nullable = false)
+    @Column(name = "shipment_id", nullable = false, columnDefinition = "BIGINT")
     private Integer shipmentId;
 
-    //수주 ID    외래키이나 연결 전 이라 임시 컬럼
-    @Column(name = "sale_id", nullable = false)
+    // 수주 ID (외래키, 임시 컬럼)
+    @NotNull(message = "수주 ID는 필수 입력 항목입니다.")
+    @Column(name = "sale_id", nullable = false, columnDefinition = "BIGINT")
     private Integer saleId;
-//    @OneToMany
-//    @JoinColumn(name = "sale_id", nullable = false)
 
-    //출고 담당자
-    @Column(name = "user_id", nullable = false)
+    // 출고 담당자
+    @NotNull(message = "출고 담당자 ID는 필수 입력 항목입니다.")
+    @Column(name = "user_id", nullable = false, columnDefinition = "BIGINT")
     private Integer userId;
 
-    //상품ID
-    @Column(name = "product_id", nullable = false)
-    private Integer productId;
-
-    //출고일
+    // 출고일
+    @NotNull(message = "출고일은 필수 입력 항목입니다.")
     @Column(name = "shipment_date", nullable = false)
     private LocalDateTime shipmentDate;
-    //상태
+
+    // 상태 (String으로 복구)
+    @NotNull(message = "출고 상태는 필수 입력 항목입니다.")
+    @Size(max = 20, message = "출고 상태는 20자를 초과할 수 없습니다.")
     @Column(name = "shipment_status", nullable = false, length = 20)
     private String shipmentStatus;
-    //사유
+
+    // 사유
     @Column(name = "shipment_reason")
     private String shipmentReason;
-    //수정일
+
+    // 수정일
+    @UpdateTimestamp
     @Column(name = "shipment_updated_at")
     private LocalDateTime shipmentUpdatedAt;
-    // 생성일
+
+    // 등록일
     @CreationTimestamp
     @Column(name = "shipment_created_at", nullable = false)
     private LocalDateTime shipmentCreatedAt;
 
-
-
-    //생성자
-
+    // 생성자
     public Shipment() {}
 
-    public Shipment(Integer shipmentId, Integer saleId, Integer userId, Integer productId, LocalDateTime shipmentDate, String shipmentStatus, String shipmentReason, LocalDateTime shipmentUpdatedAt, LocalDateTime shipmentCreatedAt) {
+    public Shipment(Integer shipmentId, Integer saleId, Integer userId, LocalDateTime shipmentDate, String shipmentStatus, String shipmentReason, LocalDateTime shipmentUpdatedAt, LocalDateTime shipmentCreatedAt) {
         this.shipmentId = shipmentId;
         this.saleId = saleId;
         this.userId = userId;
-        this.productId = productId;
         this.shipmentDate = shipmentDate;
         this.shipmentStatus = shipmentStatus;
         this.shipmentReason = shipmentReason;
@@ -63,8 +67,7 @@ public class Shipment {
         this.shipmentCreatedAt = shipmentCreatedAt;
     }
 
-
-    //gatter setter
+    // 게터, 세터
     public Integer getShipmentId() {
         return shipmentId;
     }
@@ -87,14 +90,6 @@ public class Shipment {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
     }
 
     public LocalDateTime getShipmentDate() {
@@ -137,16 +132,12 @@ public class Shipment {
         this.shipmentCreatedAt = shipmentCreatedAt;
     }
 
-
-    //
-
     @Override
     public String toString() {
         return "Shipment{" +
                 "shipmentId=" + shipmentId +
                 ", saleId=" + saleId +
                 ", userId=" + userId +
-                ", productId=" + productId +
                 ", shipmentDate=" + shipmentDate +
                 ", shipmentStatus='" + shipmentStatus + '\'' +
                 ", shipmentReason='" + shipmentReason + '\'' +
