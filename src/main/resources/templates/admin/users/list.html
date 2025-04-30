@@ -77,8 +77,10 @@
           <table class="data-table">
             <thead>
             <tr>
+              <th>ID</th>
               <th>이름</th>
               <th>사번</th>
+              <th>이메일</th>
               <th>전화번호</th>
               <th>부서</th>
               <th>직책</th>
@@ -89,8 +91,10 @@
             </thead>
             <tbody>
             <tr th:each="user : ${users}">
+              <td th:text="${user.userId}"></td>
               <td th:text="${user.userName}"></td>
               <td th:text="${user.userCode}"></td>
+              <td th:text="${user.userEmail}"></td>
               <td th:text="${user.userPhone}"></td>
               <td th:text="${user.userPart}"></td>
               <td th:text="${user.userRole}"></td>
@@ -134,7 +138,7 @@
             </tr>
             <!-- 데이터가 없을 경우 -->
             <tr th:if="${#lists.isEmpty(users)}">
-              <td colspan="8" class="no-data">조회된 사용자가 없습니다.</td>
+              <td colspan="10" class="no-data">조회된 사용자가 없습니다.</td>
             </tr>
             </tbody>
           </table>

@@ -63,29 +63,28 @@ public class AdminController {
     }
 
     @GetMapping("/users/{userId}")
-    public String showUserDetail(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
+    public String showUserDetail(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
         UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            redirectAttributes.addFlashAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
+            return "redirect:/admin/users";
         }
-        redirectAttributes.addFlashAttribute("userDTO", userDTO);
+        
+        model.addAttribute("user", userDTO); // 모델에 "user"라는 이름으로 추가
         return "admin/users/detail";
     }
 
     @GetMapping("/users/{userId}/edit")
-    public String showUserEditForm(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
+    public String showUserEditForm(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
         UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            redirectAttributes.addFlashAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
             return "redirect:/admin/users";
         }
-        redirectAttributes.addFlashAttribute("userDTO", userDTO);
+        
+        model.addAttribute("user", userDTO);
         return "admin/users/edit";
     }
 
