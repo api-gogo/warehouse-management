@@ -49,7 +49,7 @@
             <thead>
             <tr>
               <th>검수ID</th>
-              <th>검수자ID</th>
+              <th>검수자</th>
               <th>검수유형ID</th>
               <th>검수유형</th>
               <th>검수수량</th>
@@ -63,7 +63,7 @@
             <tbody>
             <tr th:each="inspection : ${inspectionList.content}" th:if="${inspectionList.content != null}">
               <td th:text="${inspection.inspectionId}"></td>
-              <td th:text="${inspection.userId}"></td>
+              <td th:text="${inspection.userName}"></td>
               <td th:text="${inspection.transactionId != null ? inspection.transactionId : '-'}"></td>
               <td>
                 <span class="status-badge"
@@ -104,15 +104,15 @@
 
         <!-- 페이지네이션 -->
         <div class="pagination" th:if="${inspectionList != '검수 목록이 없습니다.' && inspectionList.totalPages > 1}">
-          <a th:href="@{/inspections(page=1, size=${inspectionList.size}, type=${param.type})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
+          <a th:href="@{/inspections(page=1, size=${inspectionList.size}, inspectionType=${param.inspectionType})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-left"></i>
           </a>
-          <a th:href="@{/inspections(page=${inspectionList.number}, size=${inspectionList.size}, type=${param.type})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
+          <a th:href="@{/inspections(page=${inspectionList.number}, size=${inspectionList.size}, inspectionType=${param.inspectionType})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-left"></i>
           </a>
 
           <th:block th:each="i : ${#numbers.sequence(0, inspectionList.totalPages - 1)}">
-            <a th:href="@{/inspections(page=${i + 1}, size=${inspectionList.size}, type=${param.type})}"
+            <a th:href="@{/inspections(page=${i + 1}, size=${inspectionList.size}, inspectionType=${param.inspectionType})}"
                class="page-link"
                th:text="${i + 1}"
                th:classappend="${inspectionList.number == i ? 'active' : ''}">1</a>
