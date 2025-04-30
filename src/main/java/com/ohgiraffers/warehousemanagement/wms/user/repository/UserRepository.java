@@ -17,11 +17,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUserCode(String userCode);
     boolean existsByUserCode(String userCode);
 
-    Optional<User> findByUserEmail(String useremail);
-    boolean existsByUserEmail(String useremail);
+    Optional<User> findByUserEmail(String userEmail);
+    boolean existsByUserEmail(String userEmail);
 
-    Optional<User> findByUserPhone(String userphone);
-    boolean existsByUserPhone(String userphone);
+    Optional<User> findByUserPhone(String userPhone);
+    boolean existsByUserPhone(String userPhone);
 
     long countByUserStatus(UserStatus userStatus);
 
@@ -43,9 +43,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "     lower(u.userName) LIKE lower(concat('%', :search, '%')) OR " +
             "     lower(u.userCode) LIKE lower(concat('%', :search, '%')) OR " +
             "     lower(u.userPhone) LIKE lower(concat('%', :search, '%')))")
-    Page<User> findByPartRoleStatusAndSearch(@Param("part") UserPart part,
-                                             @Param("role") UserRole role,
-                                             @Param("status") UserStatus status,
-                                             @Param("search") String search,
-                                             Pageable pageable);
+    Page<User> findByFilters(@Param("part") UserPart part,
+                             @Param("role") UserRole role,
+                             @Param("status") UserStatus status,
+                             @Param("search") String search,
+                             Pageable pageable);
 }
