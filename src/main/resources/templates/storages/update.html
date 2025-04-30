@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WMS - 입고 수정</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/navigation.css?v=1">
+    <link rel="stylesheet" href="/common.css?v=1">
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{navigation :: aside(activeMenu='storage')}"></div>
+    <div class="main-content">
+        <div th:replace="~{navigation :: header}"></div>
+
+        <main class="page-content">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="page-title">입고 정보 수정</h1>
+                <a th:href="@{/storages}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> 목록으로
+                </a>
+            </div>
+
+            <div class="card max-w-4xl mx-auto">
+                <div class="card-header">
+                    <h2 class="card-title">입고 수정</h2>
+                    <p class="card-description">입고 정보를 수정해주세요.</p>
+                </div>
+
+                <div class="card-content" style="max-width: 800px; margin: 0 auto;">
+                    <form th:action="@{/storages/update/{id}(id=${storage.storageId})}" method="post" th:object="${storage}">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">발주 ID</label>
+                                <input type="text" th:field="*{purchaseId}" class="form-input" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">입고 상태</label>
+                                <select th:field="*{storageStatus}" class="form-select" required>
+                                    <option th:each="status : ${statusList}"
+                                            th:value="${status.name()}"
+                                            th:text="${status.description}"></option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">입고일</label>
+                                <input type="date" th:field="*{storageDate}" class="form-input" required>
+                            </div>
+
+                            <div class="form-group col-span-2">
+                                <label class="form-label">수정 사유</label>
+                                <input type="text" th:field="*{storageReason}" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-6 space-x-2">
+                            <a th:href="@{/storages}" class="btn btn-outline">취소</a>
+                            <button type="submit" class="btn btn-primary">수정 완료</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>

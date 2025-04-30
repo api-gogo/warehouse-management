@@ -84,7 +84,7 @@ public class SecurityConfig {
 
             // 6. 각 부서별 작업에 대한 권한 설정 -> 이후 직책별에 맞게 수정 필요
             // 입고 부서
-            auth.requestMatchers("/storages/**").hasAnyAuthority("입고_사원", "입고_매니저", "입고_관리자");
+            auth.requestMatchers("/storages/**").hasAnyAuthority("입고_사원", "입고_매니저", "입고_관리자", "통합_관리자");
             // 출고 부서
             auth.requestMatchers("/shipments/**").hasAnyAuthority("출고_사원", "출고_매니저", "출고_관리자");
             // 재고 부서

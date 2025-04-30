@@ -1,3 +1,4 @@
+// ✅ StorageController.java
 package com.ohgiraffers.warehousemanagement.wms.storage.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.request.StorageRequestDTO;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
-@RequestMapping("/storage")
+@RequestMapping("/storages")
 public class StorageController {
 
     private static final Logger log = LoggerFactory.getLogger(StorageController.class);
@@ -24,70 +27,57 @@ public class StorageController {
         this.storageService = storageService;
     }
 
-    // ✅ 입고 목록 조회
-    @GetMapping("/list")
-    public String getAllStorage(Model model) {
-        model.addAttribute("storages", storageService.getAllStorage()); // Key 값: storages
-        return "storage/list"; // templates/storage/list.html
+    //  목록 조회 + 검색
+    @GetMapping
+    public String getAllStorage(@RequestParam(required = false) String searchKeyword, Model model) {
+        List<StorageResponseDTO> storages = (searchKeyword != null && !searchKeyword.isBlank())
+                ? storageService.searchStoragesByPurchaseId(searchKeyword)
+                : storageService.getAllStorage();
+        model.addAttribute("storages", storages);
+        model.addAttribute("searchKeyword", searchKeyword);
+        return "storages/list";
     }
 
-    // ✅ 입고 등록 화면
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("storageRequestDTO", new StorageRequestDTO());
+        model.addAttribute("storages", new StorageRequestDTO());
         model.addAttribute("statusList", StorageStatus.values());
-        return "storage/create"; // templates/storage/create.html
+        return "storages/create";
     }
 
-    // ✅ 입고 등록 처리
     @PostMapping
     public String createStorage(@ModelAttribute @Valid StorageRequestDTO storageRequestDTO) {
-        log.info("입고 등록 요청: 데이터={}", storageRequestDTO);
-
-        if (storageRequestDTO.getPurchaseId() != null) {
-            log.info("발주 ID 제공됨: {}", storageRequestDTO.getPurchaseId());
-        }
-
-        storageService.createStorage(storageRequestDTO);
-        return "redirect:/storage/list"; // 등록 후 목록 페이지로 이동
+        log.info("입고 등록 요청: {}", storageRequestDTO);
+        StorageResponseDTO created = storageService.createStorage(storageRequestDTO);
+        log.info("등록 완료 - 입고 ID: {}", created.getStorageId());
+        return "redirect:/storages";
     }
 
-    // ✅ 입고 상세 조회
     @GetMapping("/{id}")
-    public String getStorageById(@PathVariable("id") int id, Model model) {
-        log.info("입고 상세 조회 요청: ID={}", id);
+    public String getStorageById(@PathVariable int id, Model model) {
         StorageResponseDTO storage = storageService.getStorageById(id);
         model.addAttribute("pageTitle", "입고 상세 조회 - " + id);
         model.addAttribute("storage", storage);
-        return "storage/detail"; // templates/storage/detail.html
+        return "storages/detail";
     }
 
-    // ✅ 입고 수정 처리
-    @PostMapping("/{id}")
-    public String updateStorage(@PathVariable("id") int id,
-                                @ModelAttribute @Valid StorageRequestDTO storageRequestDTO) {
-        log.info("입고 수정 요청: ID={}, 데이터={}", id, storageRequestDTO);
-        storageService.updateStorage(id, storageRequestDTO);
-        return "redirect:/storage/list"; // 수정 후 목록 이동
-    }
-
-    // ✅ 입고 수정 화면 보여주기
-    @GetMapping("/{id}/edit")
-    public String showUpdateForm(@PathVariable("id") int id, Model model) {
-        log.info("입고 수정 폼 요청: ID={}", id);
+    @GetMapping("/update/{id}")
+    public String showUpdateForm(@PathVariable int id, Model model) {
         StorageResponseDTO storage = storageService.getStorageById(id);
         model.addAttribute("storage", storage);
         model.addAttribute("statusList", StorageStatus.values());
-        return "storage/edit";  // templates/storage/edit.html
+        return "storages/update";
     }
 
+    @PostMapping("/update/{id}")
+    public String updateStorage(@PathVariable int id, @ModelAttribute("storage") StorageRequestDTO storageRequestDTO) {
+        storageService.updateStorage(id, storageRequestDTO);
+        return "redirect:/storages";
+    }
 
-    // ✅ 입고 삭제 처리
-    @PostMapping("/{id}/delete")
-    public String deleteStorage(@PathVariable("id") int id) {
-        log.info("입고 삭제 요청: ID={}", id);
+    @PostMapping("/delete/{id}")
+    public String deleteStorage(@PathVariable int id) {
         storageService.deleteStorage(id);
-        return "redirect:/storage/list"; // 삭제 후 목록 이동
+        return "redirect:/storages";
     }
 }
-

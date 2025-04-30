@@ -3,6 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.request;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.StorageStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ public class StorageRequestDTO {
 
     private String inspectionStatus;  // 검수 상태 (입고 이상/완료 등)
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "입고일은 필수입니다!")
     private LocalDate storageDate;  // 입고일
 

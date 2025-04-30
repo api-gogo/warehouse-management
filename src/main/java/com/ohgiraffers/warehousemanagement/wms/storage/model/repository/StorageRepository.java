@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface StorageRepository extends JpaRepository<Storage, Integer> {
     List<Storage> findByStorageStatus(StorageStatus storageStatus);
+    // StorageRepository.java
+    List<Storage> findByPurchaseId(Integer purchaseId);
+
 }
 
 
