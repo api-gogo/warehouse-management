@@ -22,7 +22,7 @@
         </div>
         <div class="common-actions">
           <!-- 삭제되지 않은 거래처만 수정 버튼 표시 -->
-          <a th:if="${!supplier.isDeleted}" th:href="@{/suppliers/{id}(id=${supplier.supplierId})}" class="btn btn-primary">
+          <a th:if="${!supplier.isDeleted}" th:href="@{/suppliers/{id}/edit(id=${supplier.supplierId})}" class="btn btn-primary">
             <i class="fas fa-edit me-2"></i>수정
           </a>
         </div>
@@ -100,7 +100,7 @@
             <i class="fas fa-list me-2"></i>목록
           </a>
           <!-- 삭제되지 않은 거래처만 수정 버튼 표시 -->
-          <a th:if="${!supplier.isDeleted}" th:href="@{/suppliers/{id}(id=${supplier.supplierId})}" class="btn btn-primary">
+          <a th:if="${!supplier.isDeleted}" th:href="@{/suppliers/{id}/edit(id=${supplier.supplierId})}" class="btn btn-primary">
             <i class="fas fa-edit me-2"></i>수정
           </a>
           <!-- 삭제되지 않은 거래처만 삭제 버튼 표시 -->

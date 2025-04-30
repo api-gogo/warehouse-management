@@ -42,12 +42,12 @@ public class Store {
 
     protected Store() {}
 
-    public Store(String storeManagerEmail, String storeManagerPhone, String storeManagerName, String storeAddress, String storeName) {
-        this.storeManagerEmail = storeManagerEmail;
-        this.storeManagerPhone = storeManagerPhone;
-        this.storeManagerName = storeManagerName;
-        this.storeAddress = storeAddress;
+    public Store(String storeName, String storeAddress, String storeManagerName, String storeManagerPhone, String storeManagerEmail) {
         this.storeName = storeName;
+        this.storeAddress = storeAddress;
+        this.storeManagerName = storeManagerName;
+        this.storeManagerPhone = storeManagerPhone;
+        this.storeManagerEmail = storeManagerEmail;
         this.storeCreatedAt = LocalDateTime.now();
         this.isDeleted = false;
     }
