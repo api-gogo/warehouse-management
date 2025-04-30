@@ -4,273 +4,82 @@
   <title>재고 수정</title>
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
-    <style>
-      /* 재고 수정 페이지 스타일 */
-      .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-      
-      .page-title {
-        font-size: 24px;
-        font-weight: 600;
-      }
-      
-      .button-group {
-        display: flex;
-        gap: 10px;
-      }
-      
-      .btn {
-        padding: 8px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        transition: all 0.2s;
-      }
-      
-      .btn i {
-        margin-right: 5px;
-      }
-      
-      .btn-outline {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        color: #333;
-        text-decoration: none;
-      }
-      
-      .btn-outline:hover {
-        background-color: #f5f5f5;
-      }
-      
-      .btn-primary {
-        background-color: #0d6efd;
-        text-decoration: none;
-        color: white;
-        border: none;
-      }
-      
-      .btn-primary:hover {
-        background-color: #0b5ed7;
-        text-decoration: none;
-      }
-      
-      .btn-danger {
-        background-color: #dc3545;
-        text-decoration: none;
-        color: white;
-        border: none;
-      }
-      
-      .btn-danger:hover {
-        background-color: #bb2d3b;
-        text-decoration: none;
-      }
-      
-      .subtitle {
-        font-size: 18px;
-        font-weight: 500;
-        margin-bottom: 10px;
-      }
-      
-      .description {
-        color: #777;
-        margin-bottom: 20px;
-        font-size: 14px;
-      }
-      
-      /* 재고 수정 섹션 */
-      .inventory-section {
-        background-color: #fff;
-        border-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        padding: 20px;
-        margin-bottom: 20px;
-      }
-      
-      /* 폼 스타일 */
-      .form-section {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-      }
-      
-      .form-group {
-        margin-bottom: 15px;
-      }
-      
-      .form-label {
-        display: block;
-        font-size: 14px;
-        color: #555;
-        margin-bottom: 5px;
-      }
-      
-      .form-control {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-        transition: border 0.2s;
-      }
-      
-      .form-control:focus {
-        border-color: #0d6efd;
-        outline: none;
-      }
-      
-      .form-actions {
-        grid-column: span 2;
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 10px;
-      }
-      
-      /* 폼 유효성 검사 */
-      .error-message {
-        color: #dc3545;
-        font-size: 12px;
-        margin-top: 5px;
-      }
-      
-      .form-control.is-invalid {
-        border-color: #dc3545;
-      }
-      
-      /* 다크 모드에서의 폼 스타일 */
-      body.dark-mode .btn-outline {
-        background-color: #2a2a2a;
-        border-color: #444;
-        color: #e0e0e0;
-      }
-      
-      body.dark-mode .btn-outline:hover {
-        background-color: #333;
-      }
-      
-      body.dark-mode .inventory-section {
-        background-color: #1e1e1e;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      }
-      
-      body.dark-mode .form-label {
-        color: #b0b0b0;
-      }
-      
-      body.dark-mode .form-control {
-        background-color: #2a2a2a;
-        border-color: #444;
-        color: #e0e0e0;
-      }
-      
-      body.dark-mode .form-control:focus {
-        border-color: #0d6efd;
-      }
-      
-      body.dark-mode .description {
-        color: #aaa;
-      }
-      
-      @media (max-width: 768px) {
-        .form-section {
-          grid-template-columns: 1fr;
-        }
-        
-        .form-actions {
-          grid-column: 1;
-        }
-        
-        .page-header {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 10px;
-        }
-        
-        .button-group {
-          width: 100%;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/common.css">
   </th:block>
 </head>
 <body>
   <!-- 페이지 콘텐츠 -->
   <th:block layout:fragment="content" th:with="activeMenu='inventory'">
-    <!-- 페이지 헤더 -->
-    <div class="page-header">
-      <h1 class="page-title">재고 수정</h1>
-      <div class="button-group">
-        <a th:href="@{/inventories/detail/{id}(id=${inventory.inventoryId})}" class="btn btn-outline">
-          <i class="fas fa-arrow-left"></i> 상세로 돌아가기
-        </a>
-      </div>
-    </div>
-    
-    <!-- 재고 수정 폼 섹션 -->
-    <div class="inventory-section">
-      <h2 class="subtitle">재고 정보 수정</h2>
-      <p class="description">재고 ID: <span th:text="${inventory.inventoryId}"></span></p>
-      
-      <form id="editForm" th:action="@{/inventories/edit/{id}(id=${inventory.inventoryId})}" method="post">
-        <input type="hidden" name="inventoryId" th:value="${inventory.inventoryId}">
-        
-        <div class="form-section">
-          <div class="form-group">
-            <label for="productId" class="form-label">상품 ID</label>
-            <input type="text" id="productId" name="productId" th:value="${inventory.productId}" class="form-control" readonly>
-            <small class="description">상품 ID는 직접 변경할 수 없습니다.</small>
-          </div>
-          
-          <div class="form-group">
-            <label for="lotNumber" class="form-label">로트 번호</label>
-            <input type="text" id="lotNumber" name="lotNumber" th:value="${inventory.lotNumber}" class="form-control" readonly>
-            <small class="description">로트 번호는 직접 변경할 수 없습니다.</small>
-          </div>
-          
-          <div class="form-group">
-            <label for="storageId" class="form-label">창고 ID</label>
-            <input type="text" id="storageId" name="storageId" th:value="${inventory.storageId}" class="form-control" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="locationCode" class="form-label">위치 코드</label>
-            <input type="text" id="locationCode" name="locationCode" th:value="${inventory.locationCode}" class="form-control" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="availableStock" class="form-label">가용 재고</label>
-            <input type="number" id="availableStock" name="availableStock" th:value="${inventory.availableStock}" class="form-control" required min="0">
-          </div>
-          
-          <div class="form-group">
-            <label for="allocatedStock" class="form-label">할당 재고</label>
-            <input type="number" id="allocatedStock" name="allocatedStock" th:value="${inventory.allocatedStock}" class="form-control" required min="0">
-          </div>
-          
-          <div class="form-group">
-            <label for="disposedStock" class="form-label">폐기 재고</label>
-            <input type="number" id="disposedStock" name="disposedStock" th:value="${inventory.disposedStock}" class="form-control" required min="0">
-          </div>
-          
-          <div class="form-group">
-            <label for="inventoryExpiryDate" class="form-label">유통기한</label>
-            <input type="date" id="inventoryExpiryDate" name="inventoryExpiryDate" 
-                 th:value="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}" class="form-control" required>
-          </div>
-          
-          <div class="form-actions">
-            <a th:href="@{/inventories/detail/{id}(id=${inventory.productId})}" class="btn btn-outline">취소</a>
-            <button type="submit" class="btn btn-primary">저장</button>
-          </div>
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">재고 수정</h1>
+        <div class="common-actions">
+          <a th:href="@{/inventories/detail/{id}(id=${inventory.productId})}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> 상세로 돌아가기
+          </a>
         </div>
-      </form>
+      </div>
+      
+      <div class="common-content">
+        <div class="detail-section">
+          <h2 class="section-title">재고 정보 수정</h2>
+          <p class="section-description">재고 ID: <span th:text="${inventory.inventoryId}"></span> | 상품명: <span th:text="${inventory.productName}"></span></p>
+          
+          <form id="editForm" th:action="@{/inventories/edit/{id}(id=${inventory.inventoryId})}" method="post">
+            <input type="hidden" name="inventoryId" th:value="${inventory.inventoryId}">
+            
+            <div class="info-grid">
+              <div class="form-group">
+                <label for="productId" class="form-label">상품 ID</label>
+                <input type="text" id="productId" name="productId" th:value="${inventory.productId}" class="form-control readonly-field" readonly>
+                <small class="form-text text-muted">상품 ID는 직접 변경할 수 없습니다.</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="lotNumber" class="form-label">로트 번호</label>
+                <input type="text" id="lotNumber" name="lotNumber" th:value="${inventory.lotNumber}" class="form-control readonly-field" readonly>
+                <small class="form-text text-muted">로트 번호는 직접 변경할 수 없습니다.</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="storageId" class="form-label">창고 ID</label>
+                <input type="text" id="storageId" name="storageId" th:value="${inventory.storageId}" class="form-control" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="locationCode" class="form-label">위치 코드</label>
+                <input type="text" id="locationCode" name="locationCode" th:value="${inventory.locationCode}" class="form-control" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="availableStock" class="form-label">가용 재고</label>
+                <input type="number" id="availableStock" name="availableStock" th:value="${inventory.availableStock}" class="form-control" required min="0">
+              </div>
+              
+              <div class="form-group">
+                <label for="allocatedStock" class="form-label">할당 재고</label>
+                <input type="number" id="allocatedStock" name="allocatedStock" th:value="${inventory.allocatedStock}" class="form-control" required min="0">
+              </div>
+              
+              <div class="form-group">
+                <label for="disposedStock" class="form-label">폐기 재고</label>
+                <input type="number" id="disposedStock" name="disposedStock" th:value="${inventory.disposedStock}" class="form-control" required min="0">
+              </div>
+              
+              <div class="form-group">
+                <label for="inventoryExpiryDate" class="form-label">유통기한</label>
+                <input type="date" id="inventoryExpiryDate" name="inventoryExpiryDate" 
+                     th:value="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <a th:href="@{/inventories/detail/{id}(id=${inventory.productId})}" class="btn btn-outline">취소</a>
+              <button type="submit" class="btn btn-primary">저장</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </th:block>
   
