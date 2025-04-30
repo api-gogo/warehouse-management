@@ -225,12 +225,13 @@
           <div class="form-group">
             <label for="productId" class="form-label">상품 ID</label>
             <input type="text" id="productId" name="productId" th:value="${inventory.productId}" class="form-control" readonly>
-            <small class="description">상품 ID는 변경할 수 없습니다.</small>
+            <small class="description">상품 ID는 직접 변경할 수 없습니다.</small>
           </div>
           
           <div class="form-group">
             <label for="lotNumber" class="form-label">로트 번호</label>
-            <input type="text" id="lotNumber" name="lotNumber" th:value="${inventory.lotNumber}" class="form-control" required>
+            <input type="text" id="lotNumber" name="lotNumber" th:value="${inventory.lotNumber}" class="form-control" readonly>
+            <small class="description">로트 번호는 직접 변경할 수 없습니다.</small>
           </div>
           
           <div class="form-group">
