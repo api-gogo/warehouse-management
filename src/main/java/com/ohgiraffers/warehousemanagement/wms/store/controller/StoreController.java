@@ -100,7 +100,7 @@ public class StoreController {
     }
 
     @GetMapping("/{storeId}/edit")
-    public String showStoreEditForm(@PathVariable Integer storeId, RedirectAttributes redirectAttributes) {
+    public String showStoreEditForm(@PathVariable Integer storeId, Model model, RedirectAttributes redirectAttributes) {
         StoreDTO storeDTO = storeServiceImpl.findById(storeId);
 
         if (storeDTO == null) {
@@ -110,7 +110,7 @@ public class StoreController {
             return "redirect:/stores/" + storeId;
         }
 
-        redirectAttributes.addFlashAttribute("storeDTO", storeDTO);
+        model.addAttribute("store", storeDTO);
         return "stores/edit";
     }
 

@@ -100,17 +100,15 @@ public class SupplierController {
     }
 
     @GetMapping("/{supplierId}/edit")
-    public String showSupplierEditForm(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+    public String showSupplierEditForm(@PathVariable Integer supplierId, Model model, RedirectAttributes redirectAttributes) {
         SupplierDTO supplierDTO = supplierServiceImpl.findById(supplierId);
 
         if (supplierDTO == null) {
-            String message = null;
-            message = "해당 id의 거래처가 없습니다.";
-            redirectAttributes.addFlashAttribute("message", message);
-            return "redirect:/suppliers/" + supplierId;
+            redirectAttributes.addFlashAttribute("message", "해당 id의 거래처가 없습니다.");
+            return "redirect:/suppliers";
         }
 
-        redirectAttributes.addFlashAttribute("supplierDTO", supplierDTO);
+        model.addAttribute("supplier", supplierDTO);
         return "suppliers/edit";
     }
 
