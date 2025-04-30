@@ -98,4 +98,52 @@ public class SupplierController {
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/suppliers";
     }
+
+    @GetMapping("/{supplierId}/edit")
+    public String showSupplierEditForm(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+        SupplierDTO supplierDTO = supplierServiceImpl.findById(supplierId);
+
+        if (supplierDTO == null) {
+            String message = null;
+            message = "해당 id의 거래처가 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/" + supplierId;
+        }
+
+        redirectAttributes.addFlashAttribute("supplierDTO", supplierDTO);
+        return "suppliers/edit";
+    }
+
+    @PatchMapping("/{supplierId}")
+    public String updateSupplier(@PathVariable Integer supplierId,
+                                 SupplierDTO supplierDTO, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.updateSupplier(supplierId, supplierDTO);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처 정보가 업데이트 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers/" + supplierId;
+    }
+
+    @PostMapping("/{supplierId}/delete")
+    public String deleteSupplier(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.deleteSupplier(supplierId);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처가 삭제 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers";
+    }
 }
