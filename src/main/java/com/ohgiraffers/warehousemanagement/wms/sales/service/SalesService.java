@@ -1,5 +1,9 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
+
 public interface SalesService {
-    Integer getSalesBySalesId(Integer id); // 수주ID로 정보 가져올 수 있게
+    Sales getSalesBySalesId(Integer id); // 수주ID로 수주서 정보 가져올 수 있게
+    SalesItem getSalesItemBySalesId(Integer id); // 수주ID로 수주상품목록 정보 가져올 수 있게  
 }

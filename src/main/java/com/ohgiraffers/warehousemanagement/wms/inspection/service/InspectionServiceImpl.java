@@ -3,8 +3,11 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.service;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.ParamResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.repository.InspectionRepository;
+import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
+import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,10 +21,12 @@ import java.util.Optional;
 @Service
 public class InspectionServiceImpl implements InspectionService {
     private final InspectionRepository inspectionRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public InspectionServiceImpl(InspectionRepository inspectionRepository) {
+    public InspectionServiceImpl(InspectionRepository inspectionRepository, UserRepository userRepository) {
         this.inspectionRepository = inspectionRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -38,24 +43,43 @@ public class InspectionServiceImpl implements InspectionService {
             }
         }
 
-            Inspection inspection = new Inspection(requestDTO);
+        Inspection inspection = new Inspection(requestDTO);
+        Optional<User> userById = userRepository.findById(requestDTO.getUserId());
+        if (userById.isPresent()) {
+            inspection.setUser(userById.get());
+        } else {
+            throw new IllegalArgumentException("유저 정보가 없습니다.\n" +
+                    "조회한 유저 ID : " + requestDTO.getUserId());
+        }
 
-            Inspection saveInspection = inspectionRepository.save(inspection);
+        Inspection saveInspection = inspectionRepository.save(inspection);
 
-            return new InspectionResponseDTO(saveInspection);
+        return new InspectionResponseDTO(saveInspection);
     }
 
-    public Page<InspectionResponseDTO> getAllInspection(int page, int size) {
+    public Page<InspectionResponseDTO> getAllInspection(ParamResponseDTO dto, int page, int size) {
+        Page<Inspection> inspectionList = null;
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Inspection> inspectionList = inspectionRepository.findAllByOrderByInspectionIdDesc(pageable);
+            if(dto.getSearchType() == null || dto.getSearchType().trim().isEmpty()) {
+                inspectionList = inspectionRepository.findAllByOrderByInspectionIdDesc(pageable);
+            } else {
+                inspectionList = inspectionRepository.findAllBySearchOrderByInspectionIdDesc(dto.getSearchType(), dto.getSearch(), pageable);
+            }
+
         return inspectionList.map(InspectionResponseDTO::new);
     }
 
-    public Page<InspectionResponseDTO> getAllInspectionByTag(String type, int page, int size) {
+    public Page<InspectionResponseDTO> getAllInspectionByTag(ParamResponseDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-
-        if (InspectionTransactionType.typeContains(type)) {
-            Page<Inspection> inspectionList = inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(type), pageable);
+        Page<Inspection> inspectionList = null;
+        if (InspectionTransactionType.typeContains(dto.getInspectionType())) {
+            if(dto.getSearchType() == null || dto.getSearchType().trim().isEmpty()) {
+                inspectionList = inspectionRepository.findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType.valueOf(dto.getInspectionType()), pageable);
+            } else {
+                inspectionList = inspectionRepository.findAllByTransactionTypeAndSearchOrderByInspectionIdDesc(
+                        InspectionTransactionType.valueOf(dto.getInspectionType()),
+                        dto.getSearchType(), dto.getSearch(), pageable);
+            }
             return inspectionList.map(InspectionResponseDTO::new);
         }
         else
@@ -73,7 +97,7 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     @Override
-    public InspectionResponseDTO getInspectionByTagAndTagId(String type, int typeId) {
+    public InspectionResponseDTO getInspectionByTagAndTagId(String type, Long typeId) {
         if (!InspectionTransactionType.typeContains(type))
             throw new IllegalArgumentException("존재하지 않는 유형입니다!");
 
