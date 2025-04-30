@@ -51,7 +51,7 @@
                         </tr>
                         <tr>
                             <th>수주담당자</th>
-                            <td th:text="${sales.userId}">홍길동</td>
+                            <td th:text="${sales.userName}">홍길동</td>
                             <th>담당자 전화번호</th>
                             <td></td> <!-- 전화번호 -->
                         </tr>
@@ -81,7 +81,7 @@
                             <td th:if="${sales.salesStatus.name() == 'PENDING'}">
                                 <form th:action="@{/sales/update/status/{salesId}(salesId=${sales.salesId})}" method="post"
                                       style="display: flex; gap: 5px; align-items: center;">
-                                    <input type="hidden" name="_method" value="patch"/>
+                                    <input type="hidden" name="_method" value="PATCH"/>
                                     <input type="hidden" name="salesId" th:value="${sales.salesId}" />
 
                                     <button type="submit"

@@ -1,16 +1,19 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.controller;
 
+import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +51,10 @@ public class SalesController {
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
     @PostMapping("/create")
     public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
-        int salesId = salesServiceImpl.createSales(salesDTO);
+        AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = authDetails.getUserId();
+
+        int salesId = salesServiceImpl.createSales(salesDTO, userId);
         String resultUrl = null;
 
         if (salesId > 0) {
@@ -79,7 +85,9 @@ public class SalesController {
 
     @GetMapping("/update/{salesId}")
     public ModelAndView updateSales(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
+
         SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
+        System.out.println(findDTO);
 
         if (findDTO != null) {
             mv.addObject("salesDTO", findDTO);
@@ -109,7 +117,7 @@ public class SalesController {
     }
 
     @PatchMapping("/update/status/{salesId}")
-    public String updateStatusSales(@PathVariable Integer salesId, @RequestParam SalesStatus status, RedirectAttributes rdtat) {
+    public String updateStatusSales(@PathVariable Integer salesId, @RequestParam(name = "status") SalesStatus status, RedirectAttributes rdtat) {
         boolean result = salesServiceImpl.updateStatusSales(salesId, status);
         String resultUrl = null;
 

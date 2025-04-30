@@ -4,12 +4,15 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SalesDTO {
     private Integer salesId;
     private Integer storeId;
     private Integer userId;
+    private String userName;
+    private String userPhone;
     private LocalDate salesDate;
     private LocalDate shippingDueDate;
     private SalesStatus salesStatus;
@@ -24,10 +27,12 @@ public class SalesDTO {
     public SalesDTO() {
     }
 
-    public SalesDTO(Integer salesId, Integer storeId, Integer userId, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
+    public SalesDTO(Integer salesId, Integer storeId, Integer userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
         this.salesId = salesId;
         this.storeId = storeId;
         this.userId = userId;
+        this.userName = userName;
+        this.userPhone = userPhone;
         this.salesDate = salesDate;
         this.shippingDueDate = shippingDueDate;
         this.salesStatus = salesStatus;
@@ -57,6 +62,22 @@ public class SalesDTO {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public LocalDate getSalesDate() {
@@ -145,6 +166,7 @@ public class SalesDTO {
                 "salesId=" + salesId +
                 ", storeId=" + storeId +
                 ", userId=" + userId +
+                ", userName='" + userName + '\'' +
                 ", salesDate=" + salesDate +
                 ", shippingDueDate=" + shippingDueDate +
                 ", salesStatus=" + salesStatus +
@@ -153,6 +175,8 @@ public class SalesDTO {
                 ", productIds=" + productIds +
                 ", productNames=" + productNames +
                 ", quantity=" + quantity +
+                ", pricePerBox=" + pricePerBox +
+                ", totalPrice=" + totalPrice +
                 '}';
     }
 }

@@ -21,8 +21,8 @@ public class SalesItem {
     @Column(name = "sales_items_quantity", nullable = false)
     private Integer salesItemsQuantity;
 
-//    @Column(name = "lot_number", nullable = false)
-//    private Integer lotNumber;
+    @Column(name = "lot_number", nullable = false)
+    private String lotNumber;
 
     public SalesItem() {
     }
@@ -31,14 +31,14 @@ public class SalesItem {
         this.salesId = builder.salesId;
         this.productId = builder.productId;
         this.salesItemsQuantity = builder.salesItemsQuantity;
-//        this.lotNumber = builder.lotNumber;
+        this.lotNumber = builder.lotNumber;
     }
 
     public static class Builder {
         private Sales salesId;
         private Integer productId;
         private Integer salesItemsQuantity;
-//        private Integer lotNumber;
+        private String lotNumber;
 
         public Builder() {}
 
@@ -57,17 +57,17 @@ public class SalesItem {
             return this;
         }
 
-//        public Builder lotNumber(Integer lotNumber) {
-//            this.lotNumber = lotNumber;
-//            return this;
-//        }
+        public Builder lotNumber(String lotNumber) {
+            this.lotNumber = lotNumber;
+            return this;
+        }
 
         public SalesItem build() {
             SalesItem salesItem = new SalesItem();
             salesItem.salesId = salesId;
             salesItem.productId = productId;
             salesItem.salesItemsQuantity = salesItemsQuantity;
-//            salesItem.lotNumber = lotNumber;
+            salesItem.lotNumber = lotNumber;
 
             return salesItem;
         }
