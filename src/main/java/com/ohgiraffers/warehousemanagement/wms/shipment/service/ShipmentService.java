@@ -6,19 +6,19 @@ import com.ohgiraffers.warehousemanagement.wms.shipment.model.dto.ShipmentRespon
 import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipment;
 
 public interface ShipmentService {
-
+    // 모든 출고 목록을 페이지 단위로 조회 (검색 및 필터링 포함)
     ShipmentPageResponseDTO getAllShipments(int page, int size, String status, String searchTerm);
-
+    // 특정 출고 ID로 출고 상세 정보 조회
     ShipmentResponseDTO getShipmentById(Integer shipmentId);
-
+    // 특정 출고 ID로 출고 엔티티 조회
     Shipment findShipmentById(Integer shipmentId);
-
+    // 새로운 출고 생성
     ShipmentResponseDTO createShipment(ShipmentCreateDTO createDTO);
-
+    // 특정 출고 ID로 출고 정보 수정
     ShipmentResponseDTO updateShipment(Integer shipmentId, ShipmentCreateDTO updateDTO);
-
+    // 특정 출고 ID로 출고 취소
     void cancelShipment(Integer shipmentId);
-
+    // 특정 출고 ID로 연관된 수주 ID 조회
     Integer getSaleIdByShipmentId(Integer shipmentId);
 }
 
@@ -32,8 +32,4 @@ public interface ShipmentService {
 *
 *  // saleId를 사용한 추가 로직
 * }
-*
-* //shipmentId가 유효하지 않거나 출고가 존재하지 않으면 RuntimeException이 발생하니, 타 도메인에서 적절히 예외 처리 필요.
-* //SecurityConfig 에서 /shipments/** 경로에 접근하려면 출고_사원, 출고_매니저, 출고_관리자 권한 필요한데 이건 태빈이형한테 요청 해봐야할듯
-* -> SecurityConfig 권한 태빈이형한테 수정 부탁 드려보세용
  **/
