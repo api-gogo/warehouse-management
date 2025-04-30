@@ -119,6 +119,7 @@ public class InspectionServiceImpl implements InspectionService {
         if (findInspection.isPresent()) {
             Inspection inspection = findInspection.get();
             Inspection dtoToInspection = new Inspection(requestDTO);
+            dtoToInspection.setUser(inspection.getUser());
 
             dtoToInspection.setInspectionId(inspection.getInspectionId());
             dtoToInspection.setInspectionUpdatedAt(inspection.getInspectionUpdatedAt());
