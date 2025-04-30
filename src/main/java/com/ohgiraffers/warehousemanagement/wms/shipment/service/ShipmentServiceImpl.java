@@ -38,7 +38,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     /**
      * 출고 목록을 조회하고 페이징, 필터링, 검색 기능을 제공
-     * 
      * @param page 요청 페이지 번호
      * @param size 페이지당 항목 수
      * @param status 출고 상태 필터 (선택 사항)
