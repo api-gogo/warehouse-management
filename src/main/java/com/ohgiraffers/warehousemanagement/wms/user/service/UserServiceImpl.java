@@ -125,6 +125,8 @@ public class UserServiceImpl implements UserService {
         return user.map(u -> new LogUserDTO(
                 u.getUserId(),
                 u.getUserName(),
+                u.getUserEmail(),
+                u.getUserPhone(),
                 u.getUserPart().getPart(),
                 u.getUserRole().getRole(),
                 u.getUserStatus().getStatus()
