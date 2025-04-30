@@ -66,7 +66,7 @@
                   <i class="fas fa-eye"></i>
                 </a>
                 <!-- 활성 상태일 때만 수정/삭제 버튼 표시 -->
-                <a th:if="${!store.isDeleted}" th:href="@{/stores/{id}/edit(id=${store.storeId})}" class="action-button" title="수정">
+                <a th:if="${!store.isDeleted}" th:href="@{/stores/{id}(id=${store.storeId})}" class="action-button" title="수정">
                   <i class="fas fa-edit"></i>
                 </a>
                 <button th:if="${!store.isDeleted}" class="action-button danger-button delete-button" 
