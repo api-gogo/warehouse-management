@@ -190,6 +190,15 @@
       .action-link:hover {
         text-decoration: underline;
       }
+      
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+      
+      .btn-sm i {
+        margin-right: 3px;
+      }
 
       /* 다크 모드 내 재고 페이지 스타일 */
       body.dark-mode .btn-outline {
@@ -320,20 +329,28 @@
       <table class="data-table">
         <thead>
         <tr>
+          <th>상품 번호</th>
           <th>상품 이름</th>
-          <th>해당 상품의 로트 번호 갯수</th>
+          <th>로트 번호 갯수</th>
           <th>총 가용 재고</th>
           <th>총 할당 재고</th>
           <th>총 폐기 재고</th>
+          <th>상세보기</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="inventory : ${inventories}">
+          <td th:text="${inventory.productId}"></td>
           <td th:text="${inventory.productName}"></td>
           <td th:text="${inventory.Count}"></td>
           <td th:text="${inventory.TotalAvailableStock}"></td>
           <td th:text="${inventory.TotalAllocatedStock}"></td>
           <td th:text="${inventory.TotalDisposedStock}"></td>
+          <td>
+            <a th:href="@{/inventories/detail/{id}(id=${inventory.productId})}" class="btn btn-outline btn-sm">
+              <i class="fas fa-eye"></i>
+            </a>
+          </td>
         </tr>
         </tbody>
       </table>

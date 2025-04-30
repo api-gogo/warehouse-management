@@ -46,6 +46,7 @@
       
       .btn-outline:hover {
         background-color: #f5f5f5;
+        text-decoration: none;
       }
       
       .btn-primary {
@@ -93,6 +94,74 @@
         margin-bottom: 20px;
       }
       
+      /* 데이터 카드 및 테이블 */
+      .data-card {
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+      }
+      
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .data-table th {
+        font-weight: 500;
+        color: #777;
+        background-color: #f9f9f9;
+      }
+      
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+      
+      /* 상태 태그 */
+      .status-tag {
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      
+      .status-normal {
+        background-color: #e7f5ea;
+        color: #198754;
+      }
+      
+      .status-low {
+        background-color: #ffe8e8;
+        color: #dc3545;
+      }
+      
+      /* 오류 메시지 */
+      .error-message {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #ffe8e8;
+        border-left: 4px solid #dc3545;
+        border-radius: 4px;
+      }
+      
+      .error-message p {
+        color: #dc3545;
+        margin: 0;
+      }
+      
+      /* 데이터 없을 때 */
+      .empty-state {
+        text-align: center;
+        padding: 40px 0;
+      }
+      
       /* 상세 정보 레이아웃 */
       .detail-grid {
         display: grid;
@@ -116,59 +185,7 @@
         font-weight: 500;
       }
       
-      /* 상태 태그 */
-      .status-tag {
-        padding: 4px 8px;
-        border-radius: 3px;
-        font-size: 12px;
-        font-weight: 500;
-        display: inline-block;
-      }
-      
-      .status-normal {
-        background-color: #e7f5ea;
-        color: #198754;
-      }
-      
-      .status-low {
-        background-color: #ffe8e8;
-        color: #dc3545;
-      }
-      
-      /* 히스토리 섹션 */
-      .history-section {
-        margin-top: 30px;
-      }
-      
-      .history-item {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-      }
-      
-      .history-item:last-child {
-        border-bottom: none;
-      }
-      
-      .history-date {
-        font-size: 12px;
-        color: #777;
-        margin-bottom: 5px;
-      }
-      
-      .history-action {
-        font-weight: 500;
-      }
-      
-      /* 데이터 카드 */
-      .data-card {
-        background-color: #fff;
-        border-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        overflow: hidden;
-        margin-top: 20px;
-      }
-      
-      /* 다크 모드에서의 상세 페이지 스타일 */
+      /* 다크 모드 스타일 */
       body.dark-mode .btn-outline {
         background-color: #2a2a2a;
         border-color: #444;
@@ -185,18 +202,29 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       }
       
+      body.dark-mode .data-table th {
+        background-color: #252525;
+        color: #b0b0b0;
+      }
+      
+      body.dark-mode .data-table td {
+        border-color: #333;
+      }
+      
       body.dark-mode .detail-label {
         color: #aaa;
       }
       
-      body.dark-mode .history-date {
+      body.dark-mode .error-message {
+        background-color: #3d2626;
+        border-left-color: #dc3545;
+      }
+      
+      body.dark-mode .description {
         color: #aaa;
       }
       
-      body.dark-mode .history-item {
-        border-color: #333;
-      }
-      
+      /* 반응형 스타일 */
       @media (max-width: 768px) {
         .detail-grid {
           grid-template-columns: 1fr;
@@ -212,21 +240,6 @@
           width: 100%;
         }
       }
-      
-      /* 그래프 컨테이너 */
-      .graph-container {
-        margin-top: 20px;
-        height: 300px;
-        width: 100%;
-        background-color: #fff;
-        border-radius: 4px;
-        padding: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      }
-      
-      body.dark-mode .graph-container {
-        background-color: #1e1e1e;
-      }
     </style>
   </th:block>
 </head>
@@ -240,109 +253,76 @@
         <a th:href="@{/inventories}" class="btn btn-outline">
           <i class="fas fa-arrow-left"></i> 목록으로
         </a>
-        <a th:href="@{/inventories/edit/{id}(id=${inventory.inventoryId})}" class="btn btn-primary">
-          <i class="fas fa-edit"></i> 수정
+      </div>
+    </div>
+    
+    <!-- 오류 메시지가 있는 경우 표시 -->
+    <div class="error-message" th:if="${errorMessage != null}">
+      <p th:text="${errorMessage}">오류 메시지</p>
+    </div>
+    
+    <!-- 상품 정보 섹션 -->
+    <div class="inventory-section" th:if="${inventory != null and !#lists.isEmpty(inventory)}">
+      <h2 class="subtitle" th:text="${inventory[0].productName}">상품명</h2>
+      <p class="description">
+        상품 ID: <span th:text="${inventory[0].productId}">상품 ID</span> / 
+        총 재고 항목: <span th:text="${inventory.size()}">항목 수</span>개
+      </p>
+    </div>
+
+    <!-- 재고 목록 테이블 -->
+    <div class="data-card" th:if="${inventory != null and !#lists.isEmpty(inventory)}">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>재고 ID</th>
+            <th>로트번호</th>
+            <th>위치코드</th>
+            <th>가용재고</th>
+            <th>할당재고</th>
+            <th>유통기한</th>
+            <th>상태</th>
+            <th>수정/삭제</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="item : ${inventory}">
+            <td th:text="${item.inventoryId}">ID</td>
+            <td th:text="${item.lotNumber}">로트번호</td>
+            <td th:text="${item.locationCode}">위치코드</td>
+            <td th:text="${item.availableStock}">가용재고</td>
+            <td th:text="${item.allocatedStock}">할당재고</td>
+            <td th:text="${#temporals.format(item.inventoryExpiryDate, 'yyyy-MM-dd')}">유통기한</td>
+            <td>
+              <span th:class="${item.availableStock > 50 ? 'status-tag status-normal' : 'status-tag status-low'}"
+                    th:text="${item.availableStock > 50 ? '정상' : '부족'}">
+                상태
+              </span>
+            </td>
+            <td>
+              <div class="button-group">
+                <a th:href="@{/inventories/edit/{id}(id=${item.inventoryId})}" class="btn btn-outline btn-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a th:href="@{/inventories/delete/{id}(id=${item.inventoryId})}" class="btn btn-outline btn-sm" 
+                   onclick="return confirm('정말로 이 재고를 삭제하시겠습니까?');">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- 데이터가 없을 경우 -->
+    <div class="inventory-section empty-state" th:if="${inventory == null or #lists.isEmpty(inventory)}">
+      <h2 class="subtitle">재고 정보 없음</h2>
+      <p class="description">해당 상품의 재고 정보가 존재하지 않습니다.</p>
+      <div class="button-group" style="justify-content: center; margin-top: 20px;">
+        <a th:href="@{/inventories/add}" class="btn btn-primary">
+          <i class="fas fa-plus"></i> 재고 추가
         </a>
-        <a th:href="@{/inventories/delete/{id}(id=${inventory.inventoryId})}" class="btn btn-danger" id="deleteBtn">
-          <i class="fas fa-trash"></i> 삭제
-        </a>
-      </div>
-    </div>
-    
-    <!-- 재고 상세 정보 섹션 -->
-    <div class="inventory-section">
-      <h2 class="subtitle">기본 정보</h2>
-      <p class="description">재고 ID: <span th:text="${inventory.inventoryId}"></span></p>
-      
-      <!-- 상세 정보 그리드 -->
-      <div class="detail-grid">
-        <div class="detail-item">
-          <div class="detail-label">상품 ID</div>
-          <div class="detail-value" th:text="${inventory.productId}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">로트 번호</div>
-          <div class="detail-value" th:text="${inventory.lotNumber}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">창고 ID</div>
-          <div class="detail-value" th:text="${inventory.storageId}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">위치 코드</div>
-          <div class="detail-value" th:text="${inventory.locationCode}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">가용 재고</div>
-          <div class="detail-value" th:text="${inventory.availableStock}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">할당 재고</div>
-          <div class="detail-value" th:text="${inventory.allocatedStock}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">폐기 재고</div>
-          <div class="detail-value" th:text="${inventory.disposedStock}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">유통기한</div>
-          <div class="detail-value" th:text="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">상태</div>
-          <div class="detail-value">
-            <span 
-              th:class="${inventory.availableStock > 100 ? 'status-tag status-normal' : 'status-tag status-low'}"
-              th:text="${inventory.availableStock > 100 ? '정상' : '부족'}">
-            </span>
-          </div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">생성일</div>
-          <div class="detail-value" th:text="${#temporals.format(inventory.inventoryCreatedAt, 'yyyy-MM-dd HH:mm')}"></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">최근 수정일</div>
-          <div class="detail-value" th:text="${#temporals.format(inventory.inventoryUpdatedAt, 'yyyy-MM-dd HH:mm')}"></div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 재고 이력 섹션 -->
-    <div class="inventory-section">
-      <h2 class="subtitle">재고 이력</h2>
-      <p class="description">해당 재고의 변동 이력을 확인할 수 있습니다.</p>
-      
-      <!-- 가상 데이터를 사용한 이력 표시 (나중에 실제 데이터로 대체) -->
-      <div class="data-card">
-        <div class="history-item">
-          <div class="history-date">2023-06-15 14:30</div>
-          <div class="history-action">입고: +50개 (담당자: 김철수)</div>
-        </div>
-        <div class="history-item">
-          <div class="history-date">2023-06-10 09:15</div>
-          <div class="history-action">출고: -20개 (주문번호: ORD-12345)</div>
-        </div>
-        <div class="history-item">
-          <div class="history-date">2023-06-05 11:20</div>
-          <div class="history-action">재고조정: -5개 (사유: 파손)</div>
-        </div>
-        <div class="history-item">
-          <div class="history-date">2023-06-01 10:00</div>
-          <div class="history-action">입고: +100개 (담당자: 박지영)</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 재고 그래프 섹션 -->
-    <div class="inventory-section">
-      <h2 class="subtitle">재고 추이</h2>
-      <p class="description">최근 30일간의 재고 변동 추이입니다.</p>
-      
-      <!-- 그래프 영역 (실제로는 차트 라이브러리를 사용하여 구현) -->
-      <div class="graph-container">
-        <!-- 차트가 그려질 영역 -->
-        <div id="stockChart" style="width: 100%; height: 100%;"></div>
       </div>
     </div>
   </th:block>
@@ -351,35 +331,9 @@
   <th:block layout:fragment="scripts">
     <script th:inline="javascript">
       /*<![CDATA[*/
-      // 삭제 버튼 경고창
-      document.getElementById('deleteBtn').addEventListener('click', function(e) {
-        if(!confirm('정말로 이 재고를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-          e.preventDefault();
-        }
-      });
-
-      // 가상의 차트 데이터 (실제 구현 시 서버에서 데이터를 받아와야 함)
-      const mockChartData = {
-        labels: Array.from({length: 30}, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (29 - i));
-          return `${date.getMonth()+1}/${date.getDate()}`;
-        }),
-        datasets: [
-          {
-            label: '가용 재고',
-            data: Array.from({length: 30}, () => Math.floor(Math.random() * 50) + 100),
-            borderColor: '#0d6efd',
-            backgroundColor: 'rgba(13, 110, 253, 0.1)',
-            borderWidth: 2,
-            fill: true
-          }
-        ]
-      };
-
       document.addEventListener('DOMContentLoaded', function() {
+        // 스크립트 실행 여부 확인을 위한 로그
         console.log("재고 상세 페이지 스크립트 로딩 완료");
-        // 여기에 차트 렌더링 코드가 들어갈 수 있습니다.
       });
       /*]]>*/
     </script>
