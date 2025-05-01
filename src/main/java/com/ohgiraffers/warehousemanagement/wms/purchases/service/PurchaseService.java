@@ -11,6 +11,10 @@ import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseIt
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseStatus;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseItemRepository;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseRepository;
+import com.ohgiraffers.warehousemanagement.wms.supplier.model.dto.SupplierDTO;
+import com.ohgiraffers.warehousemanagement.wms.supplier.model.entity.Supplier;
+import com.ohgiraffers.warehousemanagement.wms.supplier.repository.SupplierRepository;
+import com.ohgiraffers.warehousemanagement.wms.supplier.service.SupplierService;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +35,16 @@ import java.util.List;
 public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final PurchaseItemRepository purchaseItemRepository;
+    private final SupplierService supplierService;
+    private final SupplierRepository supplierRepository;
 
 
     @Autowired
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository, SupplierService supplierService, SupplierRepository supplierRepository) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseItemRepository = purchaseItemRepository;
+        this.supplierService = supplierService;
+        this.supplierRepository = supplierRepository;
     }
 
 
@@ -143,6 +151,7 @@ public class PurchaseService {
     public PurchaseDTO getPurchaseById(Integer id) {
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 id의 발주가 없습니다."));
+        
         PurchaseDTO purchaseDTO = new PurchaseDTO(
                 purchase.getPurchaseId(),
                 purchase.getUserId(),
@@ -153,6 +162,12 @@ public class PurchaseService {
                 purchase.getPurchaseUpdatedAt(),
                 purchase.getNotes()
         );
+        
+        // 거래처 정보 설정
+        if (purchase.getSupplier() != null) {
+            purchaseDTO.setSupplierId(purchase.getSupplier().getSupplierId());
+        }
+        
         // PurchaseItem 목록 추가
         List<PurchaseItemDTO> items = getPurchaseItemsByPurchaseId(id);
         purchaseDTO.setItems(items);
@@ -191,7 +206,7 @@ public class PurchaseService {
             throw new IllegalArgumentException("사용자 ID가 설정되지 않았습니다.");
         }
         
-        // 컨트롤러에서 설정한 userId를 직접 사용
+        // Purchase 엔티티 생성
         Purchase purchase = new Purchase(
                 null, // ID는 자동 생성
                 purchaseDTO.getUserId(), // 컨트롤러에서 설정한 사용자 ID 사용
@@ -202,10 +217,30 @@ public class PurchaseService {
                 null,
                 purchaseDTO.getPurchaseNotes()
         );
+        
+        // 거래처 정보 설정 (supplierId가 있는 경우)
+        if (purchaseDTO.getSupplierId() != null) {
+            try {
+                // SupplierRepository를 통해 직접 Supplier 엔티티 가져오기
+                supplierRepository.findById(purchaseDTO.getSupplierId())
+                    .ifPresent(supplier -> {
+                        purchase.setSupplier(supplier);
+                        System.out.println("Setting supplier: " + supplier.getSupplierId() + " - " + supplier.getSupplierName());
+                    });
+            } catch (Exception e) {
+                System.err.println("거래처 정보 설정 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
         Purchase savedPurchase = purchaseRepository.save(purchase);
+        
+        // 저장된 결과 확인 로그
+        System.out.println("Saved Purchase: " + savedPurchase);
+        System.out.println("Saved Supplier: " + (savedPurchase.getSupplier() != null ? 
+                            savedPurchase.getSupplier().getSupplierId() : "null"));
 
-        return new PurchaseDTO(
+        PurchaseDTO savedPurchaseDTO = new PurchaseDTO(
                 savedPurchase.getPurchaseId(),
                 savedPurchase.getUserId(),
                 savedPurchase.getPurchaseCreatedAt(),
@@ -215,6 +250,13 @@ public class PurchaseService {
                 savedPurchase.getPurchaseUpdatedAt(),
                 savedPurchase.getNotes()
         );
+        
+        // 거래처 ID 설정
+        if (savedPurchase.getSupplier() != null) {
+            savedPurchaseDTO.setSupplierId(savedPurchase.getSupplier().getSupplierId());
+        }
+        
+        return savedPurchaseDTO;
     }
 
 
@@ -371,6 +413,15 @@ public class PurchaseService {
             return false;
         }
 
+    }
+
+    public Integer getSupplierid(Integer supplierId) {
+        SupplierDTO supplierDTO = supplierService.findById(supplierId);
+        if (supplierDTO == null) {
+            throw new IllegalArgumentException("해당 거래처가 없습니다.");
+        } else {
+            return supplierDTO.getSupplierId();
+        }
     }
 
     
