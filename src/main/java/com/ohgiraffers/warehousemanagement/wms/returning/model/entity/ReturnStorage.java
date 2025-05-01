@@ -27,7 +27,7 @@ public class ReturnStorage {
     @Column(name = "return_storages_created_at",nullable = false)
     private LocalDateTime returnStoragesCreatedAt;
 
-    @OneToMany(mappedBy = "returnStorageId", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "returnStorage", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ReturnStorageItem> returnStorageItems = new ArrayList<>(); //입고반품에 대해 받아올 리스트
 
     /*생성자*/

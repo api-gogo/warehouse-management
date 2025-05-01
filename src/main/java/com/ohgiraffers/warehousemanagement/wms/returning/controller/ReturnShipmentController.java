@@ -19,13 +19,13 @@ import java.util.List;
 @RequestMapping("/returns/outbound/list")
 @Validated
 
-public class ReturningController {
+public class ReturnShipmentController {
 
     //의존성 주입
     private final ReturnShipmentService returnShipmentService;
 
     @Autowired
-    public ReturningController(ReturnShipmentService returnShipmentService) {
+    public ReturnShipmentController(ReturnShipmentService returnShipmentService) {
         this.returnShipmentService = returnShipmentService;
     }
 
