@@ -64,7 +64,7 @@
                             <tbody>
                             <tr th:each="sales : ${salesLists}">
                                 <td th:text="${sales.salesId}">수주ID</td>
-                                <td th:text="${sales.storeId}">점포명</td>
+                                <td th:text="${sales.storeName}">점포명</td>
                                 <td th:text="${sales.userName}">담당자명</td>
                                 <td th:text="${#temporals.format(sales.salesDate, 'yyyy-MM-dd')}">수주일</td>
                                 <td th:text="${#temporals.format(sales.shippingDueDate, 'yyyy-MM-dd')}">출고예정일</td>
