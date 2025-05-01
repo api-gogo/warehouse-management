@@ -159,8 +159,8 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public List<StoreDTO> searchByNameContainingAndIsDeletedTrue(String storeName) {
-        List<Store> stores = storeRepository.findByStoreNameContainingAndIsDeletedTrue(storeName);
+    public List<StoreDTO> searchByNameContainingAndIsDeletedFalse(String storeName) {
+        List<Store> stores = storeRepository.findByStoreNameContainingAndIsDeletedFalse(storeName);
         System.out.println("stores: " + stores);
         return stores.stream()
                 .map(s -> new StoreDTO(

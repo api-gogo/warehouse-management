@@ -226,7 +226,7 @@ public class SalesServiceImpl implements SalesService {
     }
 
     public List<StoreDTO> searchStoresByName(String storeName) {
-        List<StoreDTO> searchResults = storeService.searchByNameContainingAndIsDeletedTrue(storeName);
+        List<StoreDTO> searchResults = storeService.searchByNameContainingAndIsDeletedFalse(storeName);
         return searchResults;
     }
 

@@ -8,5 +8,5 @@ public interface StoreService {
 
     StoreDTO findById(Integer storeId);
     StoreDTO findByName(String storeName);
-    List<StoreDTO> searchByNameContainingAndIsDeletedTrue(String storeName);
+    List<StoreDTO> searchByNameContainingAndIsDeletedFalse(String storeName);
 }
