@@ -14,11 +14,11 @@ public class ReturnStorageItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "return_storage_id",nullable = false)
-    private ReturnStorage returnStorageId; //외래키, 반품번호
+    private ReturnStorage returnStorage; //외래키, 반품번호
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "return_storage_content",nullable = false)
-    private ReturningStorageCause returnStorageContent; //반품사유
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "return_storage_content",nullable = false)
+//    private ReturningStorageCause returnStorageContent; //반품사유
 
     @Column(name = "return_storage_quantity")
     private Integer returnStorageQuantity; //수량
@@ -28,10 +28,10 @@ public class ReturnStorageItem {
     public ReturnStorageItem() {
     }
 
-    public ReturnStorageItem(Integer returnStorageItemId, ReturnStorage returnStorageId, ReturningStorageCause returnStorageContent, Integer returnStorageQuantity) {
+    public ReturnStorageItem(Integer returnStorageItemId, ReturnStorage returnStorage, ReturningStorageCause returnStorageContent, Integer returnStorageQuantity) {
         this.returnStorageItemId = returnStorageItemId;
-        this.returnStorageId = returnStorageId;
-        this.returnStorageContent = returnStorageContent;
+        this.returnStorage = returnStorage;
+//        this.returnStorageContent = returnStorageContent;
         this.returnStorageQuantity = returnStorageQuantity;
     }
 
@@ -43,21 +43,21 @@ public class ReturnStorageItem {
         this.returnStorageItemId = returnStorageItemId;
     }
 
-    public ReturnStorage getReturnStorageId() {
-        return returnStorageId;
+    public ReturnStorage getReturnStorage() {
+        return returnStorage;
     }
 
-    public void setReturnStorageId(ReturnStorage returnStorageId) {
-        this.returnStorageId = returnStorageId;
+    public void setReturnStorage(ReturnStorage returnStorage) {
+        this.returnStorage = returnStorage;
     }
 
-    public ReturningStorageCause getReturnStorageContent() {
-        return returnStorageContent;
-    }
-
-    public void setReturnStorageContent(ReturningStorageCause returnStorageContent) {
-        this.returnStorageContent = returnStorageContent;
-    }
+//    public ReturningStorageCause getReturnStorageContent() {
+//        return returnStorageContent;
+//    }
+//
+//    public void setReturnStorageContent(ReturningStorageCause returnStorageContent) {
+//        this.returnStorageContent = returnStorageContent;
+//    }
 
     public Integer getReturnStorageQuantity() {
         return returnStorageQuantity;
@@ -71,8 +71,8 @@ public class ReturnStorageItem {
     public String toString() {
         return "ReturnStorageItem{" +
                 "returnStorageItemId=" + returnStorageItemId +
-                ", returnStorageId=" + returnStorageId +
-                ", returnStorageContent=" + returnStorageContent +
+                ", returnStorageId=" + returnStorage +
+//                ", returnStorageContent=" + returnStorageContent +
                 ", returnStorageQuantity=" + returnStorageQuantity +
                 '}';
     }
