@@ -43,5 +43,17 @@
 
 <!-- 페이지별 추가 스크립트 삽입 영역 -->
 <th:block layout:fragment="scripts"></th:block>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has('accessDenied') && urlParams.get('accessDenied') === 'true') {
+      // 경고 메시지를 바로 띄우지 않고, 아주 잠깐 지연시킵니다.
+      setTimeout(function() {
+        alert('접근 권한이 없습니다.');
+      }, 100); // 100밀리초 (0.1초) 지연. 필요하면 조절하세요.
+    }
+  });
+</script>
 </body>
 </html>

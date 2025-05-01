@@ -63,7 +63,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/{userId}")
-    public String showUserDetail(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+    public String showUserDetail(@PathVariable Long userId, Model model, RedirectAttributes redirectAttributes) {
         UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
@@ -76,7 +76,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/{userId}/edit")
-    public String showUserEditForm(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+    public String showUserEditForm(@PathVariable Long userId, Model model, RedirectAttributes redirectAttributes) {
         UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
@@ -89,7 +89,7 @@ public class AdminController {
     }
 
     @PatchMapping("/users/{userId}")
-    public String updateUser(@PathVariable Integer userId, UserDTO updateUserDTO,
+    public String updateUser(@PathVariable Long userId, UserDTO updateUserDTO,
                              RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.updateUser(userId, updateUserDTO);
@@ -106,7 +106,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/approve")
-    public String approveUser(@PathVariable Integer userId, UserDTO updateUserDTO,
+    public String approveUser(@PathVariable Long userId, UserDTO updateUserDTO,
                              RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.approveUser(userId, updateUserDTO);
@@ -123,7 +123,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/reject")
-    public String rejectUser(@PathVariable Integer userId, RedirectAttributes redirectAttributes) {
+    public String rejectUser(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.rejectUser(userId);
 
@@ -139,7 +139,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/disable")
-    public String disableUser(@PathVariable Integer userId,
+    public String disableUser(@PathVariable Long userId,
                               RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.disableUser(userId);
@@ -156,7 +156,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/enable")
-    public String enableUser(@PathVariable Integer userId,
+    public String enableUser(@PathVariable Long userId,
                               RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.enableUser(userId);
@@ -173,7 +173,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/resign")
-    public String resignUser(@PathVariable Integer userId,
+    public String resignUser(@PathVariable Long userId,
                              RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.resignUser(userId);
@@ -190,7 +190,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/blacklist")
-    public String blacklistUser(@PathVariable Integer userId,
+    public String blacklistUser(@PathVariable Long userId,
                                RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.blacklistUser(userId);
@@ -207,7 +207,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/reset-to-pending")
-    public String resetToPending(@PathVariable Integer userId,
+    public String resetToPending(@PathVariable Long userId,
                                 RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.resetToApprovalPending(userId);
@@ -253,7 +253,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/approve-batch")
-    public String approveBatchUsers(@RequestParam("selectedUsers") List<Integer> userIds,
+    public String approveBatchUsers(@RequestParam("selectedUsers") List<Long> userIds,
                                     @RequestParam("batchPart") String batchPart,
                                     @RequestParam("batchRole") String batchRole,
                                     RedirectAttributes redirectAttributes) {
@@ -272,7 +272,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/reject-batch")
-    public String rejectBatchUsers(@RequestParam("selectedUsers") List<Integer> userIds,
+    public String rejectBatchUsers(@RequestParam("selectedUsers") List<Long> userIds,
                                     RedirectAttributes redirectAttributes) {
         String message = null;
         boolean result = adminService.rejectUsers(userIds);

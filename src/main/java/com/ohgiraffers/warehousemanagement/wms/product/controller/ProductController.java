@@ -56,7 +56,7 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('상품_사원', '상품_매니저', '상품_관리자', '통합_관리자')")
     public String createProductForm(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Integer userId = null;
+        Long userId = null;
         if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof AuthDetails) {
             userId = ((AuthDetails) authentication.getPrincipal()).getUserId();
         }

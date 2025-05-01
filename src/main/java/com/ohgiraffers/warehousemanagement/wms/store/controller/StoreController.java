@@ -33,9 +33,6 @@ public class StoreController {
         }
 
         Page<StoreDTO> storePage = storeServiceImpl.findAll(search, status, pageable);
-        if (storePage.isEmpty()) {
-            model.addAttribute("message", "조건에 맞는 점포가 없습니다.");
-        }
 
         model.addAttribute("stores", storePage.getContent());
         model.addAttribute("currentPage", storePage.getNumber());

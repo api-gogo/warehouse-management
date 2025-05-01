@@ -100,7 +100,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean updateUser(Integer userId, UserDTO userDTO) {
+    public boolean updateUser(Long userId, UserDTO userDTO) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -117,7 +117,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean approveUser(Integer userId, UserDTO userDTO) {
+    public boolean approveUser(Long userId, UserDTO userDTO) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -132,14 +132,14 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean approveUsers(List<Integer> userIds, String batchPart, String batchRole) {
+    public boolean approveUsers(List<Long> userIds, String batchPart, String batchRole) {
         if (userIds == null || userIds.isEmpty()) {
             return false;
         }
 
         List<User> users = new ArrayList<>();
 
-        for (Integer id : userIds) {
+        for (Long id : userIds) {
             User user = userRepository.findById(id).orElse(null);
             if (user == null) {
                 return false;
@@ -172,7 +172,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean rejectUser(Integer userId) {
+    public boolean rejectUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -185,14 +185,14 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean rejectUsers(List<Integer> userIds) {
+    public boolean rejectUsers(List<Long> userIds) {
         if (userIds == null || userIds.isEmpty()) {
             return false;
         }
 
         List<User> users = new ArrayList<>();
 
-        for (Integer id : userIds) {
+        for (Long id : userIds) {
             User user = userRepository.findById(id).orElse(null);
             if (user == null) {
                 return false;
@@ -212,7 +212,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean disableUser(Integer userId) {
+    public boolean disableUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -225,7 +225,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean enableUser(Integer userId) {
+    public boolean enableUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -238,7 +238,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean resignUser(Integer userId) {
+    public boolean resignUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -256,7 +256,7 @@ public class AdminService {
      * 지속적으로 부적절한 행동을 하는 사용자를 완전히 차단하기 위한 기능
      */
     @Transactional
-    public boolean blacklistUser(Integer userId) {
+    public boolean blacklistUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -274,7 +274,7 @@ public class AdminService {
      * 관리자가 수동으로 승인거부된 사용자에게 재승인 기회를 주기 위한 기능
      */
     @Transactional
-    public boolean resetToApprovalPending(Integer userId) {
+    public boolean resetToApprovalPending(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getUserStatus() != UserStatus.승인거부) {
             return false;
@@ -284,14 +284,5 @@ public class AdminService {
         user.setUserUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return true;
-    }
-    
-    /**
-     * 반복적으로 승인을 거부당하는 사용자를 확인하는 메서드
-     * 동일 사용자가 너무 많은 재승인 시도를 하는 경우 블랙리스트 대상자로 표시할 수 있음
-     */
-    public int countRejectionHistory(Integer userId) {
-        // 여기서는 간단하게 구현하지만, 실제로는 승인 거부 이력을 저장하고 조회하는 로직 필요
-        return 0; // 향후 확장을 위한 메서드 스텁
     }
 }
