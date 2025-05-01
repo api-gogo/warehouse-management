@@ -16,9 +16,10 @@ import java.util.Optional;
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     Optional<Inventory> findTopByProductProductIdOrderByInventoryExpiryDateAsc(Integer productId);
 
+    Optional<Inventory> findInventoryByProductProductId(Integer productId);
+
     // 재고 조회 리스트에서 '상세 정보' 를 눌렀을 때, 해당 제품 이름의 재고 목록을 보여준다. (유통기한이 빠른 순)
     Page<Inventory> findByProductProductIdOrderByInventoryExpiryDateAsc(Long productId, Pageable pageable);
-
 
     // 페이징네이션 구현 - 상품명 검색 조회
     @Query("SELECT new com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO(" +
