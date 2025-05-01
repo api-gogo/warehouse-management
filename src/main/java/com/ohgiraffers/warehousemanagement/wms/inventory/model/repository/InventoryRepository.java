@@ -42,6 +42,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT MAX(i.lotNumber) FROM Inventory i WHERE i.product.productId = :productId AND i.lotNumber LIKE :datePrefix")
     String findMaxLotNumberByProductAndDate(Integer productId, String datePrefix);
 
-
+    //상품 ID와 로트 번호로 재고 조회.
+    Optional<Inventory> findByProductProductIdAndLotNumber(Integer productId, String lotNumber);
 
 }
