@@ -8,13 +8,15 @@ public class ProductResponseDTO {
 
     private Integer productId;
     private Category category;
-    private Integer supplierId; // Long -> Integer
+    private Integer supplierId;
+    private String supplierName;
     private Integer userId;
+    private String userName;
     private String productName;
     private Integer expirationDate;
     private String storageMethod;
-    private Integer pricePerBox; // Long -> Integer
-    private Integer quantityPerBox; // Long -> Integer
+    private Integer pricePerBox;
+    private Integer quantityPerBox;
     private LocalDateTime productCreatedAt;
     private LocalDateTime productUpdatedAt;
     private LocalDateTime productDeletedAt;
@@ -22,14 +24,16 @@ public class ProductResponseDTO {
 
     public ProductResponseDTO() {}
 
-    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, Integer userId,
-                              String productName, Integer expirationDate, String storageMethod,
-                              Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
-                              LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
+    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, String supplierName, Integer userId, String userName,
+                                String productName, Integer expirationDate, String storageMethod,
+                                Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
+                                LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
         this.productId = productId;
         this.category = category;
         this.supplierId = supplierId;
+        this.supplierName = supplierName;
         this.userId = userId;
+        this.userName = userName;
         this.productName = productName;
         this.expirationDate = expirationDate;
         this.storageMethod = storageMethod;
@@ -76,12 +80,28 @@ public class ProductResponseDTO {
         this.supplierId = supplierId;
     }
 
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
     public Integer getUserId() {
         return userId;
     }
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getProductName() {
@@ -162,7 +182,9 @@ public class ProductResponseDTO {
                 "상품번호=" + productId +
                 ", 카테고리 번호=" + (category != null ? category.getCategoryId() : null) +
                 ", 거래처 ID=" + supplierId +
-                ", 담당자=" + userId +
+                ", 거래처명='" + supplierName + '\'' +
+                ", 담당자 ID=" + userId +
+                ", 담당자명='" + userName + '\'' +
                 ", 품명='" + productName + '\'' +
                 ", 유통기한=" + expirationDate +
                 ", 보관방법='" + storageMethod + '\'' +

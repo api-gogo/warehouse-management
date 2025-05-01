@@ -4,30 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WMS - 신규 상품 등록</title>
-  <!-- 폰트어썸 아이콘 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- 페이지 css -->
   <link rel="stylesheet" href="../../static/css/products/create.css" th:href="@{/css/products/create.css}">
-  <!-- Flatpickr 달력 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- 공통 CSS -->
   <link rel="stylesheet" href="/common.css?v=1">
-  <!-- 네비게이션 CSS -->
   <link rel="stylesheet" href="/css/navigation.css?v=1">
 </head>
 <body>
 <div class="layout">
-  <!-- 네비게이션 사이드바 포함 -->
   <div th:replace="~{navigation :: aside(activeMenu='product')}"></div>
-
-  <!-- 메인 콘텐츠 -->
   <div class="main-content">
-    <!-- 헤더 포함 -->
     <div th:replace="~{navigation :: header}"></div>
-
-    <!-- 페이지 콘텐츠 영역 - 상품 추가 페이지 -->
     <main class="page-content">
-      <!-- 페이지 제목과 뒤로가기 버튼 -->
       <div class="flex items-center justify-between">
         <h1 class="page-title">신규 상품 등록</h1>
         <div class="flex items-center space-x-2">
@@ -37,28 +25,21 @@
           </a>
         </div>
       </div>
-
-      <!-- 상품 정보 입력 카드 -->
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">상품 정보</h2>
           <p class="card-description">신규 상품의 정보를 입력해주세요.</p>
         </div>
         <div class="card-content">
-          <!-- 에러 메시지 표시 -->
           <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
-
-          <!-- 상품 추가 폼 -->
           <form th:action="@{/products/create}" method="post" th:object="${product}">
+            <input type="hidden" id="userId" name="userId" th:field="*{userId}">
             <div class="form-grid">
-              <!-- 품명 입력 -->
               <div class="form-group">
                 <label for="productName" class="form-label">품명 *</label>
                 <input type="text" id="productName" name="productName" th:field="*{productName}" class="form-input" required>
                 <div class="form-error" th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}">품명을 입력해주세요.</div>
               </div>
-
-              <!-- 카테고리 선택 -->
               <div class="form-group">
                 <label for="categoryId" class="form-label">카테고리 *</label>
                 <select id="categoryId" name="categoryId" th:field="*{categoryId}" class="form-select" required>
@@ -69,29 +50,21 @@
                 </select>
                 <div class="form-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">카테고리를 선택해주세요.</div>
               </div>
-
-              <!-- 거래처 ID 입력 -->
               <div class="form-group">
-                <label for="supplierId" class="form-label">거래처 ID *</label>
-                <input type="number" id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-input" required min="1" max="2147483647">
-                <div class="form-error" th:if="${#fields.hasErrors('supplierId')}" th:errors="*{supplierId}">거래처 ID를 입력해주세요.</div>
+                <label for="supplierId" class="form-label">거래처 *</label>
+                <select id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-select" required>
+                  <option value="">거래처 선택</option>
+                  <option th:each="supplier : ${suppliers}"
+                          th:value="${supplier.supplierId}"
+                          th:text="${supplier.supplierName}"></option>
+                </select>
+                <div class="form-error" th:if="${#fields.hasErrors('supplierId')}" th:errors="*{supplierId}">거래처를 선택해주세요.</div>
               </div>
-
-              <!-- 담당자 ID 입력 -->
-              <div class="form-group">
-                <label for="userId" class="form-label">담당자 ID *</label>
-                <input type="number" id="userId" name="userId" th:field="*{userId}" class="form-input" required min="1" max="2147483647">
-                <div class="form-error" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">담당자 ID를 입력해주세요.</div>
-              </div>
-
-              <!-- 보관방법 입력 -->
               <div class="form-group">
                 <label for="storageMethod" class="form-label">보관방법 *</label>
                 <input type="text" id="storageMethod" name="storageMethod" th:field="*{storageMethod}" class="form-input" required>
                 <div class="form-error" th:if="${#fields.hasErrors('storageMethod')}" th:errors="*{storageMethod}">보관방법을 입력해주세요.</div>
               </div>
-
-              <!-- 유통기한 선택 -->
               <div class="form-group">
                 <label for="expirationDatePicker" class="form-label">유통기한 *</label>
                 <input type="text" id="expirationDatePicker" class="form-input" placeholder="유통기한을 선택해주세요" required>
@@ -99,16 +72,12 @@
                 <div class="form-hint">상품의 유통기한을 선택해주세요.</div>
                 <div class="form-error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}">유통기한을 입력해주세요.</div>
               </div>
-
-              <!-- 박스당 단가 입력 -->
               <div class="form-group">
                 <label for="pricePerBox" class="form-label">박스당 단가 *</label>
                 <input type="number" id="pricePerBox" name="pricePerBox" th:field="*{pricePerBox}" class="form-input" min="0" max="2147483647" step="100" required>
                 <div class="form-hint">박스당 단가를 원 단위로 입력해주세요.</div>
                 <div class="form-error" th:if="${#fields.hasErrors('pricePerBox')}" th:errors="*{pricePerBox}">박스당 단가를 입력해주세요.</div>
               </div>
-
-              <!-- 박스당 개수 입력 -->
               <div class="form-group">
                 <label for="quantityPerBox" class="form-label">박스당 개수 *</label>
                 <input type="number" id="quantityPerBox" name="quantityPerBox" th:field="*{quantityPerBox}" class="form-input" min="1" max="2147483647" required>
@@ -116,11 +85,7 @@
                 <div class="form-error" th:if="${#fields.hasErrors('quantityPerBox')}" th:errors="*{quantityPerBox}">박스당 개수를 입력해주세요.</div>
               </div>
             </div>
-
-            <!-- 삭제 상태 기본값 설정 -->
             <input type="hidden" name="isDeleted" th:field="*{isDeleted}" value="false">
-
-            <!-- 폼 제출 버튼 -->
             <div class="flex justify-end space-x-2">
               <button type="button" class="btn btn-outline" onclick="history.back()">취소</button>
               <button type="submit" class="btn btn-primary">등록</button>
@@ -131,15 +96,10 @@
     </main>
   </div>
 </div>
-
 <div th:replace="~{navigation :: scripts}"></div>
-
-<!-- Flatpickr 달력 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-
 <script>
-  // 달력 초기화 및 유통기한 계산
   const expirationDatePicker = flatpickr("#expirationDatePicker", {
     locale: "ko",
     dateFormat: "Y-m-d",
@@ -153,12 +113,9 @@
       document.getElementById("expirationDate").value = diffDays;
     }
   });
-
-  // 폼 유효성 검사
   document.querySelector('form').addEventListener('submit', function(event) {
     const requiredFields = document.querySelectorAll('[required]');
     let isValid = true;
-
     requiredFields.forEach(field => {
       if (!field.value.trim()) {
         isValid = false;
@@ -179,7 +136,6 @@
         }
       }
     });
-
     if (!document.getElementById("expirationDate").value) {
       isValid = false;
       document.getElementById("expirationDatePicker").classList.add('border-red-500');
@@ -192,7 +148,6 @@
       }
       document.getElementById("expirationDatePicker").parentNode.appendChild(errorDiv);
     }
-
     if (!isValid) {
       event.preventDefault();
     }
