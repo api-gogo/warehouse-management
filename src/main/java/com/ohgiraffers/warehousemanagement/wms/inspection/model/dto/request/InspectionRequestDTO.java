@@ -7,13 +7,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class InspectionRequestDTO {
     @NotNull(message = "검수자는 필수입니다!")
     private Integer userId;
 
-    private Integer transactionId = null;
+    private Long transactionId = null;
 
     @NotNull(message = "검수 유형은 필수입니다!")
     @Enumerated(EnumType.STRING)
@@ -35,11 +36,14 @@ public class InspectionRequestDTO {
     @Enumerated(EnumType.STRING)
     private InspectionStatus inspectionStatus;
 
+    @NotNull(message = "검수 날짜는 필수입니다!")
+    private LocalDate inspectionDate;
+
     protected InspectionRequestDTO() {}
 
-    public InspectionRequestDTO(Integer userId, Integer transactionId, InspectionTransactionType transactionType,
+    public InspectionRequestDTO(Integer userId, Long transactionId, InspectionTransactionType transactionType,
                                 Integer inspectionQuantity, Integer acceptedQuantity, Integer defectiveQuantity,
-                                InspectionStatus inspectionStatus) {
+                                InspectionStatus inspectionStatus, LocalDate inspectionDate) {
         this.userId = userId;
         this.transactionId = transactionId;
         this.transactionType = transactionType;
@@ -47,6 +51,7 @@ public class InspectionRequestDTO {
         this.acceptedQuantity = acceptedQuantity;
         this.defectiveQuantity = defectiveQuantity;
         this.inspectionStatus = inspectionStatus;
+        this.inspectionDate = inspectionDate;
     }
 
     public Integer getUserId() {
@@ -57,11 +62,11 @@ public class InspectionRequestDTO {
         this.userId = userId;
     }
 
-    public Integer getTransactionId() {
+    public Long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId) {
+    public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
     }
 
@@ -105,16 +110,24 @@ public class InspectionRequestDTO {
         this.inspectionStatus = inspectionStatus;
     }
 
+    public LocalDate getInspectionDate() {
+        return inspectionDate;
+    }
+
+    public void setInspectionDate(LocalDate inspectionDate) {
+        this.inspectionDate = inspectionDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         InspectionRequestDTO that = (InspectionRequestDTO) o;
-        return Objects.equals(userId, that.userId) && Objects.equals(transactionId, that.transactionId) && transactionType == that.transactionType && Objects.equals(inspectionQuantity, that.inspectionQuantity) && Objects.equals(acceptedQuantity, that.acceptedQuantity) && Objects.equals(defectiveQuantity, that.defectiveQuantity) && inspectionStatus == that.inspectionStatus;
+        return Objects.equals(userId, that.userId) && Objects.equals(transactionId, that.transactionId) && transactionType == that.transactionType && Objects.equals(inspectionQuantity, that.inspectionQuantity) && Objects.equals(acceptedQuantity, that.acceptedQuantity) && Objects.equals(defectiveQuantity, that.defectiveQuantity) && inspectionStatus == that.inspectionStatus && Objects.equals(inspectionDate, that.inspectionDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, transactionId, transactionType, inspectionQuantity, acceptedQuantity, defectiveQuantity, inspectionStatus);
+        return Objects.hash(userId, transactionId, transactionType, inspectionQuantity, acceptedQuantity, defectiveQuantity, inspectionStatus, inspectionDate);
     }
 
     @Override
@@ -127,6 +140,7 @@ public class InspectionRequestDTO {
                 ", acceptedQuantity=" + acceptedQuantity +
                 ", defectiveQuantity=" + defectiveQuantity +
                 ", inspectionStatus=" + inspectionStatus +
+                ", inspectionDate=" + inspectionDate +
                 '}';
     }
 }

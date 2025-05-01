@@ -103,12 +103,18 @@
             </a>
           </div>
           
-          <!-- 승인대기 또는 휴직중인 경우 프로필 버튼만 중앙에 표시 -->
-          <div th:if="${#authentication.principal.userStatus == '승인대기' || #authentication.principal.userStatus == '휴직중'}" class="shortcuts-grid-single">
+          <!-- 승인대기, 휴직중, 승인거부인 경우 프로필 버튼만 중앙에 표시 -->
+          <div th:if="${#authentication.principal.userStatus == '승인대기' || #authentication.principal.userStatus == '휴직중' || #authentication.principal.userStatus == '승인거부'}" class="shortcuts-grid-single">
             <a th:href="@{/user/profile}" class="shortcut-card shortcut-card-single">
               <i class="fas fa-user"></i>
               <span>프로필</span>
             </a>
+          </div>
+          
+          <!-- 승인거부인 경우 알림 메시지 -->
+          <div th:if="${#authentication.principal.userStatus == '승인거부'}" class="alert alert-danger mt-3" role="alert">
+            <i class="fas fa-times-circle me-2"></i>
+            <strong>승인이 거부되었습니다.</strong> 프로필 페이지에서 정보를 수정하여 재승인을 요청해 주세요.
           </div>
         </div>
       </th:block>

@@ -1,0 +1,96 @@
+/* user-filter.css - 사용자 목록 필터 스타일 */
+
+/* 필터 컨테이너 */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+  padding: 16px 20px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  align-items: flex-end;
+}
+
+/* 필터 그룹 */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  flex: 1;
+}
+
+/* 필터 레이블 */
+.filter-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+/* 필터 선택 박스 */
+.filter-select {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  appearance: none; /* Remove default arrow */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+/* 필터 선택 박스 호버 효과 */
+.filter-select:hover {
+  border-color: var(--color-primary-light);
+}
+
+/* 필터 선택 박스 포커스 효과 */
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* 승인 대기 배지 */
+.pending-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 6px;
+  padding: 0 6px;
+}
+
+/* 다크 모드 스타일 */
+.dark-mode .filters-container {
+  background-color: var(--bg-card);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .filters-container {
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+}

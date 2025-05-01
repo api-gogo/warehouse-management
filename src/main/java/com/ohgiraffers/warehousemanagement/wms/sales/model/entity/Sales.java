@@ -38,6 +38,7 @@ public class Sales {
     @Column(name = "sales_updated_at")
     private LocalDateTime salesUpdatedAt;
 
+    // Sales를 지우면 SalesItem도 지워짐. 업데이트되어도 똑같음
     @OneToMany(mappedBy = "salesId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SalesItem> salesItems = new ArrayList<>();
 

@@ -4,27 +4,35 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SalesDTO {
     private Integer salesId;
     private Integer storeId;
     private Integer userId;
+    private String userName;
+    private String userPhone;
     private LocalDate salesDate;
     private LocalDate shippingDueDate;
     private SalesStatus salesStatus;
     private LocalDateTime salesCreatedAt;
     private LocalDateTime salesUpdatedAt;
-    private List<Integer> items;
+    private List<Integer> productIds;
+    private List<String> productNames; // 상품명
     private List<Integer> quantity;
+    private List<Integer> pricePerBox; // 박스당단가
+    private List<Integer> totalPrice; // 총액
 
     public SalesDTO() {
     }
 
-    public SalesDTO(Integer salesId, Integer storeId, Integer userId, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
+    public SalesDTO(Integer salesId, Integer storeId, Integer userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
         this.salesId = salesId;
         this.storeId = storeId;
         this.userId = userId;
+        this.userName = userName;
+        this.userPhone = userPhone;
         this.salesDate = salesDate;
         this.shippingDueDate = shippingDueDate;
         this.salesStatus = salesStatus;
@@ -54,6 +62,22 @@ public class SalesDTO {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public LocalDate getSalesDate() {
@@ -96,12 +120,20 @@ public class SalesDTO {
         this.salesUpdatedAt = salesUpdatedAt;
     }
 
-    public List<Integer> getItems() {
-        return items;
+    public List<Integer> getProductIds() {
+        return productIds;
     }
 
-    public void setItems(List<Integer> items) {
-        this.items = items;
+    public void setProductIds(List<Integer> productIds) {
+        this.productIds = productIds;
+    }
+
+    public List<String> getProductNames() {
+        return productNames;
+    }
+
+    public void setProductNames(List<String> productNames) {
+        this.productNames = productNames;
     }
 
     public List<Integer> getQuantity() {
@@ -112,19 +144,39 @@ public class SalesDTO {
         this.quantity = quantity;
     }
 
+    public List<Integer> getPricePerBox() {
+        return pricePerBox;
+    }
+
+    public void setPricePerBox(List<Integer> pricePerBox) {
+        this.pricePerBox = pricePerBox;
+    }
+
+    public List<Integer> getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(List<Integer> totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     @Override
     public String toString() {
         return "SalesDTO{" +
                 "salesId=" + salesId +
                 ", storeId=" + storeId +
                 ", userId=" + userId +
+                ", userName='" + userName + '\'' +
                 ", salesDate=" + salesDate +
                 ", shippingDueDate=" + shippingDueDate +
                 ", salesStatus=" + salesStatus +
                 ", salesCreatedAt=" + salesCreatedAt +
                 ", salesUpdatedAt=" + salesUpdatedAt +
-                ", items=" + items +
+                ", productIds=" + productIds +
+                ", productNames=" + productNames +
                 ", quantity=" + quantity +
+                ", pricePerBox=" + pricePerBox +
+                ", totalPrice=" + totalPrice +
                 '}';
     }
 }

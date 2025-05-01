@@ -2,10 +2,11 @@ package com.ohgiraffers.warehousemanagement.wms.user.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.AdminService;
-import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
+import com.ohgiraffers.warehousemanagement.wms.user.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,18 +21,20 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public AdminController(AdminService adminService, UserService userService) {
+    public AdminController(AdminService adminService, UserServiceImpl userServiceImpl) {
         this.adminService = adminService;
-        this.userService = userService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @GetMapping("/users")
-    public String getUsers(@RequestParam(required = false) String search,
-                           @RequestParam(required = false, defaultValue = "all") String status,
-                           @PageableDefault(size = 10) Pageable pageable,
+    public String listUsers(@RequestParam(required = false) String search,
+                           @RequestParam(required = false, defaultValue = "all") String statusTab,
+                           @RequestParam(required = false, defaultValue = "all") String roleTab,
+                           @RequestParam(required = false, defaultValue = "all") String partTab,
+                           @PageableDefault(size = 10, sort = "userCreatedAt", direction = Sort.Direction.DESC) Pageable pageable,
                            Model model) {
 
         // 검색어가 빈 문자열일 경우 null로 처리
@@ -39,7 +42,7 @@ public class AdminController {
             search = null;
         }
 
-        Page<UserDTO> userPage = adminService.findUsers(search, status, pageable);
+        Page<UserDTO> userPage = adminService.getUsersByPartRoleAndStatus(search, partTab, roleTab, statusTab, pageable);
 
         if (userPage.isEmpty()) {
             model.addAttribute("message", "조건에 맞는 회원이 없습니다.");
@@ -55,36 +58,34 @@ public class AdminController {
         model.addAttribute("pendingCount", pendingCount);
 
         model.addAttribute("search", search);
-        model.addAttribute("status", status);
 
-        return "/admin/users";
+        return "admin/users/list";
     }
 
     @GetMapping("/users/{userId}")
-    public String getUser(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.getUserByUserId(userId);
+    public String showUserDetail(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+        UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            model.addAttribute("message", message);
-        }
-        model.addAttribute("user", userDTO);
-        return "/admin/user-detail";
-    }
-    
-    @GetMapping("/users/{userId}/edit")
-    public String getUserEdit(@PathVariable Integer userId, Model model) {
-        UserDTO userDTO = userService.getUserByUserId(userId);
-
-        if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            model.addAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
             return "redirect:/admin/users";
         }
+        
         model.addAttribute("user", userDTO);
-        return "/admin/user-edit";
+        return "admin/users/detail";
+    }
+
+    @GetMapping("/users/{userId}/edit")
+    public String showUserEditForm(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
+        UserDTO userDTO = userServiceImpl.findById(userId);
+
+        if (userDTO == null) {
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
+            return "redirect:/admin/users";
+        }
+        
+        model.addAttribute("user", userDTO);
+        return "admin/users/edit";
     }
 
     @PatchMapping("/users/{userId}")
@@ -188,8 +189,42 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    @PostMapping("/users/{userId}/blacklist")
+    public String blacklistUser(@PathVariable Integer userId,
+                               RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.blacklistUser(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원이 영구 차단되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{userId}/reset-to-pending")
+    public String resetToPending(@PathVariable Integer userId,
+                                RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = adminService.resetToApprovalPending(userId);
+
+        if (!result) {
+            message = "회원 정보를 찾을 수 없거나 승인거부 상태가 아닙니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/admin/users";
+        }
+
+        message = "회원 상태가 승인대기로 변경되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/admin/users";
+    }
+
     @GetMapping("/users/approvals")
-    public String getPendingUsers(@RequestParam(required = false) String search,
+    public String listPendingUsers(@RequestParam(required = false) String search,
                                   @PageableDefault(size = 10) Pageable pageable,
                                   Model model) {
         // 검색어가 빈 문자열일 경우 null로 처리
@@ -197,7 +232,7 @@ public class AdminController {
             search = null;
         }
 
-        Page<UserDTO> userPage = adminService.findPendingUsers(search, pageable);
+        Page<UserDTO> userPage = adminService.getPendingUsers(search, pageable);
 
         if (userPage.isEmpty()) {
             model.addAttribute("message", "승인 대기 중인 회원이 없습니다.");
@@ -214,7 +249,7 @@ public class AdminController {
 
         model.addAttribute("search", search);
 
-        return "/admin/user-approvals";
+        return "admin/users/approvals";
     }
 
     @PostMapping("/users/approve-batch")

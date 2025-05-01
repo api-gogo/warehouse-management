@@ -1,0 +1,32 @@
+<!-- edit.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>입고 수정</title>
+</head>
+<body>
+<h1>입고 수정</h1>
+<form th:action="@{'/storage/' + ${storage.storageId}}" method="post">
+    발주 ID: <input type="text" name="purchaseId" th:value="${storage.purchaseId}" readonly><br>
+
+    입고 상태:
+    <select name="storageStatus">
+        <option th:each="status : ${statusList}"
+                th:value="${status}"
+                th:selected="${status == storage.storageStatus}"
+                th:text="${status.description}"></option>
+    </select>
+
+
+    입고일:
+    <input type="date" name="storageDate"
+           th:value="${#temporals.format(storage.storageDate, 'yyyy-MM-dd')}"><br>
+
+    수정 사유:
+    <input type="text" name="storageReason" th:value="${storage.storageReason}"><br>
+
+    <button type="submit">수정 완료</button>
+</form>
+<a th:href="@{/storage/list}">목록으로</a>
+</body>
+</html>

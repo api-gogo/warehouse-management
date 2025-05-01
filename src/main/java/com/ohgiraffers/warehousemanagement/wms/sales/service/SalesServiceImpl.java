@@ -1,11 +1,16 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryService;
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
+import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesItemsRepository;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,11 +25,17 @@ import java.util.stream.Collectors;
 public class SalesServiceImpl implements SalesService {
     private final SalesRepository salesRepository;
     private final SalesItemsRepository salesItemsRepository;
+    private final ProductService productService;
+    private final UserService userService;
+    private final InventoryService inventoryService;
 
     @Autowired
-    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository) {
+    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService) {
         this.salesRepository = salesRepository;
         this.salesItemsRepository = salesItemsRepository;
+        this.productService = productService;
+        this.userService = userService;
+        this.inventoryService = inventoryService;
     }
 
     public List<SalesDTO> getAllSales() {
@@ -33,12 +44,14 @@ public class SalesServiceImpl implements SalesService {
         List<SalesDTO> salesLists = new ArrayList<>();
 
         // 수주 상품 목록 Sales 엔티티에서 꺼냄
-
         for (Sales salesEntity : findAll) {
+            LogUserDTO user = userService.getUserInfoForLogging(salesEntity.getUserId());
             SalesDTO salesDTO = new SalesDTO(
                     salesEntity.getSalesId(),
                     salesEntity.getStoreId(),
                     salesEntity.getUserId(),
+                    user.getUserName(),
+                    null,
                     salesEntity.getSalesDate(),
                     salesEntity.getShippingDueDate(),
                     salesEntity.getSalesStatus(),
@@ -46,28 +59,18 @@ public class SalesServiceImpl implements SalesService {
                     salesEntity.getSalesUpdatedAt()
             );
 
-            List<Integer> items = new ArrayList<>();
-            List<Integer> quantities = new ArrayList<>();
-
-            for (SalesItem salesItem : salesEntity.getSalesItems()) {
-                items.add(salesItem.getProductId());
-                quantities.add(salesItem.getSalesItemsQuantity());
-            }
-
-            salesDTO.setItems(items);
-            salesDTO.setQuantity(quantities);
             salesLists.add(salesDTO);
         }
         return salesLists;
     }
 
     @Transactional
-    public boolean createSales(SalesDTO salesDTO) {
+    public int createSales(SalesDTO salesDTO, Integer userId) {
 
         // 수주 정보 저장
         Sales salesEntity = new Sales.Builder()
                 .storeId(salesDTO.getStoreId())
-                .userId(salesDTO.getUserId())
+                .userId(userId)
                 .salesDate(salesDTO.getSalesDate())
                 .shippingDueDate(salesDTO.getSalesDate().plusDays(3))
                 .salesStatus(SalesStatus.PENDING)
@@ -77,29 +80,22 @@ public class SalesServiceImpl implements SalesService {
 
         // 수주 리스트 저장
         List<SalesItem> salesItemList = new ArrayList<>();
-        for (int i = 0; i < salesDTO.getItems().size(); i++) {
+        for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
+            String lotNumber = inventoryService.findTopByProductIdOrderByInventoryExpiryDateAsc(salesDTO.getProductIds().get(i)).getLotNumber();
             SalesItem salesItem = new SalesItem.Builder()
                     .salesId(savedSales)
-                    .productId(salesDTO.getItems().get(i))
+                    .productId(salesDTO.getProductIds().get(i))
                     .salesItemsQuantity(salesDTO.getQuantity().get(i))
+                    .lotNumber(lotNumber)
                     .build();
             salesItemList.add(salesItem);
-            SalesItem savedSalesItem = salesItemsRepository.save(salesItem);
+            salesItemsRepository.save(salesItem);
         }
 
-        // 저장 후 상세페이지로 보여주기 때문에 dto로 다시 바꿔줬음
-        SalesDTO savedDTO = new SalesDTO(
-                salesEntity.getSalesId(),
-                salesEntity.getStoreId(),
-                salesEntity.getUserId(),
-                salesEntity.getSalesDate(),
-                salesEntity.getShippingDueDate(),
-                salesEntity.getSalesStatus(),
-                salesEntity.getSalesCreatedAt(),
-                salesEntity.getSalesUpdatedAt() == null ? null : salesEntity.getSalesUpdatedAt()
-        );
+        // 저장 후 상세페이지 보여주기 위해 ID만 반환
+        int salesId = savedSales.getSalesId();
 
-        return true;
+        return salesId;
     }
 
     public SalesDTO getSalesById(Integer salesId) {
@@ -107,13 +103,31 @@ public class SalesServiceImpl implements SalesService {
         Sales findSales = salesRepository.findById(salesId).orElseThrow(
                 () -> new NullPointerException("수주 데이터 없음"));
 
-        List<Integer> items = findSales.getSalesItems().stream().map(SalesItem::getProductId).collect(Collectors.toList());
+        List<Integer> productIds = new ArrayList<>();
+        List<String> productNames = new ArrayList<>();
+        List<Integer> pricePerBoxList = new ArrayList<>();
+        List<Integer> quantityList = new ArrayList<>();
+        List<Integer> totalPriceList = new ArrayList<>();
+
+        for (SalesItem item : findSales.getSalesItems()) {
+            Product product = productService.findProductById(item.getProductId());
+
+            productIds.add(product.getProductId());
+            productNames.add(product.getProductName());
+            pricePerBoxList.add(product.getPricePerBox());
+            quantityList.add(item.getSalesItemsQuantity());
+            totalPriceList.add(product.getPricePerBox() * item.getSalesItemsQuantity());
+        }
+
         List<Integer> quantity = findSales.getSalesItems().stream().map(SalesItem::getSalesItemsQuantity).collect(Collectors.toList());
+        LogUserDTO user = userService.getUserInfoForLogging(findSales.getUserId());
 
         SalesDTO findDTO = new SalesDTO(
                 findSales.getSalesId(),
                 findSales.getStoreId(),
                 findSales.getUserId(),
+                user.getUserName(),
+                null,
                 findSales.getSalesDate(),
                 findSales.getShippingDueDate(),
                 findSales.getSalesStatus(),
@@ -121,8 +135,11 @@ public class SalesServiceImpl implements SalesService {
                 findSales.getSalesUpdatedAt() == null ? null : findSales.getSalesUpdatedAt()
         );
 
-        findDTO.setItems(items);
+        findDTO.setProductIds(productIds);
+        findDTO.setProductNames(productNames);
         findDTO.setQuantity(quantity);
+        findDTO.setPricePerBox(pricePerBoxList);
+        findDTO.setTotalPrice(totalPriceList);
 
         return findDTO;
     }
@@ -148,10 +165,6 @@ public class SalesServiceImpl implements SalesService {
         if (!Objects.equals(salesDTO.getShippingDueDate(), findSales.getShippingDueDate())) {
             findSales.setShippingDueDate(salesDTO.getShippingDueDate());
         }
-        
-//        if (!Objects.equals(salesDTO.getSalesStatus(), findSales.getSalesStatus())) {
-//            findSales.setSalesStatus(salesDTO.getSalesStatus());
-//        }
 
         // 수정이 일어났으니 무조건 업데이트시킴
         findSales.setSalesUpdatedAt(LocalDateTime.now());
@@ -161,10 +174,10 @@ public class SalesServiceImpl implements SalesService {
         salesItemsRepository.deleteBySalesId(findSales);
         // 새로등록할거임
         List<SalesItem> newItems = new ArrayList<>();
-        for (int i = 0; i < salesDTO.getItems().size(); i++) {
+        for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
             SalesItem item = new SalesItem.Builder()
                     .salesId(savedEntity)
-                    .productId(salesDTO.getItems().get(i))
+                    .productId(salesDTO.getProductIds().get(i))
                     .salesItemsQuantity(salesDTO.getQuantity().get(i))
                     .build();
             newItems.add(item);
@@ -179,8 +192,6 @@ public class SalesServiceImpl implements SalesService {
     public boolean updateStatusSales(Integer salesId, SalesStatus status) {
         Sales findSales = salesRepository.findById(salesId).orElseThrow(
                 () -> new NullPointerException("상태를 변경할 수주 데이터 없음"));
-        System.out.println("sv 수주상태변경전 엔티티 조회 : " + findSales);
-        System.out.println(findSales.getSalesDate());
 
         // 등록상태에서만 승인이나 취소 가능
         if (findSales.getSalesStatus() != SalesStatus.PENDING) {
@@ -198,7 +209,12 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Override
-    public Integer getSalesBySalesId(Integer salesId) {
-        return salesRepository.findById(salesId).get().getSalesId();
+    public Sales getSalesBySalesId(Integer salesId) {
+        return salesRepository.findById(salesId).get();
+    }
+
+    @Override
+    public SalesItem getSalesItemBySalesId(Integer salesId) {
+        return salesItemsRepository.findById(salesId).get();
     }
 }
