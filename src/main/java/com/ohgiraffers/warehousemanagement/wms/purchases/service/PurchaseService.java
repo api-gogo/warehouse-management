@@ -46,8 +46,6 @@ public class PurchaseService {
         this.supplierService = supplierService;
         this.supplierRepository = supplierRepository;
     }
-
-
     public PurchaseItemDTO getProductInfo(Integer productId) {
         // Native Query를 사용한 기존 메서드
         return purchaseRepository.findProductInfo(productId);
@@ -77,6 +75,8 @@ public class PurchaseService {
                     purchase.getPurchaseStatus().getLabel(),
                     purchase.getPurchaseUpdatedAt(),
                     purchase.getNotes()
+
+
             );
             purchasesDTOs.add(purchaseDTO);
         }
@@ -326,46 +326,44 @@ public class PurchaseService {
     
 
 
-    /**
+    /*
      * 발주 항목 삭제
-     * @param purchaseId 발주 ID
-     * @param itemId 항목 ID
-     * @return 삭제 성공 여부
      */
     @Transactional
-    public boolean deletePurchaseItem(Integer purchaseId, Integer itemId) {
+    public boolean deletePurchaseItem(Integer purchaseId, Long itemId) {
         // 1. 발주 항목 조회
         PurchaseItem purchaseItem = purchaseItemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 발주 항목이 없습니다."));
-                
+
         // 2. 발주가 발주대기 상태인지 확인
         Purchase purchase = purchaseRepository.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 발주가 없습니다."));
-                
+
         if (!PurchaseStatus.대기.equals(purchase.getPurchaseStatus())) {
             throw new IllegalStateException("발주대기 상태일 때만 상품을 삭제할 수 있습니다.");
         }
-        
+
         // 3. 항목이 해당 발주에 속하는지 확인
         if (!purchaseItem.getPurchase().getPurchaseId().equals(purchaseId)) {
             throw new IllegalArgumentException("해당 발주에 속한 항목이 아닙니다.");
         }
-        
+
         // 4. 발주 항목 삭제
         purchaseItemRepository.delete(purchaseItem);
-        
+
         return true;
     }
 
 
-    @Transactional
     public boolean deletedpurchase(Integer id) {
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 발주가 없습니다. ID: " + id));
 
-        purchaseRepository.delete(purchase); // 엔티티를 직접 삭제
-
-        return true; // 삭제가 완료되었으면 true 반환
+        // 연관된 PurchaseItem 엔티티들을 먼저 명시적으로 제거
+        purchase.getItems().clear();
+        // 그 후에 발주 엔티티 삭제
+        purchaseRepository.delete(purchase);
+        return true;
     }
 
 
@@ -424,39 +422,7 @@ public class PurchaseService {
         }
     }
 
-    
 
-
-//    // 페이징 처리된 발주 목록 조회
-//    public Page<Purchase> getPurchasesWithPagination(Pageable pageable) {
-//        return purchaseRepository.findAll(pageable);
-//    }
-//
-//    // 검색 조건이 있는 페이징 처리
-//    public Page<Purchase> searchPurchasesWithPagination(
-//            String keyword,
-//            String status,
-//            LocalDate startDate,
-//            LocalDate endDate,
-//            Pageable pageable) {
-//
-//        // 검색 조건에 따른 분기 처리
-//        if (status != null && !status.isEmpty()) {
-//            if (startDate != null && endDate != null) {
-//                // 상태 + 날짜 범위 검색
-//                LocalDateTime start = startDate.atStartOfDay();
-//                LocalDateTime end = endDate.atTime(23, 59, 59);
-//                return purchaseRepository.findByPurchaseDateBetweenAndPurchaseStatusContaining(
-//                        start, end, status, pageable);
-//            } else {
-//                // 상태만 검색
-//                return purchaseRepository.findByPurchaseStatusContaining(status, pageable);
-//            }
-//        } else {
-//            // 기본 페이징
-//            return purchaseRepository.findAll(pageable);
-//        }
-//    }
 
 
 

@@ -23,7 +23,7 @@ public class PurchaseItemController {
 
     //단일 조회
     @GetMapping("/purchase-detail/{id}")
-    public String getPurchaseItemById(@PathVariable Integer id, Model model) {
+    public String getPurchaseItemById(@PathVariable Long id, Model model) {
         PurchaseItemDTO purchaseItemDTO = purchasesItemService.getPurchaseItemById(id);
         model.addAttribute("purchaseItem", purchaseItemDTO);
         model.addAttribute("pageTitle", "발주 항목 상세 정보");
