@@ -1,7 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.model.entity;
 
-import com.ohgiraffers.warehousemanagement.wms.returning.model.ReturnShipmentStatus;
-import com.ohgiraffers.warehousemanagement.wms.shipment.model.entity.Shipment;
+import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
 
@@ -24,21 +23,19 @@ public class ReturnShipment {
     private Shipment shipmentId; //shipment클래스의 shipment_id를 외래키로 받겠다*/
 
     @Column(name = "shipment_id",nullable = false)
-    private Integer shipmentId; //나중에 외래키로
+    private Integer shipmentId; //나중에 외래키로, 출고와 외래키
 
     @Column(name = "user_id",nullable = false)
     private Integer userId;
     @Column(name = "store_id",nullable = false)
     private Integer storeId;
 
-    @Column(name = "lot_number",nullable = false)
+    @Column(name = "lot_number"/*,nullable = false*/)
     private String lotNumber;
 
     @Column(name = "return_shipment_quantity",nullable = false)
     private int returnShipmentQuantity;
 
-    @Column(name = "return_shipment_content",nullable = false)
-    private String returnShipmentContent;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "return_shipment_status",nullable = false)
@@ -54,7 +51,7 @@ public class ReturnShipment {
     private LocalDateTime returnShipmentDeletedAt;
 
     @Column(name = "is_deleted",nullable = false)
-    private boolean isDeleted;
+    private boolean isDeleted = true;
 
     @OneToMany(mappedBy = "returnShipmentId",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ReturnShipmentItem> returnShipmentItems = new ArrayList<>(); //출고반품에 대해 리스트로 받아옴
@@ -62,13 +59,12 @@ public class ReturnShipment {
     public ReturnShipment() {
     }
 
-    public ReturnShipment(Integer returnShipmentId, Integer userId, Integer storeId, String lotNumber, int returnShipmentQuantity, String returnShipmentContent, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
+    public ReturnShipment(Integer returnShipmentId, Integer userId, Integer storeId, String lotNumber, int returnShipmentQuantity, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
         this.returnShipmentId = returnShipmentId;//pk값
         this.userId = userId;
         this.storeId = storeId;
         this.lotNumber = lotNumber;
         this.returnShipmentQuantity = returnShipmentQuantity;
-        this.returnShipmentContent = returnShipmentContent;
         this.returnShipmentStatus = returnShipmentStatus;
         this.returnShipmentCreatedAt = returnShipmentCreatedAt;
         this.returnShipmentUpdatedAt = returnShipmentUpdatedAt;
@@ -77,13 +73,12 @@ public class ReturnShipment {
         this.shipmentId = shipmentId;
     }
 
-    public ReturnShipment(Integer storeId,Integer userId,String lotNumber,int returnShipmentQuantity,String returnShipmentContent,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
+    public ReturnShipment(Integer storeId,Integer userId,String lotNumber,int returnShipmentQuantity,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
     {
         this.storeId = storeId;
         this.userId = userId;
         this.lotNumber = lotNumber;
         this.returnShipmentQuantity = returnShipmentQuantity;
-        this.returnShipmentContent = returnShipmentContent;
         this.returnShipmentStatus = returnShipmentStatus;
         this.returnShipmentCreatedAt = returnShipmentCreatedAt;
         this.shipmentId = shipmentId;
@@ -135,14 +130,6 @@ public class ReturnShipment {
 
     public void setReturnShipmentQuantity(int returnShipmentQuantity) {
         this.returnShipmentQuantity = returnShipmentQuantity;
-    }
-
-    public String getReturnShipmentContent() {
-        return returnShipmentContent;
-    }
-
-    public void setReturnShipmentContent(String returnShipmentContent) {
-        this.returnShipmentContent = returnShipmentContent;
     }
 
     public ReturnShipmentStatus getReturnShipmentStatus() {
@@ -202,7 +189,6 @@ public class ReturnShipment {
                 ", storeId=" + storeId +
                 ", lotNumber='" + lotNumber + '\'' +
                 ", returnShipmentQuantity=" + returnShipmentQuantity +
-                ", returnShipmentContent='" + returnShipmentContent + '\'' +
                 ", returnShipmentStatus='" + returnShipmentStatus + '\'' +
                 ", returnShipmentCreatedAt=" + returnShipmentCreatedAt +
                 ", returnShipmentUpdatedAt=" + returnShipmentUpdatedAt +

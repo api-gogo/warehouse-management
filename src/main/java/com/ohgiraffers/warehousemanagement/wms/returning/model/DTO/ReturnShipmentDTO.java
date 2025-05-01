@@ -1,7 +1,8 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.model.DTO;
 
 
-import com.ohgiraffers.warehousemanagement.wms.returning.model.ReturnShipmentStatus;
+import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
+import com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +13,7 @@ public class ReturnShipmentDTO {
     private Integer storeId;
     private Integer userId;
 
-    private ReturnShipmentStatus returnShipmentStatus;
+    private ReturnShipmentStatus returnShipmentStatus; //Enum
 
     private LocalDateTime returnShipmentCreatedAt;
     private LocalDateTime returnShipmentUpdatedAt;
@@ -22,9 +23,9 @@ public class ReturnShipmentDTO {
 
     private Integer shipmentId; //FK값
 
-    private List<Integer> lotNumber;
+    private List<String> lotNumber;
     private List<Integer> returnShipmentQuantity;
-    private List<ReturnShipmentStatus> returnShipmentContent; //나중에 확인 필요
+    private List<ReturningShipmentCause> returnShipmentContent; //나중에 확인 필요
 
     public ReturnShipmentDTO() {
     }
@@ -44,6 +45,7 @@ public class ReturnShipmentDTO {
         this.isDeleted = isDeleted;
         this.shipmentId = shipmentId;
     }
+
 
     //게터세터
 
@@ -120,11 +122,11 @@ public class ReturnShipmentDTO {
         this.shipmentId = shipmentId;
     }
 
-    public List<Integer> getLotNumber() {
+    public List<String> getLotNumber() {
         return lotNumber;
     }
 
-    public void setLotNumber(List<Integer> lotNumber) {
+    public void setLotNumber(List<String> lotNumber) {
         this.lotNumber = lotNumber;
     }
 
@@ -136,11 +138,11 @@ public class ReturnShipmentDTO {
         this.returnShipmentQuantity = returnShipmentQuantity;
     }
 
-    public List<ReturnShipmentStatus> getReturnShipmentContent() {
+    public List<ReturningShipmentCause> getReturnShipmentContent() {
         return returnShipmentContent;
     }
 
-    public void setReturnShipmentContent(List<ReturnShipmentStatus> returnShipmentContent) {
+    public void setReturnShipmentContent(List<ReturningShipmentCause> returnShipmentContent) {
         this.returnShipmentContent = returnShipmentContent;
     }
 

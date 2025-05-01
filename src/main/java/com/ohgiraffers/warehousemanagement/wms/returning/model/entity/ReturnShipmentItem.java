@@ -1,7 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.model.entity;
 
-import com.ohgiraffers.warehousemanagement.wms.returning.model.ReturnShipmentStatus;
-import com.ohgiraffers.warehousemanagement.wms.returning.model.ReturningShipmentCause;
+import com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -20,19 +19,19 @@ public class ReturnShipmentItem {
     private ReturnShipment returnShipmentId;
 
     @Column(name = "lot_number")
-    private Integer lotNumber;
+    private String lotNumber;
 
     @Column(name = "return_shipment_quantity")
     private Integer returnShipmentQuantity;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "return_shipment_content",nullable = false)
+    @Column(name = "return_shipment_content")
     private ReturningShipmentCause returnShipmentContent;
 
     public ReturnShipmentItem() {
     }
 
-    public ReturnShipmentItem(ReturnShipment returnShipmentId, Integer lotNumber, Integer returnShipmentQuantity, ReturningShipmentCause returnShipmentContent) {
+    public ReturnShipmentItem(ReturnShipment returnShipmentId, String  lotNumber, Integer returnShipmentQuantity, ReturningShipmentCause returnShipmentContent) {
         this.returnShipmentId = returnShipmentId;
         this.lotNumber = lotNumber;
         this.returnShipmentQuantity = returnShipmentQuantity;
@@ -55,11 +54,11 @@ public class ReturnShipmentItem {
         this.returnShipmentId = returnShipmentId;
     }
 
-    public Integer getLotNumber() {
+    public String  getLotNumber() {
         return lotNumber;
     }
 
-    public void setLotNumber(Integer lotNumber) {
+    public void setLotNumber(String lotNumber) {
         this.lotNumber = lotNumber;
     }
 

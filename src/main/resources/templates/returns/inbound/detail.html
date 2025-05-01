@@ -130,13 +130,13 @@
   <div class="page-header">
     <h2>입고 반품 상세</h2>
     <div class="d-flex gap-2">
-      <a th:href="@{/returns/inbound}" class="btn btn-outline-secondary">
+      <a th:href="@{/returns/inbound/list}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> 목록으로
       </a>
-      <a th:href="@{/returns/inbound/{id}/update_view(id=${detail.returnStorageId})}" class="btn btn-outline-primary">
+      <a th:href="@{/returns/inbound/list/{id}/update(id=${returnsStorage.returnStorageId})}" class="btn btn-outline-primary">
         <i class="bi bi-pencil"></i> 수정
       </a>
-      <a th:href="@{/returns/inbound/{id}/delete(id=${detail.returnStorageId})}" class="btn btn-outline-danger"
+      <a th:href="@{/returns/inbound/list/{id}/delete(id=${returnsStorage.returnStorageId})}" class="btn btn-outline-danger"
          onclick="return confirm('정말로 삭제하시겠습니까?');">
         <i class="bi bi-trash"></i> 삭제
       </a>
@@ -146,57 +146,40 @@
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">반품 정보</h5>
-      <span th:class="${detail.returnStorageStatus == 'RETURN_COMPLETED' ? 'status-badge status-completed' : (detail.returnStorageStatus == 'RETURN_PROCESSING' ? 'status-badge status-processing' : (detail.returnStorageStatus == 'RETURN_REJECTED' ? 'status-badge status-rejected' : 'status-badge status-pending'))}"
-            th:text="${detail.returnStorageStatus == 'RETURN_COMPLETED' ? '반품완료' : (detail.returnStorageStatus == 'RETURN_PROCESSING' ? '반품중' : (detail.returnStorageStatus == 'RETURN_REJECTED' ? '반품거절' : '반품대기'))}">반품완료</span>
+      <span class="status-badge status-pending">반품대기</span>
     </div>
     <div class="card-body">
       <div class="row detail-row">
         <div class="col-md-6">
           <p class="detail-label">반품 번호</p>
-          <p class="detail-value" th:text="${detail.returnStorageId}">RS001</p>
+          <p class="detail-value" th:text="${returnsStorage.returnStorageId}">RS001</p>
         </div>
         <div class="col-md-6">
           <p class="detail-label">입고 번호</p>
-          <p class="detail-value" th:text="${detail.storageId != null ? detail.storageId : ''}">ST001</p>
+          <p class="detail-value" th:text="${returnsStorage.storageId != null ? returnsStorage.storageId : ''}">ST001</p>
         </div>
       </div>
 
       <div class="row detail-row">
-        <div class="col-md-6">
-          <p class="detail-label">공급업체</p>
-          <p class="detail-value" th:text="${detail.supplierId == 1 ? '공급업체 A' : (detail.supplierId == 2 ? '공급업체 B' : (detail.supplierId == 3 ? '공급업체 C' : '공급업체 D'))}">공급업체 A</p>
-        </div>
         <div class="col-md-6">
           <p class="detail-label">담당자</p>
-          <p class="detail-value" th:text="${detail.userId == 1 ? '김담당' : (detail.userId == 2 ? '이담당' : '박담당')}">김담당</p>
+          <p class="detail-value" th:text="${returnsStorage.userId == 1 ? '김담당' : (returnsStorage.userId == 2 ? '이담당' : '박담당')}">김담당</p>
         </div>
-      </div>
-
-      <div class="row detail-row">
-        <div class="col-md-6">
-          <p class="detail-label">로트 번호</p>
-          <p class="detail-value" th:text="${detail.lotNumber}">LOT12345</p>
-        </div>
-        <div class="col-md-6">
-          <p class="detail-label">반품 수량</p>
-          <p class="detail-value" th:text="${detail.returnStorageQuantity}">5</p>
-        </div>
-      </div>
-
-      <div class="row detail-row">
         <div class="col-md-6">
           <p class="detail-label">등록일</p>
-          <p class="detail-value" th:text="${#temporals.format(detail.returnStorageCreatedAt, 'yyyy-MM-dd HH:mm')}">2024-04-23 14:30</p>
-        </div>
-        <div class="col-md-6">
-          <p class="detail-label">수정일</p>
-          <p class="detail-value" th:text="${detail.returnStorageUpdatedAt != null ? #temporals.format(detail.returnStorageUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
+          <p class="detail-value" th:text="${#temporals.format(returnsStorage.returnStorageCreatedAt, 'yyyy-MM-dd HH:mm')}">2024-04-23 14:30</p>
         </div>
       </div>
 
-      <div class="detail-row">
-        <p class="detail-label">반품 사유</p>
-        <p class="detail-value" th:text="${detail.returnStorageContent}">품질 불량</p>
+      <div class="row detail-row" th:if="${returnsStorage.returnStorageQuantity != null && !returnsStorage.returnStorageQuantity.empty}">
+        <div class="col-md-6">
+          <p class="detail-label">반품 수량</p>
+          <p class="detail-value" th:text="${returnsStorage.returnStorageQuantity[0]}">5</p>
+        </div>
+        <div class="col-md-6">
+          <p class="detail-label">반품 사유</p>
+          <p class="detail-value" th:text="${returnsStorage.returnStorageContent != null && !returnsStorage.returnStorageContent.empty ? returnsStorage.returnStorageContent[0].getReturnShipmentCause() : '사유 없음'}">품질 불량</p>
+        </div>
       </div>
     </div>
   </div>
