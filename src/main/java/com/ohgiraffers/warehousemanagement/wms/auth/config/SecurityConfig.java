@@ -117,7 +117,26 @@ public class SecurityConfig {
             session.invalidSessionUrl("/");
         }).exceptionHandling(exception -> {
             exception.accessDeniedHandler((request, response, accessDeniedException) -> {
-                response.sendRedirect("/");
+                // 이전 페이지 URL 가져오기
+                String referer = request.getHeader("Referer");
+                // 기본 리다이렉트 URL (Referer 없을 경우 대비)
+                String targetUrl = "/";
+
+                // Referer 값이 있고, 현재 요청 경로와 다른 경우 사용 (무한 리다이렉트 방지)
+                String requestedUri = request.getRequestURI();
+                if (referer != null && !referer.isEmpty() && !referer.contains(requestedUri)) {
+                    targetUrl = referer;
+                }
+
+                // 리다이렉트 URL에 간단한 플래그 추가
+                String redirectUrl;
+                if (targetUrl.contains("?")) {
+                    redirectUrl = targetUrl + "&accessDenied=true";
+                } else {
+                    redirectUrl = targetUrl + "?accessDenied=true";
+                }
+
+                response.sendRedirect(redirectUrl); // 최종 URL로 리다이렉트
             });
         }).csrf(csrf -> csrf.disable());
 

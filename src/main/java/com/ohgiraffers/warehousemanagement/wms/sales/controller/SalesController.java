@@ -52,7 +52,7 @@ public class SalesController {
     @PostMapping("/create")
     public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
         AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer userId = authDetails.getUserId();
+        Long userId = authDetails.getUserId();
 
         int salesId = salesServiceImpl.createSales(salesDTO, userId);
         String resultUrl = null;

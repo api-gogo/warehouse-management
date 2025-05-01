@@ -65,7 +65,7 @@ public class InspectionController {
         log.info("inspectionRequestDTO : {}", requestDTO);
 
         AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-        Integer userId = authDetails.getUserId();
+        Long userId = authDetails.getUserId();
         requestDTO.setUserId(userId);
 
         InspectionResponseDTO responseDTO = inspectionServiceImpl.createInspection(requestDTO);

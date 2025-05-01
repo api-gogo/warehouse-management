@@ -101,7 +101,7 @@ public class AuthDetails implements UserDetails {
     }
 
     // id 반환
-    public Integer getUserId() {
+    public Long getUserId() {
         return loginUserDTO.getUserId();
     }
 

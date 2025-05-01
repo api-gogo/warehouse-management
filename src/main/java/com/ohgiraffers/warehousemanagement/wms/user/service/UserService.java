@@ -4,5 +4,5 @@ import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
 
 public interface UserService {
 
-    LogUserDTO getUserInfoForLogging(Integer userId);
+    LogUserDTO getUserInfoForLogging(Long userId);
 }

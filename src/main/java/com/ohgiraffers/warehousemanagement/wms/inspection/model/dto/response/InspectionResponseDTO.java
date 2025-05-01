@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public class InspectionResponseDTO {
     private Long inspectionId;
-    private Integer userId;
+    private Long userId;
     private String userName;
     private Long transactionId = null;
     private String transactionType;
@@ -22,7 +22,7 @@ public class InspectionResponseDTO {
 
     protected InspectionResponseDTO() {}
 
-    public InspectionResponseDTO(Long inspectionId, Integer userId, String userName, Long transactionId,
+    public InspectionResponseDTO(Long inspectionId, Long userId, String userName, Long transactionId,
                                  InspectionTransactionType transactionType, Integer inspectionQuantity,
                                  Integer acceptedQuantity, Integer defectiveQuantity, InspectionStatus inspectionStatus,
                                  LocalDate inspectionDate, LocalDateTime inspectionUpdatedAt) {
@@ -61,11 +61,11 @@ public class InspectionResponseDTO {
         this.inspectionId = inspectionId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
