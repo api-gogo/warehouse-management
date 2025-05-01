@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.purchases.model.dto;
 
 
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ public class PurchaseDTO {
     private LocalDate purchaseUpdatedAt;
     private LocalDate purchaseCreatedAt;
     private String purchaseNotes;
+    private Product product;
 
 
     private List<PurchaseItemDTO> items = new ArrayList<>();

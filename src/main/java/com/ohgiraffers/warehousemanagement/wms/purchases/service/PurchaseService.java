@@ -1,6 +1,9 @@
 package com.ohgiraffers.warehousemanagement.wms.purchases.service;
 
 
+import com.ohgiraffers.warehousemanagement.wms.product.model.DTO.ProductResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
+import com.ohgiraffers.warehousemanagement.wms.product.model.repository.ProductRepository;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseDTO;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.dto.PurchaseItemDTO;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
@@ -8,12 +11,19 @@ import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseIt
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseStatus;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseItemRepository;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseRepository;
-import jakarta.transaction.Transactional;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LoginUserDTO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +32,23 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final PurchaseItemRepository purchaseItemRepository;
 
+
     @Autowired
     public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseItemRepository = purchaseItemRepository;
     }
+
+
+    public PurchaseItemDTO getProductInfo(Integer productId) {
+        // Native Query를 사용한 기존 메서드
+        return purchaseRepository.findProductInfo(productId);
+    }
+
+
+
+
+
 
 
     //모든 발주 조회
@@ -119,7 +141,8 @@ public class PurchaseService {
 
     // 단일 발주 조회
     public PurchaseDTO getPurchaseById(Integer id) {
-        Purchase purchase = purchaseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 id의 발주가 없습니다."));
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 id의 발주가 없습니다."));
         PurchaseDTO purchaseDTO = new PurchaseDTO(
                 purchase.getPurchaseId(),
                 purchase.getUserId(),
@@ -130,36 +153,67 @@ public class PurchaseService {
                 purchase.getPurchaseUpdatedAt(),
                 purchase.getNotes()
         );
+        // PurchaseItem 목록 추가
+        List<PurchaseItemDTO> items = getPurchaseItemsByPurchaseId(id);
+        purchaseDTO.setItems(items);
         return purchaseDTO;
-
+    }
+    public List<PurchaseItemDTO> getPurchaseItemsByPurchaseId(Integer purchaseId) {
+        List<PurchaseItem> items = purchaseItemRepository.findByPurchasePurchaseId(purchaseId);
+        List<PurchaseItemDTO> itemDTOs = new ArrayList<>();
+        for (PurchaseItem item : items) {
+            PurchaseItemDTO itemDTO = getProductInfo(item.getProductId());
+            if (itemDTO != null) {
+                itemDTO.setPurchaseItemId(item.getPurchaseItemId());
+                itemDTO.setPurchaseId(item.getPurchase().getPurchaseId());
+                itemDTO.setProductQuantity(item.getProductQuantity());
+                itemDTOs.add(itemDTO);
+            } else {
+                // 기본 정보로만 DTO 생성
+                itemDTOs.add(new PurchaseItemDTO(
+                        item.getPurchaseItemId(),
+                        item.getPurchase().getPurchaseId(),
+                        item.getProductId(),
+                        item.getProductQuantity(),
+                        null, null, null, null
+                ));
+            }
+        }
+        return itemDTOs;
     }
 
 
     // 발주 생성
     @Transactional
     public PurchaseDTO createPurchase(PurchaseDTO purchaseDTO) {
+        // userId가 설정되었는지 확인
+        if (purchaseDTO.getUserId() == null) {
+            throw new IllegalArgumentException("사용자 ID가 설정되지 않았습니다.");
+        }
+        
+        // 컨트롤러에서 설정한 userId를 직접 사용
         Purchase purchase = new Purchase(
-                purchaseDTO.getPurchaseId(),
-                purchaseDTO.getUserId(),
+                null, // ID는 자동 생성
+                purchaseDTO.getUserId(), // 컨트롤러에서 설정한 사용자 ID 사용
+                purchaseDTO.getPurchaseDate() != null ? purchaseDTO.getPurchaseDate() : LocalDate.now(),
+                purchaseDTO.getPurchaseDueDate() != null ? purchaseDTO.getPurchaseDueDate() : LocalDate.now().plusDays(7),
+                PurchaseStatus.대기,
                 LocalDate.now(),
-                LocalDate.now().plusDays(7),
-                 PurchaseStatus.대기,
-                 LocalDate.now(),
                 null,
                 purchaseDTO.getPurchaseNotes()
         );
 
-        Purchase savepurchase = purchaseRepository.save(purchase);
+        Purchase savedPurchase = purchaseRepository.save(purchase);
 
         return new PurchaseDTO(
-                savepurchase.getPurchaseId(),
-                savepurchase.getUserId(),
-                savepurchase.getPurchaseCreatedAt(),
-                savepurchase.getPurchaseDate(),
-                savepurchase.getPurchaseDueDate(),
-                savepurchase.getPurchaseStatus().getLabel(),
-                savepurchase.getPurchaseUpdatedAt(),
-                savepurchase.getNotes()
+                savedPurchase.getPurchaseId(),
+                savedPurchase.getUserId(),
+                savedPurchase.getPurchaseCreatedAt(),
+                savedPurchase.getPurchaseDate(),
+                savedPurchase.getPurchaseDueDate(),
+                savedPurchase.getPurchaseStatus().getLabel(),
+                savedPurchase.getPurchaseUpdatedAt(),
+                savedPurchase.getNotes()
         );
     }
 
@@ -227,6 +281,39 @@ public class PurchaseService {
             throw new IllegalArgumentException("Invalid status: " + statusStr);
         }
     }
+    
+
+
+    /**
+     * 발주 항목 삭제
+     * @param purchaseId 발주 ID
+     * @param itemId 항목 ID
+     * @return 삭제 성공 여부
+     */
+    @Transactional
+    public boolean deletePurchaseItem(Integer purchaseId, Integer itemId) {
+        // 1. 발주 항목 조회
+        PurchaseItem purchaseItem = purchaseItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 발주 항목이 없습니다."));
+                
+        // 2. 발주가 발주대기 상태인지 확인
+        Purchase purchase = purchaseRepository.findById(purchaseId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 발주가 없습니다."));
+                
+        if (!PurchaseStatus.대기.equals(purchase.getPurchaseStatus())) {
+            throw new IllegalStateException("발주대기 상태일 때만 상품을 삭제할 수 있습니다.");
+        }
+        
+        // 3. 항목이 해당 발주에 속하는지 확인
+        if (!purchaseItem.getPurchase().getPurchaseId().equals(purchaseId)) {
+            throw new IllegalArgumentException("해당 발주에 속한 항목이 아닙니다.");
+        }
+        
+        // 4. 발주 항목 삭제
+        purchaseItemRepository.delete(purchaseItem);
+        
+        return true;
+    }
 
 
     @Transactional
@@ -285,25 +372,41 @@ public class PurchaseService {
         }
 
     }
+
     
-    // 발주 ID로 발주 항목 목록 조회
-//    public List<PurchaseItemDTO> getPurchaseItemsByPurchaseId(Integer purchaseId) {
-//        List<PurchaseItem> purchaseItems = purchaseItemRepository.findByPurchasePurchaseId(purchaseId);
-//        List<PurchaseItemDTO> purchaseItemDTOs = new ArrayList<>();
-//
-//        for (PurchaseItem item : purchaseItems) {
-//            PurchaseItemDTO dto = new PurchaseItemDTO(
-//                item.getPurchaseItemId(),
-//                item.getPurchase().getPurchaseId(),
-//                item.getProductId(),
-//                item.getProductName(),
-//                item.getPrice(),
-//                item.getQuantity()
-//            );
-//            purchaseItemDTOs.add(dto);
-//        }
-//
-//        return purchaseItemDTOs;
+
+
+//    // 페이징 처리된 발주 목록 조회
+//    public Page<Purchase> getPurchasesWithPagination(Pageable pageable) {
+//        return purchaseRepository.findAll(pageable);
 //    }
+//
+//    // 검색 조건이 있는 페이징 처리
+//    public Page<Purchase> searchPurchasesWithPagination(
+//            String keyword,
+//            String status,
+//            LocalDate startDate,
+//            LocalDate endDate,
+//            Pageable pageable) {
+//
+//        // 검색 조건에 따른 분기 처리
+//        if (status != null && !status.isEmpty()) {
+//            if (startDate != null && endDate != null) {
+//                // 상태 + 날짜 범위 검색
+//                LocalDateTime start = startDate.atStartOfDay();
+//                LocalDateTime end = endDate.atTime(23, 59, 59);
+//                return purchaseRepository.findByPurchaseDateBetweenAndPurchaseStatusContaining(
+//                        start, end, status, pageable);
+//            } else {
+//                // 상태만 검색
+//                return purchaseRepository.findByPurchaseStatusContaining(status, pageable);
+//            }
+//        } else {
+//            // 기본 페이징
+//            return purchaseRepository.findAll(pageable);
+//        }
+//    }
+
+
 
 }

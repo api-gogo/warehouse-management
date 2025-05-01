@@ -21,6 +21,7 @@ public class Purchase {
      private List<PurchaseItem> items = new ArrayList<>();
 
 
+
 //    @OneToOne(mappedBy = "purchase") // UserProfile에서 참조하는 쪽에서 mappedBy 사용
 //    private Storages storages; //입고에서 참고 함
 

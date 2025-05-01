@@ -24,7 +24,6 @@ public class PurchaseItem {
 
     public PurchaseItem() {}
 
-
     public PurchaseItem(Integer purchaseItemId, Purchase purchase, Integer productId, Integer productQuantity) {
         this.purchaseItemId = purchaseItemId;
         this.purchase = purchase;

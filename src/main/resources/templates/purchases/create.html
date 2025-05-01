@@ -106,6 +106,15 @@
             background-color: #f9fafb;
         }
 
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
@@ -188,6 +197,111 @@
             flex: 1;
             padding: 0 0.5rem;
         }
+
+        /* 테이블 */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            font-weight: 500;
+            color: #6b7280;
+            background-color: #f9fafb;
+            font-size: 0.875rem;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table td {
+            font-size: 0.875rem;
+        }
+
+        .table .text-right {
+            text-align: right;
+        }
+
+        /* 입력 필드 */
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+        }
+
+        /* 추가 유틸리티 클래스 */
+        .justify-end {
+            justify-content: flex-end;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-gray-700 {
+            color: #374151;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .border-t {
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .product-info {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
     </style>
 </head>
 <body>
@@ -209,12 +323,14 @@
             <p class="card-description" th:text="${cardDescription}">새로운 발주를 등록할 수 있습니다.</p>
         </div>
         <div class="card-content">
-            <form th:action="@{/purchases/create}" method="post" th:object="${purchaseDTO}">
+            <form th:action="@{/purchases/create}" method="post" th:object="${purchaseDTO}" id="purchaseForm">
                 <div class="form-row">
                     <div class="form-col">
+                        <!-- 담당자 ID는 자동으로 현재 로그인한 사용자의 ID가 설정됩니다 -->
                         <div class="form-group">
-                            <label for="userId" class="form-label">담당자 ID:</label>
-                            <input type="number" id="userId" th:field="*{userId}" class="form-control" required>
+                            <label class="form-label">담당자 ID:</label>
+                            <input type="text" th:value="${#authentication.principal.userId}" class="form-control" readonly style="background-color: #f9fafb;">
+                            <input type="hidden" id="userId" th:field="*{userId}" th:value="${#authentication.principal.userId}">
                         </div>
                     </div>
                     <div class="form-col">
@@ -250,35 +366,112 @@
                     <textarea id="notes" th:field="*{purchaseNotes}" class="form-control"></textarea>
                 </div>
 
-                <div class="flex justify-between" style="margin-top: 1.5rem;">
-                    <a th:href="@{/purchases}" class="btn btn-outline">취소</a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        발주 등록
-                    </button>
-                </div>
+                <!-- 숨겨진 상품 목록 데이터 필드 -->
+                <input type="hidden" id="purchaseItemsData" name="purchaseItemsData" value="">
             </form>
         </div>
     </div>
+
+    <!-- 상품 목록 카드 -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">발주 상품 목록</h2>
+            <p class="card-description">이 발주에 포함될 상품을 추가하세요.</p>
+        </div>
+        <div class="card-content">
+            <!-- 상품 추가 폼 -->
+            <div class="mb-4">
+                <h3 class="text-lg font-medium mb-2">상품 추가</h3>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="productIdInput" class="form-label">상품 ID:</label>
+                            <input type="number" id="productIdInput" class="form-control" placeholder="상품 ID 입력" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="quantityInput" class="form-label">수량:</label>
+                            <input type="number" id="quantityInput" class="form-control" placeholder="수량 입력" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-col" style="flex: 0.5;">
+                        <div class="form-group">
+                            <label for="addProductBtn" class="form-label">&nbsp;</label>
+                            <button type="button" id="addProductBtn" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">
+                                <i class="fas fa-plus"></i> 추가
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="productInfo" class="product-info"></div>
+            </div>
+
+            <div class="table-container">
+                <table class="table" id="productTable">
+                    <thead>
+                        <tr>
+                            <th>상품 ID</th>
+                            <th>상품명</th>
+                            <th>단가 (원/박스)</th>
+                            <th>수량 (박스)</th>
+                            <th class="text-right">합계 (원)</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- 상품 목록 데이터가 없는 경우 -->
+                        <tr id="emptyRow">
+                            <td colspan="6" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 총 금액 표시 -->
+            <div class="flex justify-end py-2 px-4 border-t mt-4">
+                <div class="text-right">
+                    <div class="mb-2 text-gray-700">총 상품 수량: <span id="totalQuantityDisplay">0</span>개</div>
+                    <div class="text-lg font-bold">총 금액: <span id="totalAmountDisplay">0원</span></div>
+                </div>
+            </div>
+
+            <!-- 제출 버튼 -->
+            <div class="flex justify-between mt-4">
+                <a th:href="@{/purchases}" class="btn btn-outline">
+                    <i class="fas fa-times"></i> 취소
+                </a>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">
+                    <i class="fas fa-save"></i> 발주 등록
+                </button>
+            </div>
+        </div>
+    </div>
 </main>
-<script>
-    // 페이지 로드 시 자동으로 발주일로부터 7일 후를 납기일로 설정
+
+<!-- 자바스크립트 -->
+<script th:inline="javascript">
+    // 상품 목록 관리를 위한 배열
+    let products = [];
+    let currentProduct = null;
+
+    // 페이지 로드 시 실행
     document.addEventListener('DOMContentLoaded', function() {
         // 발주일 입력란에 이벤트 리스너 추가
         const purchaseDateInput = document.getElementById('purchaseDate');
         const purchaseDueDateInput = document.getElementById('purchaseDueDate');
-        
+
         // 초기값 설정 (오늘 날짜)
         const today = new Date();
         const formattedToday = today.toISOString().split('T')[0];
         purchaseDateInput.value = formattedToday;
-        
+
         // 발주일 + 7일을 납기일로 설정
         const dueDate = new Date(today);
         dueDate.setDate(dueDate.getDate() + 7);
         const formattedDueDate = dueDate.toISOString().split('T')[0];
         purchaseDueDateInput.value = formattedDueDate;
-        
+
         // 발주일이 변경될 때 납기일 자동 업데이트
         purchaseDateInput.addEventListener('change', function() {
             if(this.value) {
@@ -288,7 +481,306 @@
                 purchaseDueDateInput.value = newDueDate.toISOString().split('T')[0];
             }
         });
+
+        // 상품 ID 입력 필드에 이벤트 리스너 추가
+        document.getElementById('productIdInput').addEventListener('change', fetchProductInfo);
+        document.getElementById('productIdInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                fetchProductInfo();
+            }
+        });
+
+        // 수량 입력 필드에 엔터키 이벤트 리스너 추가
+        document.getElementById('quantityInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                addProduct();
+            }
+        });
+
+        // 추가 버튼에 이벤트 리스너 추가
+        document.getElementById('addProductBtn').addEventListener('click', addProduct);
     });
+
+    // 상품 정보 가져오기 (백엔드 연동)
+    function fetchProductInfo() {
+        const productId = document.getElementById('productIdInput').value;
+        const productInfoDiv = document.getElementById('productInfo');
+
+        if (productId) {
+            // AJAX를 사용하여 백엔드 API 호출
+            fetch(`/purchases/api/products/${productId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('상품 정보를 찾을 수 없습니다.');
+                    }
+                    return response.json();
+                })
+                .then(product => {
+                    console.log('상품 정보:', product); // 디버깅용
+
+                    // 상품 정보 저장
+                    currentProduct = product;
+
+                    // 상품 정보 표시 (pricePerBox가 null이면 0으로 표시)
+                    const price = product.pricePerBox || 0;
+                    productInfoDiv.innerHTML = `
+                        <div style="margin-top: 0.5rem;">
+                            <strong>${product.productName}</strong> -
+                            ${price.toLocaleString()}원/박스
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('상품 정보 가져오기 오류:', error);
+                    productInfoDiv.innerHTML = '<div style="margin-top: 0.5rem; color: #ef4444;">상품 정보를 찾을 수 없습니다.</div>';
+                    currentProduct = null;
+                });
+        } else {
+            productInfoDiv.innerHTML = '';
+            currentProduct = null;
+        }
+    }
+
+    // 상품 추가
+    function addProduct() {
+        const productId = document.getElementById('productIdInput').value;
+        const quantity = parseInt(document.getElementById('quantityInput').value);
+        const productInfoDiv = document.getElementById('productInfo');
+
+        // 입력값 검증
+        if (!productId || !quantity) {
+            alert('상품 ID와 수량을 모두 입력해주세요.');
+            return;
+        }
+
+        if (!currentProduct) {
+            alert('유효한 상품 정보가 없습니다. 상품 ID를 확인해주세요.');
+            return;
+        }
+
+        if (quantity <= 0) {
+            alert('수량은 1 이상이어야 합니다.');
+            return;
+        }
+
+        // 제품 데이터 생성
+        const product = {
+            productId: parseInt(productId),
+            productName: currentProduct.productName,
+            price: currentProduct.pricePerBox,
+            quantity: quantity
+        };
+
+        // 이미 추가된 상품인지 확인
+        const existingIndex = products.findIndex(p => p.productId === product.productId);
+
+        if (existingIndex >= 0) {
+            // 이미 있는 상품이면 수량을 더할지 물어보기
+            if (confirm(`'${product.productName}'은(는) 이미 목록에 있습니다. 수량을 추가하시겠습니까? (취소 시 수량을 새로운 값으로 변경)`)) {
+                // 수량 추가
+                products[existingIndex].quantity += quantity;
+            } else {
+                // 수량 변경
+                products[existingIndex].quantity = quantity;
+            }
+
+            // 테이블 업데이트
+            const rows = document.querySelectorAll('#productTableBody tr:not(#emptyRow)');
+            const row = rows[existingIndex];
+
+            if (row) {
+                const quantityCell = row.cells[3];
+                const totalCell = row.cells[4];
+
+                const newQuantity = products[existingIndex].quantity;
+                const newTotal = products[existingIndex].price * newQuantity;
+
+                quantityCell.textContent = newQuantity;
+                totalCell.textContent = newTotal.toLocaleString() + '원';
+            }
+        } else {
+            // 배열에 추가
+            products.push(product);
+
+            // 테이블에 행 추가
+            const tableBody = document.getElementById('productTableBody');
+
+            // 빈 행 제거
+            const emptyRow = document.getElementById('emptyRow');
+            if (emptyRow) {
+                emptyRow.remove();
+            }
+
+            // 새 행 추가
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${product.productId}</td>
+                <td>${product.productName}</td>
+                <td>${product.price.toLocaleString()}</td>
+                <td>${product.quantity}</td>
+                <td class="text-right">${(product.price * product.quantity).toLocaleString()}</td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeProduct(${products.length - 1}, this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="editProduct(${products.length - 1})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+        }
+
+        // 총계 업데이트
+        updateTotals();
+
+        // 입력 필드 초기화
+        document.getElementById('productIdInput').value = '';
+        document.getElementById('quantityInput').value = '';
+        productInfoDiv.innerHTML = '';
+        currentProduct = null;
+
+        // 상품 ID 입력 필드로 포커스 이동
+        document.getElementById('productIdInput').focus();
+    }
+
+    // 상품 편집
+    function editProduct(index) {
+        const product = products[index];
+
+        if (!product) return;
+
+        // 입력 필드에 현재 상품 정보 표시
+        document.getElementById('productIdInput').value = product.productId;
+        document.getElementById('quantityInput').value = product.quantity;
+
+        // 상품 정보 표시
+        const productInfoDiv = document.getElementById('productInfo');
+        productInfoDiv.innerHTML = `
+            <div style="margin-top: 0.5rem;">
+                <strong>${product.productName}</strong> -
+                ${product.price.toLocaleString()}원/박스
+            </div>
+        `;
+
+        // 현재 상품 정보 저장
+        currentProduct = {
+            productName: product.productName,
+            pricePerBox: product.price
+        };
+
+        // 해당 상품 삭제 (수정 시 새로 추가됨)
+        removeProduct(index, null, true);
+
+        // 수량 입력 필드로 포커스 이동
+        document.getElementById('quantityInput').focus();
+        document.getElementById('quantityInput').select();
+    }
+
+    // 상품 삭제
+    function removeProduct(index, button, skipConfirm = false) {
+        // 확인 메시지 (편집 모드에서는 스킵)
+        if (!skipConfirm && !confirm('이 상품을 목록에서 삭제하시겠습니까?')) {
+            return;
+        }
+
+        // 배열에서 제거
+        products.splice(index, 1);
+
+        // 테이블에서 행 제거 (버튼이 있는 경우에만)
+        if (button) {
+            const row = button.closest('tr');
+            row.remove();
+        } else {
+            // 버튼이 없는 경우 (편집 모드) 모든 행을 다시 그림
+            redrawProductTable();
+        }
+
+        // 상품이 없는 경우 빈 메시지 표시
+        if (products.length === 0) {
+            const tableBody = document.getElementById('productTableBody');
+            const emptyRow = document.createElement('tr');
+            emptyRow.id = 'emptyRow';
+            emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>';
+            tableBody.appendChild(emptyRow);
+        }
+
+        // 총계 업데이트
+        updateTotals();
+    }
+
+    // 상품 테이블 다시 그리기
+    function redrawProductTable() {
+        const tableBody = document.getElementById('productTableBody');
+
+        // 기존 행 모두 제거
+        tableBody.innerHTML = '';
+
+        if (products.length === 0) {
+            // 상품이 없는 경우
+            const emptyRow = document.createElement('tr');
+            emptyRow.id = 'emptyRow';
+            emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>';
+            tableBody.appendChild(emptyRow);
+        } else {
+            // 상품 목록 그리기
+            products.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.productId}</td>
+                    <td>${product.productName}</td>
+                    <td>${product.price.toLocaleString()}</td>
+                    <td>${product.quantity}</td>
+                    <td class="text-right">${(product.price * product.quantity).toLocaleString()}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProduct(${index}, this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="editProduct(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    }
+
+    // 총 수량 및 금액 업데이트
+    function updateTotals() {
+        const totalQuantity = products.reduce((sum, product) => sum + product.quantity, 0);
+        const totalAmount = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+
+        document.getElementById('totalQuantityDisplay').textContent = totalQuantity;
+        document.getElementById('totalAmountDisplay').textContent = totalAmount.toLocaleString() + '원';
+    }
+
+    // 폼 제출
+    function submitForm() {
+        if (products.length === 0) {
+            alert('최소 하나 이상의 상품을 추가해야 합니다.');
+            return;
+        }
+
+        // 입력 데이터 검증
+        const purchaseDate = document.getElementById('purchaseDate').value;
+
+        if (!purchaseDate) {
+            alert('발주일을 입력해주세요.');
+            return;
+        }
+
+        // 최종 확인
+        if (confirm('발주를 등록하시겠습니까?')) {
+            // 폼 데이터에 상품 정보 저장
+            document.getElementById('purchaseItemsData').value = JSON.stringify(products);
+
+            // 폼 제출
+            document.getElementById('purchaseForm').submit();
+        }
+    }
 </script>
+
 </body>
 </html>
