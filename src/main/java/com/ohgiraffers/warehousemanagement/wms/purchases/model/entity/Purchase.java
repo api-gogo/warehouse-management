@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.purchases.model.entity;
 
+import com.ohgiraffers.warehousemanagement.wms.supplier.model.entity.Supplier;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -10,9 +11,9 @@ import java.util.List;
 @Table(name = "purchases")
 public class Purchase {
 
-//    @ManyToOne(fetch = FetchType.LAZY) // 거래처와 연결 다대일 관계 여러개의 발주가 거래처 하나만 보유 가능
-//    @JoinColumn(name = "supplier_id")
-//    private Supplier supplier;
+    @ManyToOne(fetch = FetchType.LAZY) // 거래처와 연결 다대일 관계 여러개의 발주가 거래처 하나만 보유 가능
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
 //    //Purchase 엔티티에 연결된 실제 거래처 정보를 담는 필드
 //
 
@@ -59,6 +60,11 @@ public class Purchase {
 //    private Integer userId;
 
     public Purchase() {}
+    public Integer getSupplierId() {
+        return supplier != null ? supplier.getSupplierId() : null;
+    }
+
+
 
 
 
@@ -67,10 +73,10 @@ public class Purchase {
                     Integer userId, LocalDate purchaseDate, LocalDate purchaseDueDate,
                     PurchaseStatus purchaseStatus, LocalDate purchaseCreatedAt,
                     LocalDate purchase_updated_at, String notes) {
-        //Supplier supplier, Storages storages,
+//        Supplier supplier, Storages storages,
 
 
-//        this.supplier = supplier;
+        this.supplier = supplier;
 //        this.storages = storages;
         this.purchaseId = purchaseId;
         this.userId = userId;
@@ -81,17 +87,20 @@ public class Purchase {
         this.purchaseUpdatedAt = purchase_updated_at;
         this.notes = notes;
     }
+    public Purchase(Supplier supplier){
+        this.supplier = supplier;
+    }
 
 
 
-//    public Supplier getSupplier() {
-//        return supplier;
-//    }
-//
-//    public void setSupplier(Supplier supplier) {
-//        this.supplier = supplier;
-//    }
-//
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
+
     public List<PurchaseItem> getItems() {
         return items;
     }
@@ -179,7 +188,7 @@ public class Purchase {
                 "purchaseId=" + purchaseId +
                 ", userId=" + userId +
                 ", purchaseDate=" + purchaseDate +
-//              ", supplier=" + supplier +
+              ", supplier=" + supplier +
                 ", items=" + items +
 //                ", storages=" + storages +
                 ", purchaseDueDate=" + purchaseDueDate +
