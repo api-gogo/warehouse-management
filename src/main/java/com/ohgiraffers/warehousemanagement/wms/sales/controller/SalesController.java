@@ -83,6 +83,7 @@ public class SalesController {
         return mv;
     }
 
+    // 수주서 수정 화면 (id 기준으로 기존 데이터 가져와서 띄워줌)
     @GetMapping("/update/{salesId}")
     public ModelAndView updateSales(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
 
@@ -100,8 +101,13 @@ public class SalesController {
         return mv;
     }
 
+    // 수주서 수정
     @PatchMapping("/update/{salesId}")
     public String updateSales(@PathVariable Integer salesId, @Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
+        System.out.println("수주서 수정 con 동작");
+        System.out.println("test: productIds"+salesDTO.getProductIds());
+        System.out.println("test: 수량 가져오는지"+salesDTO.getQuantity());
+
         SalesDTO updatedDTO = salesServiceImpl.updateSales(salesId, salesDTO);
         String resultUrl = null;
 
@@ -116,6 +122,7 @@ public class SalesController {
         return resultUrl;
     }
 
+    // 수주 상태 변경
     @PatchMapping("/update/status/{salesId}")
     public String updateStatusSales(@PathVariable Integer salesId, @RequestParam(name = "status") SalesStatus status, RedirectAttributes rdtat) {
         boolean result = salesServiceImpl.updateStatusSales(salesId, status);

@@ -4,9 +4,8 @@ import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.Inspectio
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.ParamResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.SearchResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionServiceImpl;
-import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -89,7 +88,7 @@ class InspectionControllerTest {
     @Test
     @DisplayName("메인 페이지 조회 테스트")
     void getAllInspections() {
-        ParamResponseDTO param = new ParamResponseDTO(null, null, null);
+        SearchResponseDTO param = new SearchResponseDTO(null, null, null);
         Page<InspectionResponseDTO> allInspection = inspectionService.getAllInspection(param, 1, 10);
 
         log.info("조회된 Inspection 목록\n{}", allInspection.getContent());
@@ -100,7 +99,7 @@ class InspectionControllerTest {
     @Test
     @DisplayName("태그로 조회 테스트")
     void getAllTagInspections() {
-        ParamResponseDTO param = new ParamResponseDTO("INSPECTION", null, null);
+        SearchResponseDTO param = new SearchResponseDTO("INSPECTION", null, null);
         Page<InspectionResponseDTO> allTagInspection = inspectionService.getAllInspectionByTag(param, 1, 10);
 
         log.info("조회된 Inspection 목록\n{}", allTagInspection.getContent());
@@ -111,7 +110,7 @@ class InspectionControllerTest {
     @Test
     @DisplayName("없는 태그 조회 테스트 [예외 발생]")
     void getAllTagInspections_NotFound() {
-        ParamResponseDTO param = new ParamResponseDTO("없는태그", null, null);
+        SearchResponseDTO param = new SearchResponseDTO("없는태그", null, null);
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             inspectionService.getAllInspectionByTag(param,1, 10);
         });
