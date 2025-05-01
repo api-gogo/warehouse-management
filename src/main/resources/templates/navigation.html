@@ -65,25 +65,12 @@
       </li>
       <li th:class="${activeMenu == 'supplier' ? 'active' : ''}">
         <a th:href="@{/suppliers}">
-          <i class="fas fa-truck"></i> <span>거래처 관리</span>
+          <i class="fas fa-truck"></i> <span>거래처 관리(발주)</span>
         </a>
       </li>
       <li th:class="${activeMenu == 'store' ? 'active' : ''}">
         <a th:href="@{/stores}">
-          <i class="fas fa-store"></i>
-          <span>점포 관리</span>
-        </a>
-      </li>
-      <li th:class="${activeMenu == 'report' ? 'active' : ''}">
-        <a href="#">
-          <i class="fas fa-chart-bar"></i>
-          <span>보고서</span>
-        </a>
-      </li>
-      <li th:class="${activeMenu == 'settings' ? 'active' : ''}">
-        <a href="#">
-          <i class="fas fa-cog"></i>
-          <span>설정</span>
+          <i class="fas fa-store"></i> <span>점포 관리(수주)</span>
         </a>
       </li>
     </ul>

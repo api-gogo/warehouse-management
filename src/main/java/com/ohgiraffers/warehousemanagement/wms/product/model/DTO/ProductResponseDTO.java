@@ -1,35 +1,45 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.DTO;
 
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 
 import java.time.LocalDateTime;
 
+/**
+ * 상품 정보를 클라이언트에 전달하기 위한 DTO 클래스
+ */
 public class ProductResponseDTO {
 
     private Integer productId;
     private Category category;
-    private Integer supplierId; // Long -> Integer
-    private Integer userId;
+    private Integer supplierId;
+    private String supplierName;
+    private Long userId;
+    private String userName;
     private String productName;
     private Integer expirationDate;
     private String storageMethod;
-    private Integer pricePerBox; // Long -> Integer
-    private Integer quantityPerBox; // Long -> Integer
+    private Integer pricePerBox;
+    private Integer quantityPerBox;
     private LocalDateTime productCreatedAt;
     private LocalDateTime productUpdatedAt;
     private LocalDateTime productDeletedAt;
     private Boolean isDeleted;
+    private Product.ProductStatus status;
 
     public ProductResponseDTO() {}
 
-    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, Integer userId,
+    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, String supplierName, Long userId, String userName,
                               String productName, Integer expirationDate, String storageMethod,
                               Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
-                              LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
+                              LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted,
+                              Product.ProductStatus status) {
         this.productId = productId;
         this.category = category;
         this.supplierId = supplierId;
+        this.supplierName = supplierName;
         this.userId = userId;
+        this.userName = userName;
         this.productName = productName;
         this.expirationDate = expirationDate;
         this.storageMethod = storageMethod;
@@ -39,6 +49,7 @@ public class ProductResponseDTO {
         this.productUpdatedAt = productUpdatedAt;
         this.productDeletedAt = productDeletedAt;
         this.isDeleted = isDeleted;
+        this.status = status;
     }
 
     public Integer getProductId() {
@@ -76,12 +87,28 @@ public class ProductResponseDTO {
         this.supplierId = supplierId;
     }
 
-    public Integer getUserId() {
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getProductName() {
@@ -156,13 +183,23 @@ public class ProductResponseDTO {
         this.isDeleted = isDeleted;
     }
 
+    public Product.ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(Product.ProductStatus status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "ProductResponseDTO{" +
                 "상품번호=" + productId +
                 ", 카테고리 번호=" + (category != null ? category.getCategoryId() : null) +
                 ", 거래처 ID=" + supplierId +
-                ", 담당자=" + userId +
+                ", 거래처명='" + supplierName + '\'' +
+                ", 담당자 ID=" + userId +
+                ", 담당자명='" + userName + '\'' +
                 ", 품명='" + productName + '\'' +
                 ", 유통기한=" + expirationDate +
                 ", 보관방법='" + storageMethod + '\'' +
@@ -172,6 +209,7 @@ public class ProductResponseDTO {
                 ", 수정시간=" + productUpdatedAt +
                 ", 삭제시간=" + productDeletedAt +
                 ", 삭제상태=" + isDeleted +
+                ", 상태=" + status +
                 '}';
     }
 }

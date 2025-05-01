@@ -2,7 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.user.model.dto;
 
 public class LogUserDTO {
 
-    private Integer userId;
+    private Long userId;
     private String userName;
     private String userEmail;
     private String userPhone;
@@ -12,7 +12,7 @@ public class LogUserDTO {
 
     public LogUserDTO() {}
 
-    public LogUserDTO(Integer userId, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus) {
+    public LogUserDTO(Long userId, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus) {
         this.userId = userId;
         this.userName = userName;
         this.userEmail = userEmail;
@@ -22,11 +22,11 @@ public class LogUserDTO {
         this.userStatus = userStatus;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

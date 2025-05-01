@@ -4,13 +4,14 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SalesDTO {
     private Integer salesId;
     private Integer storeId;
-    private Integer userId;
+    private String storeName;
+    private String storeAddress;
+    private Long userId;
     private String userName;
     private String userPhone;
     private LocalDate salesDate;
@@ -27,9 +28,11 @@ public class SalesDTO {
     public SalesDTO() {
     }
 
-    public SalesDTO(Integer salesId, Integer storeId, Integer userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
+    public SalesDTO(Integer salesId, Integer storeId, String storeName, String storeAddress, Long userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
         this.salesId = salesId;
         this.storeId = storeId;
+        this.storeName = storeName;
+        this.storeAddress = storeAddress;
         this.userId = userId;
         this.userName = userName;
         this.userPhone = userPhone;
@@ -56,11 +59,27 @@ public class SalesDTO {
         this.storeId = storeId;
     }
 
-    public Integer getUserId() {
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public String getStoreAddress() {
+        return storeAddress;
+    }
+
+    public void setStoreAddress(String storeAddress) {
+        this.storeAddress = storeAddress;
+    }
+
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -165,8 +184,10 @@ public class SalesDTO {
         return "SalesDTO{" +
                 "salesId=" + salesId +
                 ", storeId=" + storeId +
+                ", storeAddress='" + storeAddress + '\'' +
                 ", userId=" + userId +
                 ", userName='" + userName + '\'' +
+                ", userPhone='" + userPhone + '\'' +
                 ", salesDate=" + salesDate +
                 ", shippingDueDate=" + shippingDueDate +
                 ", salesStatus=" + salesStatus +

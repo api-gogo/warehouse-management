@@ -10,7 +10,7 @@ import java.util.List;
 
 public class PurchaseDTO {
     private Integer purchaseId;
-    private Integer userId;
+    private Long userId;
     private LocalDate purchaseDate;
     private LocalDate purchaseDueDate;
     private String purchaseStatus;
@@ -31,7 +31,7 @@ public class PurchaseDTO {
     public PurchaseDTO() {}
 
 
-    public PurchaseDTO(Integer purchaseId, Integer userId,LocalDate purchaseCreatedAt ,LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, LocalDate purchaseUpdatedAt,String purchaseNotes
+    public PurchaseDTO(Integer purchaseId, Long userId, LocalDate purchaseCreatedAt , LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, LocalDate purchaseUpdatedAt, String purchaseNotes
                        )
     {  //Supplier supplier, List<PurchaseItem> items,Storages storages
         this.purchaseId = purchaseId;
@@ -55,11 +55,11 @@ public class PurchaseDTO {
         this.purchaseId = purchaseId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

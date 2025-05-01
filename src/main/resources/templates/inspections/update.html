@@ -17,6 +17,10 @@
         const defectiveQuantityInput = document.getElementById('defectiveQuantity');
         const acceptedQuantityInput = document.getElementById('acceptedQuantity');
         const defectRateInput = document.getElementById('defectRate');
+        // 검수 유형 입력 필드 찾기
+        const transactionTypeSelect = document.getElementById('transactionType');
+        const transactionIdContainer = document.getElementById('transactionIdContainer');
+        const transactionId = document.getElementById('transactionId');
         
         // 수량 변경 시 자동 계산 함수
         function updateQuantities() {
@@ -65,9 +69,24 @@
             return false;
           }
         });
+
+        // 검수 유형 ID 표시 제어 함수
+        function toggleTransactionId() {
+          if (transactionTypeSelect.value === 'INSPECTION') {
+            transactionIdContainer.style.display = 'none';
+            transactionId.value = null;
+            document.getElementById('transactionId').required = false;
+          } else {
+            transactionIdContainer.style.display = 'block';
+            document.getElementById('transactionId').required = true;
+          }
+        }
+
+        transactionTypeSelect.addEventListener('change', toggleTransactionId);
         
         // 페이지 로드 시 초기 계산
         updateQuantities();
+        toggleTransactionId();
       });
     </script>
   </th:block>
@@ -103,7 +122,7 @@
           </div>
         </div>
 
-        <form id="updateForm" th:action="@{/inspections/update/{id}(id=${inspection.inspectionId})}" method="post">
+        <form id="updateForm" th:action="@{/inspections/{id}/edit(id=${inspection.inspectionId})}" method="post">
           <div class="user-detail-sections">
             <div class="detail-section">
               <h3 class="section-title">기본 정보</h3>
@@ -121,8 +140,8 @@
                 </div>
 
                   <div class="form-group">
-                      <label class="form-label">거래 유형</label>
-                      <select class="form-control" name="transactionType">
+                      <label for="transactionType" class="form-label">검수 유형</label>
+                      <select class="form-control" name="transactionType" id="transactionType">
                         <option value="INSPECTION" th:selected="${inspection.transactionType == '상시'}">상시</option>
                         <option value="PURCHASE" th:selected="${inspection.transactionType == '발주'}">발주</option>
                         <option value="SALES" th:selected="${inspection.transactionType == '수주'}">수주</option>
@@ -132,8 +151,10 @@
                   </div>
 
                 <div class="form-group">
-                  <label class="form-label">거래 유형의 ID</label>
-                  <input type="text" class="form-control" name="transactionId" th:value="${inspection.transactionId}">
+                  <div id="transactionIdContainer" class="form-group mb-4" style="display: none;">
+                    <label for="transactionId" class="form-label">검수 유형의 ID</label>
+                    <input type="text" id="transactionId" name="transactionId" class="form-control" th:value="${inspection.transactionId}" placeholder="검수 유형의 ID를 입력하세요">
+                  </div>
                 </div>
 
                 <div class="form-group">

@@ -83,10 +83,10 @@
             <!-- 데이터가 없을 경우 -->
             <tr th:if="${#lists.isEmpty(stores)}">
               <td colspan="8" class="no-data">
-                <span th:if="${param.status != null && param.status[0] == 'deleted'}">점포가 없습니다.</span>
+                <span th:if="${param.status != null && param.status[0] == 'deleted'}">삭제된 점포 데이터가 없습니다.</span>
                 <span th:unless="${param.status != null && param.status[0] == 'deleted'}">
-                  <span th:if="${search != null && search != ''}">점포가 없습니다.</span>
-                  <span th:unless="${search != null && search != ''}">점포가 없습니다.</span>
+                  <span th:if="${search != null && search != ''}">검색 결과에 해당하는 점포가 없습니다.</span>
+                  <span th:unless="${search != null && search != ''}">등록된 점포가 없습니다. 신규 점포를 등록해주세요.</span>
                 </span>
               </td>
             </tr>

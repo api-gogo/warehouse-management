@@ -8,23 +8,21 @@ import java.time.LocalDateTime;
 
 public class ProductCreateDTO {
 
-    private Integer productId;          // 상품 ID
-    private Integer categoryId;         // 카테고리 ID
-    private Integer supplierId;         // 공급업체 ID
-    private Integer userId;             // 담당자 ID
-    private String productName;         // 상품 이름
-    private Integer expirationDate;     // 유통기한 (일수)
-    private String storageMethod;       // 보관 방법
-    private Integer pricePerBox;        // 박스당 단가
-    private Integer quantityPerBox;     // 박스당 수량
-    private LocalDateTime productCreatedAt; // 생성 시간
-    private Boolean isDeleted;          // 삭제 상태
+    private Integer productId;
+    private Integer categoryId;
+    private Integer supplierId;
+    private Long userId;
+    private String productName;
+    private Integer expirationDate;
+    private String storageMethod;
+    private Integer pricePerBox;
+    private Integer quantityPerBox;
+    private LocalDateTime productCreatedAt;
+    private Boolean isDeleted;
 
-    // 기본 생성자
     public ProductCreateDTO() {}
 
-    // 모든 필드를 포함한 생성자
-    public ProductCreateDTO(Integer productId, Integer categoryId, Integer supplierId, Integer userId, String productName,
+    public ProductCreateDTO(Integer productId, Integer categoryId, Integer supplierId, Long userId, String productName,
                             Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox,
                             LocalDateTime productCreatedAt, Boolean isDeleted) {
         this.productId = productId;
@@ -39,8 +37,6 @@ public class ProductCreateDTO {
         this.productCreatedAt = productCreatedAt;
         this.isDeleted = isDeleted;
     }
-
-    // Getter와 Setter 메서드
 
     public Integer getProductId() {
         return productId;
@@ -69,11 +65,11 @@ public class ProductCreateDTO {
         this.supplierId = supplierId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -128,7 +124,7 @@ public class ProductCreateDTO {
     }
 
     @NotNull(message = "박스당 개수는 필수 입력 항목입니다.")
-    @Min(value = 0, message = "박스당 개수는 음수일 수 없습니다.")
+    @Min(value = 1, message = "박스당 개수는 1보다 작을 수 없습니다.")
     @Max(value = 2147483647, message = "박스당 개수는 2,147,483,647을 초과할 수 없습니다.")
     public Integer getQuantityPerBox() {
         return quantityPerBox;

@@ -99,7 +99,7 @@
 <div class="main-content">
   <div class="page-header">
     <h2>출고 반품 등록</h2>
-    <a th:href="@{/returns/outbound}" class="btn btn-outline-secondary">
+    <a th:href="@{/returns}" class="btn btn-outline-secondary">
       <i class="bi bi-arrow-left"></i> 목록으로
     </a>
   </div>
@@ -109,7 +109,7 @@
       <h5 class="card-title">반품 정보 입력</h5>
       <p class="card-text text-muted">출고된 상품의 반품 정보를 입력해주세요.</p>
 
-      <form th:action="@{/returns/outbound/regist}" method="post">
+      <form th:action="@{/returns/regist}" method="post">
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="shipmentId" class="form-label required-field">출고 번호</label>
@@ -152,9 +152,10 @@
           <div class="col-md-6">
             <label for="returnShipmentStatus" class="form-label required-field">반품 상태</label>
             <select class="form-select" id="returnShipmentStatus" name="returnShipmentStatus" required>
-              <option value="PENDING" selected>반품대기</option>
-              <option value="PROCESSING">반품중</option>
-              <option value="COMPLETED">반품완료</option>
+              <option value="RETURN_WAITING" selected>반품 대기</option>
+              <option value="RETURN_APPROVED">반품 승인</option>
+              <option value="RETURN_REJECTED">반품 거절</option>
+              <option value="RETURN_COMPLETED">반품 완료</option>
             </select>
           </div>
         </div>
@@ -165,7 +166,7 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2">
-          <a th:href="@{/returns/outbound}" class="btn btn-outline-secondary">취소</a>
+          <a th:href="@{/returns}" class="btn btn-outline-secondary">취소</a>
           <button type="submit" class="btn btn-primary">등록</button>
         </div>
       </form>
