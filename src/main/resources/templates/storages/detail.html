@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WMS - 입고 상세</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/navigation.css?v=1">
+    <link rel="stylesheet" href="/common.css?v=1">
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .info-box {
+            background-color: #f7f9fc;
+            border: 1px solid #ccd6e0;
+            border-radius: 6px;
+            padding: 1.2rem 1.5rem;
+        }
+
+        .info-row {
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .info-row strong {
+            display: inline-block;
+            width: 150px;
+            color: #333;
+        }
+
+        .flex {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-outline {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+        }
+
+        .max-w-4xl {
+            max-width: 900px;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{navigation :: aside(activeMenu='storage')}"></div>
+    <div class="main-content">
+        <div th:replace="~{navigation :: header}"></div>
+
+        <main class="page-content">
+            <div class="flex justify-between mb-6">
+                <h1 class="page-title">입고 상세</h1>
+                <div class="flex gap-2">
+                    <a th:href="@{/storages}" class="btn btn-outline">목록으로</a>
+                    <a th:href="@{'/storages/update/' + ${storage.storageId}}" class="btn btn-primary">수정</a>
+                </div>
+            </div>
+
+            <!--  입고 정보 -->
+            <div class="card max-w-4xl mx-auto">
+                <div class="card-header">
+                    <h2 class="card-title">입고 정보</h2>
+                    <p class="card-description">입고 상세 내역을 확인할 수 있습니다.</p>
+                </div>
+
+                <div class="card-content info-box">
+                    <div class="info-row"><strong>입고 ID:</strong> <span th:text="${storage.storageId}">-</span></div>
+                    <div class="info-row"><strong>발주 ID:</strong> <span th:text="${storage.purchaseId}">-</span></div>
+                    <div class="info-row"><strong>입고 상태:</strong> <span th:text="${storage.storageStatusDescription}">-</span></div>
+                    <div class="info-row"><strong>검수 상태:</strong> <span th:text="${storage.inspectionStatus}">-</span></div>
+                    <div class="info-row"><strong>입고일:</strong> <span th:text="${storage.storageDate}">-</span></div>
+                    <div class="info-row"><strong>입고 사유:</strong> <span th:text="${storage.storageReason}">-</span></div>
+                    <div class="info-row"><strong>입고 담당자:</strong> <span th:text="${storage.purchaseUserName}">-</span></div>
+                </div>
+            </div>
+
+            <!-- 발주 정보 -->
+            <div class="card max-w-4xl mx-auto mt-6">
+                <div class="card-header">
+                    <h2 class="card-title">발주 정보</h2>
+                    <p class="card-description">입고와 연결된 발주 정보입니다.</p>
+                </div>
+
+                <div class="card-content info-box">
+                    <div class="info-row"><strong>담당자 ID:</strong> <span th:text="${storage.purchaseUserId}">-</span></div>
+                    <div class="info-row"><strong>담당자 이름:</strong> <span th:text="${storage.purchaseUserName}">-</span></div>
+                    <div class="info-row"><strong>납기일:</strong> <span th:text="${storage.purchaseDueDate}">-</span></div>
+                    <div class="info-row"><strong>발주 상태:</strong> <span th:text="${storage.purchaseStatus}">-</span></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>

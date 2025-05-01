@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WMS - 입고 목록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/navigation.css?v=1">
+    <link rel="stylesheet" href="/common.css?v=1">
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .badge-default {
+            background-color: #e2e3e5;
+            color: #41464b;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{navigation :: aside(activeMenu='storage')}"></div>
+    <div class="main-content">
+        <div th:replace="~{navigation :: header}"></div>
+
+        <main class="page-content">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="page-title">입고 목록</h1>
+                <a th:href="@{/storages/create}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> 신규 입고 등록
+                </a>
+            </div>
+
+            <!-- 검색 폼 -->
+            <form th:action="@{/storages}" method="get" class="filter-area mb-4">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="search" name="searchKeyword" placeholder="발주 ID 검색..."
+                           class="search-input" th:value="${searchKeyword}">
+                </div>
+                <button type="submit" class="btn btn-outline btn-icon">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <!-- 목록 카드 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">입고 내역</h2>
+                    <p class="card-description">입고 정보를 확인하고 관리할 수 있습니다.</p>
+                </div>
+
+                <div class="card-content">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>입고 ID</th>
+                                <th>발주 ID</th>
+                                <th>입고 상태</th>
+                                <th>입고일</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="storage : ${storages}">
+                                <td th:text="${storage.storageId}">1</td>
+                                <td th:text="${storage.purchaseId}">101</td>
+                                <td>
+                                    <span th:class="${(storage.storageStatus.name() == 'COMPLETED') ? 'badge badge-success' :
+                                                     (storage.storageStatus.name() == 'WAITING') ? 'badge badge-warning' :
+                                                     (storage.storageStatus.name() == 'DELAYED') ? 'badge badge-danger' :
+                                                     (storage.storageStatus.name() == 'REJECTED') ? 'badge badge-danger' :
+                                                     (storage.storageStatus.name() == 'DEFECTIVE') ? 'badge badge-danger' :
+                                                     'badge badge-default'}"
+                                          th:text="${storage.storageStatusDescription}">
+                                    </span>
+                                </td>
+                                <td th:text="${storage.storageDate}">2025-05-01</td>
+                                <td>
+                                    <a th:href="@{'/storages/' + ${storage.storageId}}" class="btn btn-outline btn-sm">상세</a>
+                                    <a th:href="@{'/storages/update/' + ${storage.storageId}}" class="btn btn-outline btn-sm">수정</a>
+                                    <form th:action="@{'/storages/delete/' + ${storage.storageId}}"
+                                          method="post"
+                                          style="display:inline;"
+                                          onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                        <button type="submit" class="btn btn-outline btn-sm">삭제</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(storages)}">
+                                <td colspan="5" style="text-align: center; padding: 2rem;">등록된 입고 내역이 없습니다.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{navigation :: scripts}"></div>
+</body>
+</html>
