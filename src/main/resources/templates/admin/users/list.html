@@ -146,24 +146,24 @@
 
         <!-- 페이지네이션 -->
         <div class="pagination" th:if="${totalPages > 1}">
-          <a th:href="@{/templates/admin/users(page=0, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=0, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-left"></i>
           </a>
-          <a th:href="@{/templates/admin/users(page=${currentPage - 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=${currentPage - 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
             <i class="fas fa-angle-left"></i>
           </a>
 
           <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/templates/admin/users(page=${i}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}"
+            <a th:href="@{/admin/users(page=${i}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}"
                class="page-link"
                th:text="${i + 1}"
                th:classappend="${currentPage == i ? 'active' : ''}">1</a>
           </th:block>
 
-          <a th:href="@{/templates/admin/users(page=${currentPage + 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=${currentPage + 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
             <i class="fas fa-angle-right"></i>
           </a>
-          <a th:href="@{/templates/admin/users(page=${totalPages - 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+          <a th:href="@{/admin/users(page=${totalPages - 1}, size=${size}, partTab=${param.partTab}, roleTab=${param.roleTab}, statusTab=${param.statusTab}, search=${search})}" class="page-link" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
             <i class="fas fa-angle-double-right"></i>
           </a>
         </div>

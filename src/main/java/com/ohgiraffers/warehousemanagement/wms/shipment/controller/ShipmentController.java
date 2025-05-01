@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.shipment.controller;
 
+import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.Inventory;
 import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryService;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
@@ -54,6 +55,7 @@ public class ShipmentController {
 
     @GetMapping
     public String showShipmentList(
+            Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
@@ -61,18 +63,16 @@ public class ShipmentController {
             Model model) {
         log.info("출고 목록 표시 - 페이지: {}, 크기: {}, 상태: {}, 검색어: {}", page, size, status, searchTerm);
         try {
-            // 로그인된 사용자의 ID 가져오기
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String currentUserId = authentication.getName();
-            Integer userId;
+            Long currentUserId = null;
             try {
-                userId = Integer.parseInt(currentUserId);
+                AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+                currentUserId = authDetails.getUserId();
             } catch (NumberFormatException e) {
                 log.error("담당자 ID 변환 실패: {}", currentUserId);
                 model.addAttribute("error", "담당자 ID가 유효한 숫자가 아닙니다: " + currentUserId);
                 return "shipments/shipment";
             }
-            model.addAttribute("currentUserId", userId);
+            model.addAttribute("currentUserId", currentUserId);
 
             ShipmentPageResponseDTO shipmentPage = shipmentService.getAllShipments(page, size, status, searchTerm);
             model.addAttribute("shipments", shipmentPage.getShipments());
