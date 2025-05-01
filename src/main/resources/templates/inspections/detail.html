@@ -7,6 +7,14 @@
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/common.css">
+    <style>
+      .delete-btn {
+        color: #dc3545;
+      }
+      .delete-btn:hover {
+        color: #b02a37;
+      }
+    </style>
   </th:block>
 </head>
 <body>
@@ -22,9 +30,15 @@
         </div>
 
         <div class="admin-actions">
-          <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="btn btn-primary">
+          <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="btn btn-primary">
             <i class="fas fa-edit me-2"></i>수정
           </a>
+          <a th:if="${#authorization.expression('hasAnyAuthority(''관리자'', ''매니저'')')}"
+             href="#" class="btn btn-danger ms-2 delete-btn"
+             onclick="confirmDelete(); return false;">
+            <i class="fas fa-trash me-2"></i>삭제
+          </a>
+          <form id="deleteForm" th:action="@{/inspections/{id}/delete(id=${inspection.inspectionId})}" method="post" style="display:none;"></form>
         </div>
       </div>
 
@@ -113,16 +127,33 @@
           </div>
 
           <div class="form-actions">
-            <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="btn btn-primary">
+            <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="btn btn-primary">
               <i class="fas fa-edit me-2"></i>검수 정보 수정
             </a>
             <a th:href="@{/inspections}" class="btn btn-secondary ms-2">
               <i class="fas fa-list me-2"></i>목록으로
             </a>
+            <a th:if="${#authorization.expression('hasAnyAuthority(''관리자'', ''매니저'')')}"
+               href="#" class="btn btn-danger ms-2 delete-btn"
+               onclick="confirmDelete(); return false;">
+              <i class="fas fa-trash me-2"></i>삭제
+            </a>
           </div>
         </div>
       </div>
     </div>
+  </th:block>
+
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script>
+      // 삭제 확인 함수
+      function confirmDelete() {
+        if (confirm('정말로 이 검수를 삭제하시겠습니까?')) {
+          document.getElementById('deleteForm').submit();
+        }
+      }
+    </script>
   </th:block>
 </body>
 </html>

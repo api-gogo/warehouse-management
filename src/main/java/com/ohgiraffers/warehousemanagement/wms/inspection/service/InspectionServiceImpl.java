@@ -3,7 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.service;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.ParamResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.SearchResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.repository.InspectionRepository;
 import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
@@ -57,7 +57,7 @@ public class InspectionServiceImpl implements InspectionService {
         return new InspectionResponseDTO(saveInspection);
     }
 
-    public Page<InspectionResponseDTO> getAllInspection(ParamResponseDTO dto, int page, int size) {
+    public Page<InspectionResponseDTO> getAllInspection(SearchResponseDTO dto, int page, int size) {
         Page<Inspection> inspectionList = null;
         Pageable pageable = PageRequest.of(page - 1, size);
             if(dto.getSearchType() == null || dto.getSearchType().trim().isEmpty()) {
@@ -69,7 +69,7 @@ public class InspectionServiceImpl implements InspectionService {
         return inspectionList.map(InspectionResponseDTO::new);
     }
 
-    public Page<InspectionResponseDTO> getAllInspectionByTag(ParamResponseDTO dto, int page, int size) {
+    public Page<InspectionResponseDTO> getAllInspectionByTag(SearchResponseDTO dto, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Inspection> inspectionList = null;
         if (InspectionTransactionType.typeContains(dto.getInspectionType())) {
@@ -134,6 +134,17 @@ public class InspectionServiceImpl implements InspectionService {
         } else {
             throw new IllegalArgumentException("존재하지 않는 검수 ID입니다! \n" +
                     "검색 ID : " + inspectionId);
+        }
+    }
+
+    public void deleteInspection(Long inspectionId) {
+        Optional<Inspection> findInspection = inspectionRepository.findById(inspectionId);
+        if (findInspection.isPresent()) {
+            Inspection inspection = findInspection.get();
+            inspectionRepository.delete(inspection);
+        } else {
+            throw new IllegalArgumentException("존재하지 않는 검수 ID입니다! \n" +
+                    "검수 ID : " + inspectionId);
         }
     }
 }

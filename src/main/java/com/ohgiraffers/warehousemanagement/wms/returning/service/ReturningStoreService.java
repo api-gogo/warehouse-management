@@ -1,123 +1,131 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.service;
 
+import com.ohgiraffers.warehousemanagement.wms.returning.ReturningStorageCause;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnStorageDTO;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnStorage;
-import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.Storages;
+import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnStorageItem;
+import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnStorageItemRepository;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnStorageRepository;
-import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.StorageRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReturningStoreService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReturningStoreService.class);
     private final ReturnStorageRepository returnStorageRepository;
-    //private final ShipmentRepository shipmentRepository;
-    private final StorageRepository storageRepository; // 생성에서 필요함
+    private final ReturnStorageItemRepository returnStorageItemRepository;
 
     @Autowired
-    public ReturningStoreService(ReturnStorageRepository returnStorageRepository) {
+    public ReturningStoreService(ReturnStorageRepository returnStorageRepository, ReturnStorageItemRepository returnStorageItemRepository) {
         this.returnStorageRepository = returnStorageRepository;
-        //this.shipmentRepository = shipmentsRepository;
-        this.storageRepository = storageRepository;
+        this.returnStorageItemRepository = returnStorageItemRepository;
     }
-//전체조회 -> PK값 있어야됨
-    public List<ReturnStorageDTO> getALlReturning() {
-        List<ReturnStorage> rs = returnStorageRepository.findAll();
-        List<ReturnStorageDTO> rsDTOs = new ArrayList<>();
-        for (ReturnStorage rsEntity : rs) {
 
-          // Integer StorageId = rsEntity.getStorageId().getStorageId() -> .getStorage() 외래키 참조 횟수
+    /*전체 조회*/
+    public List<ReturnStorageDTO> getAllReturns() {
+        List<ReturnStorage> findAll = returnStorageRepository.findAll();
+        List<ReturnStorageDTO> returnLists = new ArrayList<>();
 
-            ReturnStorageDTO rsDTO = new ReturnStorageDTO(
-                    rsEntity.getReturnStorageId(),
-                    rsEntity.getUserId(),
-                    rsEntity.getReturnStoragesContent(),
-                    rsEntity.getReturnStoragesCreatedAt(),
-                    rsEntity.getStorageId() //나중에 외래키로 바꿔줘야됨
+        for (ReturnStorage storageEntity : findAll) {
+
+            ReturnStorageDTO storageDTO = new ReturnStorageDTO(
+                    storageEntity.getReturnStorageId(),
+                    storageEntity.getUserId(),
+                    storageEntity.getReturnStoragesCreatedAt(),
+                    storageEntity.getStorageId()
             );
-                rsDTOs.add(rsDTO);
+            returnLists.add(storageDTO);
         }
-        return rsDTOs;
-
+        return returnLists;
     }
 
-    //등록 -> PK 값 필요x --> 고치기 외래키 써야됨
+    /*등록*/
     @Transactional
-    public ReturnStorageDTO CreateReturning(ReturnStorageDTO returnStorageDTO) {
-        /*나중에 입고의 엔티티 클래스로 바꿔줘야됨@@@@@@*/
-        Storages storage = storageRepository.findById(returnStorageDTO.getStorageId())
-                .orElseThrow(() -> new RuntimeException("No such storage found")); //-> 고치기 반품도
+    public int createReturns(ReturnStorageDTO returnStorageDTO) {
 
+        /*예외처리*/
+        Logger logger = LoggerFactory.getLogger(ReturnStorageService.class);
+        logger.info("Recived DTO : returnShipmentContent={}, returnShipmentQuantity={}",
+                returnStorageDTO.getReturnStorageContent(),
+                returnStorageDTO.getReturnStorageQuantity());
 
-        ReturnStorage returnStorage = new ReturnStorage(returnStorageDTO.getStorageId(),
-                                        returnStorageDTO.getUserId(),
-                                        /*returnStorageDTO.getReturnStorageCreatedAt()*/
-                                        LocalDateTime.now(), //등록일
-                                        returnStorageDTO.getReturnStorageContent()
-                                        );
-
-        returnStorageRepository.save(returnStorage);
-        return returnStorageDTO;
-    }
-    //상세 조회 -> PK값 필요
-    public ReturnStorageDTO getReturningById(Integer returnStorageId) {
-
-        ReturnStorage rsEntity = returnStorageRepository.findById(returnStorageId)
-        .orElseThrow(() -> new RuntimeException("해당 반품 정보가 존재하지 않습니다."));
-
-        ReturnStorageDTO rsDTO = new ReturnStorageDTO();
-        rsDTO.setReturnStorageId(rsEntity.getReturnStorageId());//PK 값
-        rsDTO.setUserId(rsEntity.getUserId());
-        rsDTO.setReturnStorageContent(rsEntity.getReturnStoragesContent());
-        rsDTO.setReturnStorageCreatedAt(rsEntity.getReturnStoragesCreatedAt());
-        rsDTO.setStorageId(rsEntity.getStorageId());
-
-        return rsDTO;
-    }
-
-
-    //삭제->삭제일 등록
-    @Transactional
-    public boolean deleteReturning(Integer returnStorageId) {
-        try{
-            ReturnStorage returnStorage = returnStorageRepository.findById(returnStorageId)
-                    .orElseThrow(() -> new RuntimeException("삭제할 반품서가 없습니다"));
-            returnStorage.setReturnStoragesCreatedAt(LocalDateTime.now());
-            returnStorageRepository.save(returnStorage);
-
-            return true;
-        }catch (Exception e) {
-            logger.error("삭제 실패", e);
-            return false;
-        }
-    }
-
-    @Transactional
-    public boolean updateReturning(@Valid ReturnStorageDTO returnStorageDTO) {
-
-        Optional<ReturnStorage> existReturnOpt = returnStorageRepository.findById(returnStorageDTO.getReturnStorageId());
-        if(existReturnOpt.isEmpty()) {
-            return false;
+        /*유효성 검증*/
+        if (returnStorageDTO.getReturnStorageQuantity() == null || returnStorageDTO.getReturnStorageQuantity().isEmpty()) {
+            throw new IllegalArgumentException("수량은 필수입니다.");
         }
 
-        ReturnStorage existReturn = existReturnOpt.get();
+        List<ReturningStorageCause> causes = returnStorageDTO.getReturnStorageContent();
+        if (causes == null || causes.isEmpty()) {
+            throw new IllegalArgumentException("반품 사유는 최소 하나 이상 선택해야 합니다.");
+        }
 
-        existReturn.setReturnStoragesCreatedAt(LocalDateTime.now());
+        ReturnStorage storageEntity = new ReturnStorage();
 
-        returnStorageRepository.save(existReturn);
+        storageEntity.setUserId(returnStorageDTO.getUserId());
+        storageEntity.setReturnStorageId(returnStorageDTO.getReturnStorageId());
+        storageEntity.setReturnStoragesCreatedAt(LocalDateTime.now());
 
-        return true;
+        ReturnStorage savedStorage = returnStorageRepository.save(storageEntity);
+        //로트넘버 없이 멀로 리스트를 만들까..
+//        List<ReturnStorageItem> storageItemsList = new ArrayList<>();
+//       for(int i=0; i < returnStorageDTO.get)
+        return 0;
     }
-    //수정->수정일
+
+
+    /*상세조회*/
+    public ReturnStorageDTO getReturnsById(Integer returnStorageId) {
+        ReturnStorage findStorage = returnStorageRepository.findById(returnStorageId)
+                .orElseThrow(() -> new NullPointerException("해당 반품 정보가 존재하지 않습니다. "));
+
+        ReturnStorageDTO findDTO = new ReturnStorageDTO(
+                findStorage.getReturnStorageId(),
+                findStorage.getUserId(),
+                findStorage.getReturnStoragesCreatedAt(),
+                findStorage.getReturnStorageId()
+        );
+
+        if (findStorage.getReturnStorageItems() != null && !findStorage.getReturnStorageItems().isEmpty()) {
+            List<ReturningStorageCause> returnStorageContent = new ArrayList<>();
+            List<Integer> returnStorageQuantity = new ArrayList<>();
+
+            for (ReturnStorageItem item : findStorage.getReturnStorageItems()) {
+//                returnStorageContent.add(item.getReturnStorageContent());
+                returnStorageQuantity.add(item.getReturnStorageQuantity());
+                /*디버깅 로그*/
+//                System.out.println("Item: Cause=" + item.getReturnStorageContent() +
+//                        ", Quantity=" + item.getReturnStorageQuantity());
+
+            }
+            findDTO.setReturnStorageContent(returnStorageContent);
+            findDTO.setReturnStorageQuantity(returnStorageQuantity);
+
+            //디버깅 로그
+            System.out.println("DTO populated with: " +
+                    "Cause=" + returnStorageContent.size() +
+                    ", Quantity=" + returnStorageQuantity.size());
+        } else {
+            System.out.println("No ReturnShipmentItems found for ReturnShipment ID: " + returnStorageId);
+        }
+        return findDTO;
+    }
+
+//    /*삭제*/
+//    @Transactional
+//    public boolean deleteReturns(Integer returnStorageId) {
+//        try{
+//            ReturnStorage returnStorage = returnStorageRepository.findById(returnStorageId)
+//                    .orElseThrow() -> new RuntimeException("삭제할 반품서가 없습니다."));
+//            returnStorage.set
+//        }
+//    }
+
+
 }

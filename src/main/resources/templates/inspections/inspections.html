@@ -7,6 +7,14 @@
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/common.css">
+    <style>
+      .delete-btn {
+        color: #dc3545;
+      }
+      .delete-btn:hover {
+        color: #b02a37;
+      }
+    </style>
   </th:block>
 </head>
 <body>
@@ -49,22 +57,21 @@
             <thead>
             <tr>
               <th>검수ID</th>
-              <th>검수자</th>
               <th>검수유형ID</th>
               <th>검수유형</th>
+              <th>검수일자</th>
+              <th>검수자</th>
+              <th>검수상태</th>
               <th>검수수량</th>
               <th>정상수량</th>
               <th>불량수량</th>
-              <th>검수상태</th>
-              <th>검수일자</th>
               <th>액션</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="inspection : ${inspectionList.content}" th:if="${inspectionList.content != null}">
               <td th:text="${inspection.inspectionId}"></td>
-              <td th:text="${inspection.userName}"></td>
-              <td th:text="${inspection.transactionId != null ? inspection.transactionId : '-'}"></td>
+              <td th:text="${inspection.transactionId != null ? inspection.transactionId : '상시'}"></td>
               <td>
                 <span class="status-badge"
                     th:classappend="${inspection.transactionType == '상시' ? 'status-active' :
@@ -74,24 +81,32 @@
                                     (inspection.transactionType == '출고반품' ? 'status-resigned' : ''))))}"
                     th:text="${inspection.transactionType}">상시</span>
               </td>
+              <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>
+              <td th:text="${inspection.userName}"></td>
+              <td>
+                <span class="status-badge"
+                      th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
+                                    (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
+                                    (inspection.inspectionStatus == '보류' ? 'status-pending' : ''))}"
+                      th:text="${inspection.inspectionStatus}">이상 없음</span>
+              </td>
               <td th:text="${inspection.inspectionQuantity}"></td>
               <td th:text="${inspection.acceptedQuantity}"></td>
               <td th:text="${inspection.defectiveQuantity}"></td>
-              <td>
-                <span class="status-badge"
-                    th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
-                                    (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
-                                    (inspection.inspectionStatus == '보류' ? 'status-pending' : ''))}"
-                    th:text="${inspection.inspectionStatus}">이상 없음</span>
-              </td>
-              <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>
               <td class="actions">
                 <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="action-button" title="상세보기">
                   <i class="fas fa-eye"></i>
                 </a>
-                <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="action-button" title="수정">
+                <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="action-button" title="수정">
                   <i class="fas fa-edit"></i>
                 </a>
+                <a th:if="${#authorization.expression('hasAnyAuthority(''관리자'', ''매니저'')')}"
+                   href="#" class="action-button delete-btn" title="삭제"
+                   th:data-inspection-id="${inspection.inspectionId}" 
+                   onclick="confirmDelete(this.getAttribute('data-inspection-id')); return false;">
+                  <i class="fas fa-trash"></i>
+                </a>
+                <form th:id="'deleteForm-' + ${inspection.inspectionId}" th:action="@{/inspections/{id}/delete(id=${inspection.inspectionId})}" method="post" style="display:none;"></form>
               </td>
             </tr>
             <!-- 데이터가 없을 경우 -->
@@ -135,8 +150,15 @@
       const params = new URLSearchParams(window.location.search);
       const currentType = params.get('inspectionType');
       const urlSearchType = params.get('searchType');
+      
+      // 삭제 확인 함수
+      function confirmDelete(inspectionId) {
+        if (confirm('정말로 이 검수를 삭제하시겠습니까?')) {
+          document.getElementById('deleteForm-' + inspectionId).submit();
+        }
+      }
+      
       document.addEventListener('DOMContentLoaded', function() {
-
         // 탭 전환
         const tabButtons = document.querySelectorAll('.tab-button');
         tabButtons.forEach(button => {
