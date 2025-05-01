@@ -1,9 +1,12 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesServiceImpl;
+import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -88,7 +91,6 @@ public class SalesController {
     public ModelAndView updateSales(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
 
         SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
-        System.out.println(findDTO);
 
         if (findDTO != null) {
             mv.addObject("salesDTO", findDTO);
@@ -104,10 +106,6 @@ public class SalesController {
     // 수주서 수정
     @PatchMapping("/update/{salesId}")
     public String updateSales(@PathVariable Integer salesId, @Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
-        System.out.println("수주서 수정 con 동작");
-        System.out.println("test: productIds"+salesDTO.getProductIds());
-        System.out.println("test: 수량 가져오는지"+salesDTO.getQuantity());
-
         SalesDTO updatedDTO = salesServiceImpl.updateSales(salesId, salesDTO);
         String resultUrl = null;
 
@@ -138,4 +136,28 @@ public class SalesController {
 
         return resultUrl;
     }
+
+    // 점포명 검색하기(한글자만 입력해도 포함된거 다 가져옴)
+    @GetMapping("/search/stores")
+    @ResponseBody
+    public List<StoreDTO> searchStores(@RequestParam(name = "storeSearchName") String storeName) {
+        List<StoreDTO> searchStoreResults = salesServiceImpl.searchStoresByName(storeName);
+        return searchStoreResults;
+    }
+
+    /*// 상품 검색하기(재고에서 조회하는거라 상품명 입력하면 총 재고 가져옴
+    @GetMapping("/search/products")
+    @ResponseBody
+    public List<InventoryViewDTO> searchProducts(@RequestParam(name = "productSearchName") String productName) {
+        List<InventoryViewDTO> searchProductResults = salesServiceImpl.searchProductsByName(productName);
+        return searchProductResults;
+    }
+
+    // 담당자 검색하기
+    @GetMapping("/search/users")
+    @ResponseBody
+    public List<UserDTO> searchUsers(@RequestParam(name = "userSearchName") String userName) {
+        List<UserDTO> searchUsersResults = salesServiceImpl.searchUsersByName(userName);
+        return searchUsersResults;
+    }*/
 }

@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryService;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
@@ -12,6 +13,7 @@ import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
 import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
 import com.ohgiraffers.warehousemanagement.wms.store.service.StoreService;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +47,12 @@ public class SalesServiceImpl implements SalesService {
 
     public List<SalesDTO> getAllSales() {
         // 비즈니스로직 아직 추가안함!!
-        List<Sales> findAll = salesRepository.findAll();
+        // 조회해서 등록한거 최신순으로 보여줌
+        List<Sales> findAll = salesRepository.findAllByOrderBySalesIdDesc();
         List<SalesDTO> salesLists = new ArrayList<>();
 
         // 수주 상품 목록 Sales 엔티티에서 꺼냄
         for (Sales salesEntity : findAll) {
-            System.out.println(salesEntity);
             LogUserDTO user = userService.getUserInfoForLogging(salesEntity.getUserId());
             StoreDTO store = storeService.findById(salesEntity.getStoreId());
             SalesDTO salesDTO = new SalesDTO(
@@ -160,7 +162,6 @@ public class SalesServiceImpl implements SalesService {
     public SalesDTO updateSales(Integer salesId, SalesDTO salesDTO) {
         Sales findSales = salesRepository.findById(salesId).orElseThrow(
                 () -> new NullPointerException("수정할 수주 데이터 없음"));
-        System.out.println("수주서 수정 sv에서 entity 조회 : " + findSales);
 
         // 사용자가 수정한값과 기존값이 다를때만 수정함!
         if (!Objects.equals(salesDTO.getStoreId(), findSales.getStoreId())) {
@@ -183,12 +184,9 @@ public class SalesServiceImpl implements SalesService {
         findSales.setSalesUpdatedAt(LocalDateTime.now());
         Sales savedEntity = salesRepository.save(findSales);
 
-        System.out.println("salesItems 조회 : " + salesItemsRepository.findBySalesId(findSales));
-
         // 이 sales Id를 가진 수주 물품 목록 삭제하고
         salesItemsRepository.deleteBySalesId(findSales);
-        System.out.println("삭제됐는지");
-        
+
         // 새로등록할거. 어차피 수주 등록상태에서만 수정 가능하기 때문에 출고로 아예 넘어가지 않은 상태라 수정하지 않은 상품들도 로트넘버를 새로 갱신해줘도 상관없음
         List<SalesItem> newItems = new ArrayList<>();
         for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
@@ -226,6 +224,21 @@ public class SalesServiceImpl implements SalesService {
         findSales.setSalesUpdatedAt(LocalDateTime.now());
         return true;
     }
+
+    public List<StoreDTO> searchStoresByName(String storeName) {
+        List<StoreDTO> searchResults = storeService.searchByNameContainingAndIsDeletedTrue(storeName);
+        return searchResults;
+    }
+
+    /*public List<InventoryViewDTO> searchProductsByName(String productName) {
+        List<InventoryViewDTO> searchResults = inventoryService.searchByNameContainingAndIsDeletedTrue(productName);
+        return searchResults;
+    }
+
+    public List<UserDTO> searchUsersByName(String userName) {
+        List<UserDTO> searchResults = userService.searchByNameContainingAndIsDeletedTrue(userName);
+        return searchResults;
+    }*/
 
     @Override
     public Sales getSalesBySalesId(Integer salesId) {

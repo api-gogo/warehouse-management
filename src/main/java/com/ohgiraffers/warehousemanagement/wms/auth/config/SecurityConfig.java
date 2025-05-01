@@ -86,6 +86,7 @@ public class SecurityConfig {
             // 출고 부서
             auth.requestMatchers("/shipments/**").hasAnyAuthority("출고_사원", "출고_매니저", "출고_관리자", "통합_관리자");
             // 재고 부서
+            auth.requestMatchers("/inventories/delete/{id:\\d+}").hasAnyAuthority( "재고_관리자", "통합_관리자");
             auth.requestMatchers("/inventories/**").hasAnyAuthority("재고_사원", "재고_매니저", "재고_관리자", "통합_관리자");
             // 검수 부서
             auth.requestMatchers("/inspections/**").hasAnyAuthority("검수_사원", "검수_매니저", "검수_관리자", "통합_관리자");
@@ -93,7 +94,8 @@ public class SecurityConfig {
             auth.requestMatchers("/returns/**").hasAnyAuthority("반품_사원", "반품_매니저", "반품_관리자", "통합_관리자");
             // 발주 부서
             auth.requestMatchers("/purchases/delete/{id:\\d+}", "/purchases/complete/{id:\\d+}").hasAnyAuthority("발주_매니저", "발주_관리자", "통합_관리자");
-            auth.requestMatchers("/purchases/**").hasAnyAuthority("반품_사원", "반품_매니저", "반품_관리자", "통합_관리자");
+            auth.requestMatchers("/purchases/**").hasAnyAuthority("발주_사원", "발주_매니저", "발주_관리자", "통합_관리자");
+            auth.requestMatchers("/suppliers/**").hasAnyAuthority("발주_사원", "발주_매니저", "발주_관리자", "통합_관리자");
             // 수주 부서
             auth.requestMatchers("/sales/**", "/stores/**").hasAnyAuthority("수주_사원", "수주_매니저", "수주_관리자", "통합_관리자");
             // 상품 부서
