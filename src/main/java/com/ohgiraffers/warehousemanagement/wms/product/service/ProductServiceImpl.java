@@ -139,7 +139,6 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 상품을 찾을 수 없습니다: " + id));
         return convertToResponseDTO(product);
     }
-
     /**
      * ID로 상품 엔티티를 조회하는 메서드
      * @param productId 상품 ID
