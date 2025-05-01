@@ -5,7 +5,6 @@ import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.Inventory;
 import com.ohgiraffers.warehousemanagement.wms.supplier.model.entity.Supplier;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,38 +16,37 @@ import java.util.List;
  */
 @Entity
 @Table(name = "products")
-@Where(clause = "is_deleted = false") // 삭제되지 않은 상품만 조회 (is_deleted = false)
 public class Product {
 
-    // 상품ID (Primary Key)
+    // 상품의 고유 식별자 (Primary Key)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id", nullable = false)
     private Integer productId;
 
-    //  카테고리 (다대일)
+    // 상품이 속한 카테고리와의 다대일 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    // 거래처ID (다대일)
+    // 상품의 거래처와의 다대일 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id", nullable = false)
     private Supplier supplier;
 
-    // 담당자 ID
+    // 상품의 담당자 ID (User 엔티티와 외래 키 관계 없음)
     @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     // 상품 이름
     @Column(name = "product_name", length = 50, nullable = false)
     private String productName;
 
-    // 상품 유통기한
+    // 상품의 유통기한 (일 단위)
     @Column(name = "expiration_date", nullable = false)
     private Integer expirationDate;
 
-    // 상품 보관 방법
+    // 상품의 보관 방법
     @Column(name = "storage_method", length = 20, nullable = false)
     private String storageMethod;
 
@@ -65,29 +63,36 @@ public class Product {
     private LocalDateTime productCreatedAt;
 
     // 상품 수정 시간
-    @CreationTimestamp // 엔티티 업데이트 시 자동으로 현재 시간 설정
+    @CreationTimestamp
     @Column(name = "product_updated_at", columnDefinition = "DATETIME")
     private LocalDateTime productUpdatedAt;
 
     // 상품 삭제 시간
-    @CreationTimestamp // 엔티티 삭제 시 자동으로 현재 시간 설정
+    @CreationTimestamp
     @Column(name = "product_deleted_at", columnDefinition = "DATETIME")
     private LocalDateTime productDeletedAt;
 
-    // 상품 삭제 여부 (소프트딜리트)
+    // 상품 삭제 여부 (논리적 삭제)
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
+
+    // 상품 상태 (대기, 승인, 거절, 삭제)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'APPROVED'")
+    private ProductStatus status;
 
     // 상품과 관련된 재고 목록과의 일대다 관계
     @OneToMany(mappedBy = "product")
     private List<Inventory> inventories = new ArrayList<>();
 
-
-    //생성자
+    // 상품 상태를 정의하는 ENUM
+    public enum ProductStatus {
+        PENDING_CREATE, PENDING_UPDATE, PENDING_DELETE, APPROVED, REJECTED, DELETED
+    }
 
     public Product() {}
 
-    public Product(Integer productId, Category category, Supplier supplier, Integer userId, String productName, Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt, LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
+    public Product(Integer productId, Category category, Supplier supplier, Long userId, String productName, Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt, LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted, ProductStatus status) {
         this.productId = productId;
         this.category = category;
         this.supplier = supplier;
@@ -101,10 +106,9 @@ public class Product {
         this.productUpdatedAt = productUpdatedAt;
         this.productDeletedAt = productDeletedAt;
         this.isDeleted = isDeleted;
+        this.status = status;
     }
 
-
-    //게터 , 세터
     public Integer getProductId() {
         return productId;
     }
@@ -129,11 +133,11 @@ public class Product {
         this.supplier = supplier;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -208,7 +212,15 @@ public class Product {
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-    // 투 스트링
+
+    public ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProductStatus status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -225,6 +237,7 @@ public class Product {
                 ", productUpdatedAt=" + productUpdatedAt +
                 ", productDeletedAt=" + productDeletedAt +
                 ", isDeleted=" + isDeleted +
+                ", status=" + status +
                 '}';
     }
 }

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="/common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sales/inputSearchBox.css">
 </head>
 <body>
 <div class="layout" th:with="activeMenu='dashboard'">
@@ -36,14 +37,13 @@
                 <div class="common-content">
                     <!-- 등록 폼 시작 -->
                     <form th:action="@{/sales/create}" method="post">
-
-                        <!-- 점포 ID -->
-                        <div class="form-group mb-4">
-                            <label for="storeId">점포 ID</label>
-                            <input type="text" id="storeId" name="storeId" class="form-control" placeholder="점포 ID를 입력하세요" required>
+                        <div class="form-group mb-4" style="position: relative;">
+                            <label for="storeSearchInput">점포명</label>
+                            <input type="text" id="storeSearchInput" name="storeSearchName" class="form-control" placeholder="점포명을 입력하세요" autocomplete="off" required>
+                            <input type="hidden" id="storeId" name="storeId" />
+                            <ul id="storeSuggestions" class="suggestion-list"></ul>
                         </div>
 
-                        <!-- 수주일 -->
                         <div class="form-group mb-4">
                             <label for="salesDate">수주일</label>
                             <input type="date" id="salesDate" name="salesDate" class="form-control" required>
@@ -114,15 +114,15 @@
                         const itemRow = document.createElement('div');
                         itemRow.className = 'item-row mb-3';
                         itemRow.innerHTML = `
-          <div class="item-header">
-            <strong>물품 ${itemIndex + 1}</strong>
-            <button type="button" class="btn btn-outline-danger btn-sm remove-item">
-              <i class="fas fa-times"></i> 삭제
-            </button>
-          </div>
-          <input type="text" name="productIds[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
-          <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
-        `;
+                              <div class="item-header">
+                                <strong>물품 ${itemIndex + 1}</strong>
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                                  <i class="fas fa-times"></i> 삭제
+                                </button>
+                              </div>
+                              <input type="text" name="productIds[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
+                              <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
+                        `;
                         document.getElementById('items-container').appendChild(itemRow);
                         itemIndex++;
 
@@ -140,6 +140,42 @@
                     });
 
                     updateItemHeaders(); // 최초 1개만 있을 때 삭제버튼 숨김
+
+                    // 수주일-> 오늘날짜로 기본 설정하기
+                    document.getElementById('salesDate').value = new Date().toISOString().substring(0, 10);
+
+                    document.getElementById("storeSearchInput").addEventListener("input", function () {
+                        const keyword = this.value;
+
+                        if (keyword.length < 1) {
+                            document.getElementById("storeSuggestions").innerHTML = "";
+                            return;
+                        }
+
+                        fetch(`/sales/search/stores?storeSearchName=${encodeURIComponent(keyword)}`)
+                            .then(response => {
+                                if (!response.ok) throw new Error("서버 오류 발생");
+                                return response.json();
+                            })
+                            .then(data => {
+                                const list = document.getElementById("storeSuggestions");
+                                list.innerHTML = "";
+
+                                data.forEach(store => {
+                                    const li = document.createElement("li");
+                                    li.textContent = `${store.storeName} (${store.storeAddress})`;
+                                    li.addEventListener("click", function () {
+                                        document.getElementById("storeSearchInput").value = store.storeName;
+                                        document.getElementById("storeId").value = store.storeId;
+                                        list.innerHTML = "";
+                                    });
+                                    list.appendChild(li);
+                                });
+                            })
+                            .catch(error => {
+                                console.error("검색 실패:", error);
+                            });
+                    });
                 });
             </script>
         </main>

@@ -19,6 +19,7 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
     @Query("SELECT i FROM Inspection i WHERE " +
             "(:searchType = 'inspectionId' AND STR(i.inspectionId) = :search) OR " +
             "(:searchType = 'userId' AND STR(i.user.userId) = :search) OR " +
+            "(:searchType = 'userName' AND STR(i.user.userName) LIKE CONCAT('%', :search, '%')) OR " +
             "(:searchType = 'transactionId' AND STR(i.transactionId) = :search) OR " +
             "(:searchType = 'inspectionDate' AND STR(i.inspectionDate) LIKE CONCAT('%', :search, '%')) " +
             "ORDER BY i.inspectionId DESC")
@@ -27,6 +28,7 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
     @Query("SELECT i FROM Inspection i WHERE i.transactionType = :inspectionTransactionType AND (" +
             "(:searchType = 'inspectionId' AND STR(i.inspectionId) = :search) OR " +
             "(:searchType = 'userId' AND STR(i.user.userId) = :search) OR " +
+            "(:searchType = 'userName' AND STR(i.user.userName) LIKE CONCAT('%', :search, '%')) OR " +
             "(:searchType = 'transactionId' AND STR(i.transactionId) = :search) OR " +
             "(:searchType = 'inspectionDate' AND STR(i.inspectionDate) LIKE CONCAT('%', :search, '%'))" +
             ") ORDER BY i.inspectionId DESC")

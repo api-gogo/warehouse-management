@@ -1,123 +1,99 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/default-layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
     <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
     <title>WMS - 발주 상세 정보</title>
-    <!-- 폰트어썸 아이콘 (CDN) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* 기본 스타일 - 최소화 */
-        * {margin: 0; padding: 0; box-sizing: border-box;}
-        body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f9fafb; color: #111827; line-height: 1.5;}
-        a {text-decoration: none; color: inherit;}
-        ul {list-style: none;}
-        button {background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;}
+    <!-- Page-specific CSS -->
+    <th:block layout:fragment="css">
+        <style>
+            /* Styling consistent with purchases.html */
+            .page-content { padding: 1.5rem; min-height: 100vh; }
+            .card { background-color: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+            .card-header { padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+            .card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; }
+            .card-description { font-size: 0.875rem; color: #6b7280; }
+            .card-content { padding: 1rem; }
 
-        /* 레이아웃 */
-        .page-content {padding: 1.5rem; min-height: 100vh;}
-        .card {background-color: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); margin-bottom: 1.5rem;}
-        .card-header {padding: 1rem; border-bottom: 1px solid #e5e7eb;}
-        .card-title {font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem;}
-        .card-description {font-size: 0.875rem; color: #6b7280;}
-        .card-content {padding: 1rem;}
+            .btn { display: inline-flex; align-items: center; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; }
+            .btn-primary { background-color: #2563eb; color: #fff; border: none; }
+            .btn-primary:hover { background-color: #1d4ed8; }
+            .btn-outline { background-color: transparent; border: 1px solid #d1d5db; color: #374151; }
+            .btn-outline:hover { background-color: #f3f4f6; }
+            .btn-danger { background-color: #ef4444; color: #fff; border: none; }
+            .btn-danger:hover { background-color: #dc2626; }
+            .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+            .btn i { margin-right: 0.5rem; }
 
-        /* 버튼 스타일 */
-        .btn {display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; border-radius: 0.25rem; transition: all 0.2s;}
-        .btn-primary {background-color: #3b82f6; color: white;}
-        .btn-primary:hover {background-color: #2563eb;}
-        .btn-outline {background-color: transparent; border: 1px solid #e5e7eb; color: #111827;}
-        .btn-outline:hover {background-color: #f9fafb;}
-        .btn-danger {background-color: #ef4444; color: white;}
-        .btn-danger:hover {background-color: #dc2626;}
-        .btn-sm {padding: 0.25rem 0.5rem; font-size: 0.75rem;}
-        .btn i {margin-right: 0.5rem;}
+            .table-container { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 1rem; }
+            .table { width: 100%; border-collapse: collapse; }
+            .table th, .table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+            .table th { font-weight: 500; color: #6b7280; background-color: #f9fafb; font-size: 0.875rem; }
+            .table tr:last-child td { border-bottom: none; }
+            .table td { font-size: 0.875rem; }
+            .table .text-right { text-align: right; }
 
-        /* 테이블 */
-        .table-container {overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 1rem;}
-        .table {width: 100%; border-collapse: collapse;}
-        .table th, .table td {padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;}
-        .table th {font-weight: 500; color: #6b7280; background-color: #f9fafb; font-size: 0.875rem;}
-        .table tr:last-child td {border-bottom: none;}
-        .table td {font-size: 0.875rem;}
-        .table .text-right {text-align: right;}
+            .badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; border: 1px solid transparent; }
+            .badge-outline { border-color: #e5e7eb; }
+            .badge-success { background-color: rgba(16, 185, 129, 0.1); color: #065f46; }
+            .badge-warning { background-color: rgba(245, 158, 11, 0.1); color: #92400e; }
+            .badge-info { background-color: rgba(99, 102, 241, 0.1); color: #4f46e5; }
+            .badge-danger { background-color: rgba(239, 68, 68, 0.1); color: #b91c1c; }
 
-        /* 상태 배지 */
-        .badge {display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; border: 1px solid transparent;}
-        .badge-outline {border-color: #e5e7eb;}
-        .badge-success {background-color: rgba(16, 185, 129, 0.1); color: #065f46;}
-        .badge-warning {background-color: rgba(245, 158, 11, 0.1); color: #92400e;}
-        .badge-info {background-color: rgba(99, 102, 241, 0.1); color: #4f46e5;}
-        .badge-danger {background-color: rgba(239, 68, 68, 0.1); color: #b91c1c;}
+            .flex { display: flex; }
+            .items-center { align-items: center; }
+            .justify-between { justify-content: space-between; }
+            .justify-end { justify-content: flex-end; }
+            .space-x-2 > * + * { margin-left: 0.5rem; }
+            .page-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; }
+            .text-lg { font-size: 1.125rem; }
+            .font-bold { font-weight: 700; }
+            .text-gray-700 { color: #374151; }
+            .mt-4 { margin-top: 1rem; }
+            .mb-2 { margin-bottom: 0.5rem; }
+            .mb-4 { margin-bottom: 1rem; }
+            .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+            .px-4 { padding-left: 1rem; padding-right: 1rem; }
+            .border-t { border-top: 1px solid #e5e7eb; }
+            .text-right { text-align: right; }
 
-        /* 유틸리티 클래스 */
-        .flex {display: flex;}
-        .items-center {align-items: center;}
-        .justify-between {justify-content: space-between;}
-        .justify-end {justify-content: flex-end;}
-        .space-x-2 > * + * {margin-left: 0.5rem;}
-        .font-medium {font-weight: 500;}
-        .page-title {font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;}
-        .text-lg {font-size: 1.125rem;}
-        .font-bold {font-weight: 700;}
-        .text-gray-700 {color: #374151;}
-        .mt-4 {margin-top: 1rem;}
-        .mb-2 {margin-bottom: 0.5rem;}
-        .mb-4 {margin-bottom: 1rem;}
-        .py-2 {padding-top: 0.5rem; padding-bottom: 0.5rem;}
-        .px-4 {padding-left: 1rem; padding-right: 1rem;}
-        .border-t {border-top: 1px solid #e5e7eb;}
-        .text-right {text-align: right;}
-
-        /* 추가된 스타일 - 상품 추가 및 폼 요소 */
-        .form-group {margin-bottom: 1rem;}
-        .form-control {display: block; width: 100%; padding: 0.5rem 0.75rem; font-size: 0.875rem; line-height: 1.5; color: #111827; background-color: #fff; background-clip: padding-box; border: 1px solid #e5e7eb; border-radius: 0.25rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;}
-        .form-control:focus {border-color: #3b82f6; outline: 0; box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);}
-        .form-control[readonly] {background-color: #f9fafb; cursor: not-allowed;}
-        .form-inline {display: flex; align-items: flex-end; flex-wrap: wrap; gap: 1rem;}
-        .form-inline .form-group {flex: 1; min-width: 120px;}
-        .form-inline .btn {flex-shrink: 0;}
-        
-        /* 폼 레이블 스타일 */
-        .form-label {display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: #374151;}
-        
-        /* 폼 입력 필드 추가 스타일 */
-        textarea.form-control {min-height: 60px; resize: vertical;}
-        
-        /* 폼 행과 열 스타일 */
-        .form-row {display: flex; flex-wrap: wrap; margin-right: -0.5rem; margin-left: -0.5rem;}
-        .form-col {flex: 1; padding: 0 0.5rem;}
-        
-        /* 상품 정보 스타일 */
-        .product-info {margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;}
-    </style>
+            .form-group { margin-bottom: 1rem; }
+            .form-control { display: block; width: 100%; padding: 0.5rem 0.75rem; font-size: 0.875rem; line-height: 1.5; color: #111827; background-color: #fff; border: 1px solid #e5e7eb; border-radius: 0.25rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+            .form-control:focus { border-color: #3b82f6; outline: 0; box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25); }
+            .form-control[readonly] { background-color: #f9fafb; cursor: not-allowed; }
+            .form-row { display: flex; flex-wrap: wrap; margin-right: -0.5rem; margin-left: -0.5rem; }
+            .form-col { flex: 1; padding: 0 0.5rem; }
+            .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+            textarea.form-control { min-height: 60px; resize: vertical; }
+            .product-info { margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280; }
+        </style>
 </head>
 <body>
-
-<!-- 페이지 콘텐츠 영역 - 발주 상세 정보 페이지 -->
-<main class="page-content">
+<!-- Page content -->
+<th:block layout:fragment="content" th:with="activeMenu='purchase'">
     <div class="flex items-center justify-between">
         <h1 class="page-title">발주 상세 정보</h1>
         <div class="flex items-center space-x-2">
             <a th:href="@{/purchases}" class="btn btn-outline btn-sm">
-                <i class="fas fa-arrow-left"></i>
-                목록으로
+                <i class="fas fa-arrow-left"></i> 목록으로
             </a>
         </div>
     </div>
 
-    <!-- 발주 정보 카드 -->
+    <!-- Purchase Info Card -->
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">발주 기본 정보</h2>
             <p class="card-description" th:text="'발주 ID: ' + ${purchase.purchaseId}">발주 ID: 123</p>
         </div>
         <div class="card-content">
-            <!-- 발주 정보 직접 수정 폼 -->
+            <!-- Editable Form for 발주대기 -->
             <form th:if="${purchase.purchaseStatus == '발주대기'}" th:action="@{/purchases/update/{id}(id=${purchase.purchaseId})}" method="post" id="purchaseForm">
-                <!-- 숨겨진 필드로 원래 ID 값과 생성일을 유지 -->
                 <input type="hidden" name="purchaseId" th:value="${purchase.purchaseId}">
                 <input type="hidden" name="purchaseCreatedAt" th:value="${purchase.purchaseCreatedAt}">
                 <input type="hidden" name="purchaseUpdatedAt" th:value="${purchase.purchaseUpdatedAt}">
@@ -131,34 +107,39 @@
                             <td th:text="${purchase.purchaseId}">123</td>
                             <th>담당자</th>
                             <td>
-                                <input type="number" name="userId" class="form-control" th:value="${purchase.userId}" required>
+                                <input type="number" name="userId" class="form-control" th:value="${purchase.userId}" readonly style="background-color: #f9fafb;" required>
                             </td>
+                        </tr>
+                        <tr>
+                            <th>거래처 ID</th>
+                            <td th:text="${purchase.supplierId ?: '정보 없음'}">-</td>
+                            <th>생성일</th>
+                            <td th:text="${#temporals.format(purchase.purchaseCreatedAt, 'yyyy-MM-dd')}">2024-04-20</td>
                         </tr>
                         <tr>
                             <th>발주일</th>
                             <td>
-                                <input type="date" id="purchaseDate" name="purchaseDate" class="form-control" 
-                                       th:value="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd')}" required>
+                                <input type="date" id="purchaseDate" name="purchaseDate" class="form-control" th:value="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd')}" required>
                             </td>
                             <th>납기일</th>
                             <td>
-                                <input type="date" id="purchaseDueDate" name="purchaseDueDate" class="form-control" 
-                                       th:value="${#temporals.format(purchase.purchaseDueDate, 'yyyy-MM-dd')}" readonly required>
+                                <input type="date" id="purchaseDueDate" name="purchaseDueDate" class="form-control" th:value="${#temporals.format(purchase.purchaseDueDate, 'yyyy-MM-dd')}" readonly required>
                             </td>
                         </tr>
                         <tr>
                             <th>상태</th>
                             <td>
-                                <span class="badge badge-outline"
-                                      th:classappend="${
-                                        purchase.purchaseStatus == '발주대기' ? 'badge-info' :
-                                        purchase.purchaseStatus == '발주완료' ? 'badge-success' :
-                                        purchase.purchaseStatus == '발주거절' ? 'badge-danger' : 'badge-warning'
-                                      }"
-                                      th:text="${purchase.purchaseStatus}">발주대기</span>
+                  <span class="badge badge-outline"
+                        th:classappend="${
+                          purchase.purchaseStatus == '발주대기' ? 'badge-info' :
+                          purchase.purchaseStatus == '발주완료' ? 'badge-success' :
+                          purchase.purchaseStatus == '발주거절' ? 'badge-danger' : 'badge-warning'
+                        }"
+
+                        th:text="${purchase.purchaseStatus}">발주대기</span>
                             </td>
-                            <th>생성일</th>
-                            <td th:text="${#temporals.format(purchase.purchaseCreatedAt, 'yyyy-MM-dd')}">2024-04-20</td>
+                            <th>발주일시</th>
+                            <td th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd')}">2024-04-20</td>
                         </tr>
                         <tr>
                             <th>수정일</th>
@@ -170,15 +151,14 @@
                         </tr>
                     </table>
                 </div>
-                <!-- 변경 저장 버튼 -->
                 <div class="flex justify-end mt-2">
                     <button type="submit" class="btn btn-primary btn-sm">
                         <i class="fas fa-save"></i> 정보 저장
                     </button>
                 </div>
             </form>
-            
-            <!-- 발주 정보 읽기 전용 표시 (발주대기 상태가 아닐 때) -->
+
+            <!-- Read-only Display for Non-발주대기 -->
             <div th:unless="${purchase.purchaseStatus == '발주대기'}" class="table-container">
                 <table class="table">
                     <tr>
@@ -196,13 +176,13 @@
                     <tr>
                         <th>상태</th>
                         <td>
-                            <span class="badge badge-outline"
-                                  th:classappend="${
-                                    purchase.purchaseStatus == '발주대기' ? 'badge-info' :
-                                    purchase.purchaseStatus == '발주완료' ? 'badge-success' :
-                                    purchase.purchaseStatus == '발주거절' ? 'badge-danger' : 'badge-warning'
-                                  }"
-                                  th:text="${purchase.purchaseStatus}">발주대기</span>
+                <span class="badge badge-outline"
+                      th:classappend="${
+                        purchase.purchaseStatus == '발주대기' ? 'badge-info' :
+                        purchase.purchaseStatus == '발주완료' ? 'badge-success' :
+                        purchase.purchaseStatus == '발주거절' ? 'badge-danger' : 'badge-warning'
+                      }"
+                      th:text="${purchase.purchaseStatus}">발주대기</span>
                         </td>
                         <th>생성일</th>
                         <td th:text="${#temporals.format(purchase.purchaseCreatedAt, 'yyyy-MM-dd')}">2024-04-20</td>
@@ -216,9 +196,9 @@
                 </table>
             </div>
 
-            <!-- 발주 상태에 따른 버튼 표시 -->
+            <!-- Status Buttons -->
             <div class="flex justify-end space-x-2 mt-4">
-                <!-- 발주 대기 상태일 때만 표시되는 버튼들 -->
+                <!-- 상태 변경 버튼들은 발주대기 상태일 때만 표시 -->
                 <div th:if="${purchase.purchaseStatus == '발주대기'}" class="flex space-x-2">
                     <form th:action="@{/purchases/complete/{id}(id=${purchase.purchaseId})}" method="post" style="display: inline;">
                         <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('발주를 완료 처리하시겠습니까?')">
@@ -230,13 +210,11 @@
                             <i class="fas fa-times"></i> 거절
                         </button>
                     </form>
-                    <a th:href="@{/purchases/cancel/{id}(id=${purchase.purchaseId})}" class="btn btn-outline btn-sm"
-                       onclick="return confirm('정말 취소하시겠습니까?')">
+                    <a th:href="@{/purchases/cancel/{id}(id=${purchase.purchaseId})}" class="btn btn-outline btn-sm" onclick="return confirm('정말 취소하시겠습니까?')">
                         <i class="fas fa-ban"></i> 취소
                     </a>
                 </div>
-
-                <!-- 모든 상태에서 항상 표시되는 삭제 버튼 -->
+                <!-- 삭제 버튼은 모든 상태(발주대기, 발주완료, 발주거절, 발주취소)에서 표시됩니다 -->
                 <form th:action="@{/purchases/delete/{id}(id=${purchase.purchaseId})}" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('정말 발주를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
                         <i class="fas fa-trash-alt"></i> 삭제
@@ -246,14 +224,13 @@
         </div>
     </div>
 
-    <!-- 상품 목록 카드 -->
+    <!-- Items Card -->
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">발주 상품 목록</h2>
             <p class="card-description">이 발주에 포함된 상품 목록입니다.</p>
         </div>
         <div class="card-content">
-            <!-- 발주 대기 상태일 때만 상품 추가 폼 표시 -->
             <div th:if="${purchase.purchaseStatus == '발주대기'}" class="mb-4">
                 <h3 class="text-lg font-medium mb-2">상품 추가</h3>
                 <div class="form-row">
@@ -294,21 +271,18 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <!-- 상품 목록 데이터가 있는 경우 -->
                     <tr th:each="item, itemStat : ${purchaseItems}" th:if="${purchaseItems != null && !purchaseItems.empty}">
                         <td th:text="${item.productId}">1001</td>
                         <td th:text="${item.productName}">상품명</td>
                         <td th:text="${#numbers.formatInteger(item.pricePerBox, 0, 'COMMA')} + '원'">10,000원</td>
                         <td th:text="${item.productQuantity}">5</td>
-                        <td class="text-right"
-                            th:text="${#numbers.formatInteger(item.pricePerBox * item.productQuantity, 0, 'COMMA')} + '원'">50,000원</td>
+                        <td class="text-right" th:text="${#numbers.formatInteger(item.pricePerBox * item.productQuantity, 0, 'COMMA')} + '원'">50,000원</td>
                         <td th:if="${purchase.purchaseStatus == '발주대기'}">
                             <button type="button" class="btn btn-danger btn-sm" th:onclick="'removeProduct(' + ${itemStat.index} + ', this)'">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>
-                    <!-- 상품 목록 데이터가 없는 경우 -->
                     <tr th:if="${purchaseItems == null || purchaseItems.empty}" id="noProductsRow">
                         <td colspan="6" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>
                     </tr>
@@ -316,7 +290,6 @@
                 </table>
             </div>
 
-            <!-- 총 금액 표시 -->
             <div class="flex justify-end py-2 px-4 border-t mt-4">
                 <div class="text-right">
                     <div class="mb-2 text-gray-700">총 상품 수량: <span id="totalQuantity" th:text="${totalQuantity ?: 0}">0</span>개</div>
@@ -324,7 +297,6 @@
                 </div>
             </div>
 
-            <!-- 발주 대기 상태일 때만 저장 버튼 표시 -->
             <div th:if="${purchase.purchaseStatus == '발주대기'}" class="flex justify-end mt-4">
                 <button type="button" id="saveItemsBtn" class="btn btn-primary">
                     <i class="fas fa-save"></i> 상품 목록 저장
@@ -332,330 +304,286 @@
             </div>
         </div>
     </div>
-</main>
+</th:block>
 
-<!-- 자바스크립트 영역 - 발주 상품 정보 가져오기 -->
-<script th:inline="javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    const purchaseId = [[${purchase.purchaseId}]];
-    let products = [];
-    let currentProduct = null;
-    
-    // 발주일 입력란에 이벤트 리스너 추가
-    const purchaseDateInput = document.getElementById('purchaseDate');
-    const purchaseDueDateInput = document.getElementById('purchaseDueDate');
-    
-    if (purchaseDateInput && purchaseDueDateInput) {
-        // 발주일이 변경될 때 납기일 자동 업데이트 (7일 후)
-        purchaseDateInput.addEventListener('change', function() {
-            if(this.value) {
-                const newPurchaseDate = new Date(this.value);
-                const newDueDate = new Date(newPurchaseDate);
-                newDueDate.setDate(newDueDate.getDate() + 7);
-                purchaseDueDateInput.value = newDueDate.toISOString().split('T')[0];
-            }
-        });
-    }
-    
-    // 폼 제출 전 상품 데이터를 JSON으로 변환
-    const purchaseForm = document.getElementById('purchaseForm');
-    if (purchaseForm) {
-        purchaseForm.addEventListener('submit', function(event) {
-            // 테이블에서 상품 목록 수집
-            const productsList = [];
-            const rows = document.querySelectorAll('#productsTable tbody tr:not(#noProductsRow)');
-            
-            rows.forEach(row => {
-                const cols = row.querySelectorAll('td');
-                if (cols.length >= 5) {
-                    productsList.push({
-                        productId: parseInt(cols[0].textContent),
-                        productName: cols[1].textContent,
-                        price: parseInt(cols[2].textContent.replace(/[^0-9]/g, '')),
-                        quantity: parseInt(cols[3].textContent)
-                    });
-                }
-            });
-            
-            // 수집한 데이터를 hidden 필드에 설정
-            document.getElementById('purchaseItemsData').value = JSON.stringify(productsList);
-        });
-    }
+<!-- Page-specific scripts -->
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const purchaseId = [[${purchase.purchaseId}]];
+            let products = [];
+            let currentProduct = null;
 
-    // 페이지 로드 시 테이블에서 제품 정보 수집
-    const loadProductsFromTable = function() {
-        products = []; // 초기화
-        const rows = document.querySelectorAll('#productsTable tbody tr:not(#noProductsRow)');
-        
-        rows.forEach((row, index) => {
-            const cols = row.querySelectorAll('td');
-            if (cols.length >= 5) {
-                const productId = parseInt(cols[0].textContent);
-                const productName = cols[1].textContent;
-                const price = parseInt(cols[2].textContent.replace(/[^0-9]/g, ''));
-                const quantity = parseInt(cols[3].textContent);
-                
-                products.push({
-                    productId: productId,
-                    productName: productName,
-                    price: price,
-                    quantity: quantity
+            const purchaseDateInput = document.getElementById('purchaseDate');
+            const purchaseDueDateInput = document.getElementById('purchaseDueDate');
+
+            if (purchaseDateInput && purchaseDueDateInput) {
+                purchaseDateInput.addEventListener('change', function() {
+                    if(this.value) {
+                        const newPurchaseDate = new Date(this.value);
+                        const newDueDate = new Date(newPurchaseDate);
+                        newDueDate.setDate(newDueDate.getDate() + 7);
+                        purchaseDueDateInput.value = newDueDate.toISOString().split('T')[0];
+                    }
                 });
             }
-        });
-    };
-    
-    // 페이지 로드 시 초기 제품 로드
-    loadProductsFromTable();
 
-    // 상품 ID 입력 필드에 이벤트 리스너 추가
-    const productIdInput = document.getElementById('productIdInput');
-    const productInfoDiv = document.getElementById('productInfo');
-    const quantityInput = document.getElementById('quantityInput');
+            const purchaseForm = document.getElementById('purchaseForm');
+            if (purchaseForm) {
+                purchaseForm.addEventListener('submit', function(event) {
+                    const productsList = [];
+                    const rows = document.querySelectorAll('#productsTable tbody tr:not(#noProductsRow)');
 
-    if (productIdInput) {
-        productIdInput.addEventListener('change', fetchProductInfo);
-        productIdInput.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                fetchProductInfo();
-                quantityInput.focus();
+                    rows.forEach(row => {
+                        const cols = row.querySelectorAll('td');
+                        if (cols.length >= 5) {
+                            productsList.push({
+                                productId: parseInt(cols[0].textContent),
+                                productName: cols[1].textContent,
+                                price: parseInt(cols[2].textContent.replace(/[^0-9]/g, '')),
+                                quantity: parseInt(cols[3].textContent)
+                            });
+                        }
+                    });
+
+                    document.getElementById('purchaseItemsData').value = JSON.stringify(productsList);
+                });
             }
-        });
-    }
-    
-    // 수량 입력 필드에 엔터키 이벤트 리스너 추가
-    if (quantityInput) {
-        quantityInput.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                addProduct();
-            }
-        });
-    }
 
-    // 상품 정보 조회 함수
-    function fetchProductInfo() {
-        const productId = productIdInput.value;
-        
-        if (!productId) {
-            productInfoDiv.innerHTML = '';
-            currentProduct = null;
-            return;
-        }
-        
-        fetch(`/purchases/api/products/${productId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('상품 정보를 불러오는데 실패했습니다.');
-                }
-                return response.json();
-            })
-            .then(product => {
-                console.log('조회된 상품 정보:', product); // 디버깅용
+            const loadProductsFromTable = function() {
+                products = [];
+                const rows = document.querySelectorAll('#productsTable tbody tr:not(#noProductsRow)');
 
-                if (product) {
-                    // 상품 정보 저장
-                    currentProduct = product;
+                rows.forEach((row, index) => {
+                    const cols = row.querySelectorAll('td');
+                    if (cols.length >= 5) {
+                        const productId = parseInt(cols[0].textContent);
+                        const productName = cols[1].textContent;
+                        const price = parseInt(cols[2].textContent.replace(/[^0-9]/g, ''));
+                        const quantity = parseInt(cols[3].textContent);
 
-                    // 상품 정보 표시
-                    const price = product.pricePerBox || 0;
-                    productInfoDiv.innerHTML = `
-                        <div style="margin-top: 0.5rem;">
-                            <strong>${product.productName}</strong> -
-                            ${price.toLocaleString()}원/박스
-                        </div>
-                    `;
-                } else {
-                    productInfoDiv.innerHTML = '<div style="margin-top: 0.5rem; color: #ef4444;">상품 정보를 찾을 수 없습니다.</div>';
-                    currentProduct = null;
-                }
-            })
-            .catch(error => {
-                console.error('오류:', error);
-                productInfoDiv.innerHTML = '<div style="margin-top: 0.5rem; color: #ef4444;">상품 정보를 불러오는데 실패했습니다.</div>';
-                currentProduct = null;
-            });
-    }
-
-    // 상품 추가 버튼 클릭 이벤트
-    const addProductBtn = document.getElementById('addProductBtn');
-    if (addProductBtn) {
-        addProductBtn.addEventListener('click', addProduct);
-    }
-    
-    // 저장 버튼 클릭 이벤트
-    const saveItemsBtn = document.getElementById('saveItemsBtn');
-    if (saveItemsBtn) {
-        saveItemsBtn.addEventListener('click', function() {
-            if(products.length === 0) {
-                alert('저장할 상품이 없습니다. 상품을 추가해주세요.');
-                return;
-            }
-            
-            // 상품 데이터 JSON으로 변환해서 서버에 전송
-            const data = {
-                purchaseId: purchaseId,
-                items: products.map(p => ({
-                    productId: p.productId,
-                    productName: p.productName,
-                    price: p.price,
-                    quantity: p.quantity
-                }))
+                        products.push({
+                            productId: productId,
+                            productName: productName,
+                            price: price,
+                            quantity: quantity
+                        });
+                    }
+                });
             };
-            
-            console.log('저장하려는 데이터:', data);
-            
-            fetch(`/purchases/api/items/update`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('상품 저장에 실패했습니다: ' + text);
+
+            loadProductsFromTable();
+
+            const productIdInput = document.getElementById('productIdInput');
+            const productInfoDiv = document.getElementById('productInfo');
+            const quantityInput = document.getElementById('quantityInput');
+
+            if (productIdInput) {
+                productIdInput.addEventListener('change', fetchProductInfo);
+                productIdInput.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') {
+                        fetchProductInfo();
+                        quantityInput.focus();
+                    }
+                });
+            }
+
+            if (quantityInput) {
+                quantityInput.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') {
+                        addProduct();
+                    }
+                });
+            }
+
+            function fetchProductInfo() {
+                const productId = productIdInput.value;
+
+                if (!productId) {
+                    productInfoDiv.innerHTML = '';
+                    currentProduct = null;
+                    return;
+                }
+
+                fetch(`/purchases/api/products/${productId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('상품 정보를 불러오는데 실패했습니다.');
+                        }
+                        return response.json();
+                    })
+                    .then(product => {
+                        console.log('조회된 상품 정보:', product);
+                        if (product) {
+                            currentProduct = product;
+                            const price = product.pricePerBox || 0;
+                            productInfoDiv.innerHTML = `
+                  <div style="margin-top: 0.5rem;">
+                    <strong>${product.productName}</strong> -
+                    ${price.toLocaleString()}원/박스
+                  </div>
+                `;
+                        } else {
+                            productInfoDiv.innerHTML = '<div style="margin-top: 0.5rem; color: #ef4444;">상품 정보를 찾을 수 없습니다.</div>';
+                            currentProduct = null;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('오류:', error);
+                        productInfoDiv.innerHTML = '<div style="margin-top: 0.5rem; color: #ef4444;">상품 정보를 불러오는데 실패했습니다.</div>';
+                        currentProduct = null;
+                    });
+            }
+
+            const addProductBtn = document.getElementById('addProductBtn');
+            if (addProductBtn) {
+                addProductBtn.addEventListener('click', addProduct);
+            }
+
+            const saveItemsBtn = document.getElementById('saveItemsBtn');
+            if (saveItemsBtn) {
+                saveItemsBtn.addEventListener('click', function() {
+                    if(products.length === 0) {
+                        alert('저장할 상품이 없습니다. 상품을 추가해주세요.');
+                        return;
+                    }
+
+                    const data = {
+                        purchaseId: purchaseId,
+                        items: products.map(p => ({
+                            productId: p.productId,
+                            productName: p.productName,
+                            price: p.price,
+                            quantity: p.quantity
+                        }))
+                    };
+
+                    console.log('저장하려는 데이터:', data);
+
+                    fetch(`/purchases/api/items/update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error('상품 저장에 실패했습니다: ' + text);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(result => {
+                            console.log('저장 결과:', result);
+                            alert('상품 목록이 저장되었습니다.');
+                            window.location.reload();
+                        })
+                        .catch(error => {
+                            console.error('상품 저장 오류:', error);
+                            alert(error.message || '상품 저장에 실패했습니다.');
+                        });
+                });
+            }
+
+            function addProduct() {
+                const productId = productIdInput.value;
+                const quantity = parseInt(quantityInput.value);
+
+                if (!productId || !quantity) {
+                    alert('상품 ID와 수량을 모두 입력해주세요.');
+                    return;
+                }
+
+                if (!currentProduct) {
+                    alert('유효한 상품 정보가 없습니다. 상품 ID를 확인해주세요.');
+                    return;
+                }
+
+                if (quantity <= 0) {
+                    alert('수량은 1 이상이어야 합니다.');
+                    return;
+                }
+
+                const product = {
+                    productId: parseInt(productId),
+                    productName: currentProduct.productName,
+                    price: currentProduct.pricePerBox || 0,
+                    quantity: quantity
+                };
+
+                const existingIndex = products.findIndex(p => p.productId === product.productId);
+
+                if (existingIndex >= 0) {
+                    if (confirm(`'${product.productName}'은(는) 이미 목록에 있습니다. 수량을 추가하시겠습니까? (취소 시 수량을 새로운 값으로 변경)`)) {
+                        products[existingIndex].quantity += quantity;
+                    } else {
+                        products[existingIndex].quantity = quantity;
+                    }
+                    redrawProductTable();
+                } else {
+                    products.push(product);
+                    redrawProductTable();
+                }
+
+                productIdInput.value = '';
+                quantityInput.value = '';
+                productInfoDiv.innerHTML = '';
+                currentProduct = null;
+                productIdInput.focus();
+            }
+
+            window.removeProduct = function(index, button) {
+                if (!confirm('이 상품을 목록에서 삭제하시겠습니까?')) {
+                    return;
+                }
+
+                products.splice(index, 1);
+                redrawProductTable();
+            };
+
+            function redrawProductTable() {
+                const tableBody = document.querySelector('#productsTable tbody');
+                tableBody.innerHTML = '';
+
+                if (products.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.id = 'noProductsRow';
+                    emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>';
+                    tableBody.appendChild(emptyRow);
+                } else {
+                    products.forEach((product, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                <td>${product.productId}</td>
+                <td>${product.productName}</td>
+                <td>${product.price.toLocaleString()}원</td>
+                <td>${product.quantity}</td>
+                <td class="text-right">${(product.price * product.quantity).toLocaleString()}원</td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="removeProduct(${index}, this)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              `;
+                        tableBody.appendChild(row);
                     });
                 }
-                return response.json();
-            })
-            .then(result => {
-                console.log('저장 결과:', result);
-                alert('상품 목록이 저장되었습니다.');
-                // 페이지 새로고침
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('상품 저장 오류:', error);
-                alert(error.message || '상품 저장에 실패했습니다.');
-            });
-        });
-    }
 
-    // 상품 추가 함수
-    function addProduct() {
-        const productId = productIdInput.value;
-        const quantity = parseInt(quantityInput.value);
-
-        // 입력값 검증
-        if (!productId || !quantity) {
-            alert('상품 ID와 수량을 모두 입력해주세요.');
-            return;
-        }
-
-        if (!currentProduct) {
-            alert('유효한 상품 정보가 없습니다. 상품 ID를 확인해주세요.');
-            return;
-        }
-
-        if (quantity <= 0) {
-            alert('수량은 1 이상이어야 합니다.');
-            return;
-        }
-
-        // 제품 데이터 생성
-        const product = {
-            productId: parseInt(productId),
-            productName: currentProduct.productName,
-            price: currentProduct.pricePerBox || 0,
-            quantity: quantity
-        };
-
-        // 이미 추가된 상품인지 확인
-        const existingIndex = products.findIndex(p => p.productId === product.productId);
-
-        if (existingIndex >= 0) {
-            // 이미 있는 상품이면 수량을 더할지 물어보기
-            if (confirm(`'${product.productName}'은(는) 이미 목록에 있습니다. 수량을 추가하시겠습니까? (취소 시 수량을 새로운 값으로 변경)`)) {
-                // 수량 추가
-                products[existingIndex].quantity += quantity;
-            } else {
-                // 수량 변경
-                products[existingIndex].quantity = quantity;
+                updateTotals();
             }
-            
-            // 테이블 갱신
-            redrawProductTable();
-        } else {
-            // 배열에 추가
-            products.push(product);
-            
-            // 테이블 갱신
-            redrawProductTable();
-        }
 
-        // 입력 필드 초기화
-        productIdInput.value = '';
-        quantityInput.value = '';
-        productInfoDiv.innerHTML = '';
-        currentProduct = null;
+            function updateTotals() {
+                const totalQuantity = products.reduce((sum, product) => sum + product.quantity, 0);
+                const totalAmount = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
 
-        // 상품 ID 입력 필드로 포커스 이동
-        productIdInput.focus();
-    }
-
-    // 상품 삭제 함수
-    window.removeProduct = function(index, button) {
-        // 확인 메시지
-        if (!confirm('이 상품을 목록에서 삭제하시겠습니까?')) {
-            return;
-        }
-
-        // 배열에서 제거
-        products.splice(index, 1);
-
-        // 테이블 갱신
-        redrawProductTable();
-    };
-
-    // 상품 테이블 갱신 함수
-    function redrawProductTable() {
-        const tableBody = document.querySelector('#productsTable tbody');
-        
-        // 기존 행 모두 제거
-        tableBody.innerHTML = '';
-
-        if (products.length === 0) {
-            // 상품이 없는 경우
-            const emptyRow = document.createElement('tr');
-            emptyRow.id = 'noProductsRow';
-            emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 2rem;">상품 정보가 없습니다.</td>';
-            tableBody.appendChild(emptyRow);
-        } else {
-            // 상품 목록 그리기
-            products.forEach((product, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.productId}</td>
-                    <td>${product.productName}</td>
-                    <td>${product.price.toLocaleString()}원</td>
-                    <td>${product.quantity}</td>
-                    <td class="text-right">${(product.price * product.quantity).toLocaleString()}원</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeProduct(${index}, this)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-        
-        // 총계 업데이트
-        updateTotals();
-    }
-
-    // 총 수량 및 금액 업데이트 함수
-    function updateTotals() {
-        const totalQuantity = products.reduce((sum, product) => sum + product.quantity, 0);
-        const totalAmount = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
-
-        document.getElementById('totalQuantity').textContent = totalQuantity;
-        document.getElementById('totalAmount').textContent = totalAmount.toLocaleString() + '원';
-    }
-});
-</script>
-
+                document.getElementById('totalQuantity').textContent = totalQuantity;
+                document.getElementById('totalAmount').textContent = totalAmount.toLocaleString() + '원';
+            }
+        });
+    </script>
+</th:block>
 </body>
 </html>

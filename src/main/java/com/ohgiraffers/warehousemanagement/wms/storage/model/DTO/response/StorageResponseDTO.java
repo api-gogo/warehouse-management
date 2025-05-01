@@ -1,31 +1,32 @@
 package com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.response;
 
 import com.ohgiraffers.warehousemanagement.wms.storage.model.StorageStatus;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class StorageResponseDTO {
 
-    private Integer storageId;             // 입고 ID (자동 생성)
-    private Integer purchaseId;            // 발주 ID (직접 입력)
-    private StorageStatus storageStatus;   // 입고 상태 (선택)
-    private String inspectionStatus;       // 검수 상태 (입고 이상/완료 등)
-    private LocalDate storageDate;         // 입고일 (입력)
-    private String storageReason;          // 입고 사유 (입력)
-    private LocalDateTime storageCreatedAt; // 등록일 (자동 생성)
+    private Integer storageId;
+    private Integer purchaseId;
 
-    public StorageResponseDTO() {
-    }
+    private StorageStatus storageStatus;
+    private String inspectionStatus;
 
-    public StorageResponseDTO(Integer storageId, Integer purchaseId, StorageStatus storageStatus, String inspectionStatus, LocalDate storageDate, String storageReason, LocalDateTime storageCreatedAt) {
-        this.storageId = storageId;
-        this.purchaseId = purchaseId;
-        this.storageStatus = storageStatus;
-        this.inspectionStatus = inspectionStatus;
-        this.storageDate = storageDate;
-        this.storageReason = storageReason;
-        this.storageCreatedAt = storageCreatedAt;
-    }
+    private LocalDate storageDate;
+    private String storageReason;
+    private LocalDateTime storageCreatedAt;
+
+    // 연관된 발주 정보
+    private Long purchaseUserId;
+    private String purchaseUserName;
+    private LocalDate purchaseDueDate;
+    private String purchaseStatus;
+
+    private String supplierName;
+    private int itemCount;
+
+    public StorageResponseDTO() {}
 
     public Integer getStorageId() {
         return storageId;
@@ -83,8 +84,65 @@ public class StorageResponseDTO {
         this.storageCreatedAt = storageCreatedAt;
     }
 
+    public Long getPurchaseUserId() {
+        return purchaseUserId;
+    }
+
+    public void setPurchaseUserId(Long purchaseUserId) {
+        this.purchaseUserId = purchaseUserId;
+    }
+
+    public String getPurchaseUserName() {
+        return purchaseUserName;
+    }
+
+    public void setPurchaseUserName(String purchaseUserName) {
+        this.purchaseUserName = purchaseUserName;
+    }
+
+    public LocalDate getPurchaseDueDate() {
+        return purchaseDueDate;
+    }
+
+    public void setPurchaseDueDate(LocalDate purchaseDueDate) {
+        this.purchaseDueDate = purchaseDueDate;
+    }
+
+    public String getPurchaseStatus() {
+        return purchaseStatus;
+    }
+
+    public void setPurchaseStatus(String purchaseStatus) {
+        this.purchaseStatus = purchaseStatus;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
+    // 상태에 따른 한글 설명 반환
     public String getStorageStatusDescription() {
-        return storageStatus != null ? storageStatus.getDescription() : "";
+        if (storageStatus == null) return "";
+        switch (storageStatus) {
+            case WAITING: return "입고대기";
+            case COMPLETED: return "입고완료";
+            case DELAYED: return "입고지연";
+            case DEFECTIVE: return "입고이상";
+            case REJECTED: return "입고거절";
+            default: return "알 수 없음";
+        }
     }
 
     @Override
@@ -97,6 +155,12 @@ public class StorageResponseDTO {
                 ", storageDate=" + storageDate +
                 ", storageReason='" + storageReason + '\'' +
                 ", storageCreatedAt=" + storageCreatedAt +
+                ", purchaseUserId=" + purchaseUserId +
+                ", purchaseUserName='" + purchaseUserName + '\'' +
+                ", purchaseDueDate=" + purchaseDueDate +
+                ", purchaseStatus='" + purchaseStatus + '\'' +
+                ", supplierName='" + supplierName + '\'' +
+                ", itemCount=" + itemCount +
                 '}';
     }
 }

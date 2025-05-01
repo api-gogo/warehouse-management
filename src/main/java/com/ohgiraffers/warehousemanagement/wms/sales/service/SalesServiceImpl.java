@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryService;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
@@ -9,7 +10,10 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesItemsRepository;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
+import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
+import com.ohgiraffers.warehousemanagement.wms.store.service.StoreService;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,30 +33,36 @@ public class SalesServiceImpl implements SalesService {
     private final ProductService productService;
     private final UserService userService;
     private final InventoryService inventoryService;
+    private final StoreService storeService;
 
     @Autowired
-    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService) {
+    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService, StoreService storeService) {
         this.salesRepository = salesRepository;
         this.salesItemsRepository = salesItemsRepository;
         this.productService = productService;
         this.userService = userService;
         this.inventoryService = inventoryService;
+        this.storeService = storeService;
     }
 
     public List<SalesDTO> getAllSales() {
         // 비즈니스로직 아직 추가안함!!
-        List<Sales> findAll = salesRepository.findAll();
+        // 조회해서 등록한거 최신순으로 보여줌
+        List<Sales> findAll = salesRepository.findAllByOrderBySalesIdDesc();
         List<SalesDTO> salesLists = new ArrayList<>();
 
         // 수주 상품 목록 Sales 엔티티에서 꺼냄
         for (Sales salesEntity : findAll) {
             LogUserDTO user = userService.getUserInfoForLogging(salesEntity.getUserId());
+            StoreDTO store = storeService.findById(salesEntity.getStoreId());
             SalesDTO salesDTO = new SalesDTO(
                     salesEntity.getSalesId(),
                     salesEntity.getStoreId(),
+                    store.getStoreName(),
+                    store.getStoreAddress(),
                     salesEntity.getUserId(),
                     user.getUserName(),
-                    null,
+                    user.getUserPhone(),
                     salesEntity.getSalesDate(),
                     salesEntity.getShippingDueDate(),
                     salesEntity.getSalesStatus(),
@@ -65,7 +76,7 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Transactional
-    public int createSales(SalesDTO salesDTO, Integer userId) {
+    public int createSales(SalesDTO salesDTO, Long userId) {
 
         // 수주 정보 저장
         Sales salesEntity = new Sales.Builder()
@@ -121,13 +132,16 @@ public class SalesServiceImpl implements SalesService {
 
         List<Integer> quantity = findSales.getSalesItems().stream().map(SalesItem::getSalesItemsQuantity).collect(Collectors.toList());
         LogUserDTO user = userService.getUserInfoForLogging(findSales.getUserId());
+        StoreDTO store = storeService.findById(findSales.getStoreId());
 
         SalesDTO findDTO = new SalesDTO(
                 findSales.getSalesId(),
                 findSales.getStoreId(),
+                store.getStoreName(),
+                store.getStoreAddress(),
                 findSales.getUserId(),
                 user.getUserName(),
-                null,
+                user.getUserPhone(),
                 findSales.getSalesDate(),
                 findSales.getShippingDueDate(),
                 findSales.getSalesStatus(),
@@ -170,15 +184,18 @@ public class SalesServiceImpl implements SalesService {
         findSales.setSalesUpdatedAt(LocalDateTime.now());
         Sales savedEntity = salesRepository.save(findSales);
 
-        // 수주 물품 목록 삭제하고
+        // 이 sales Id를 가진 수주 물품 목록 삭제하고
         salesItemsRepository.deleteBySalesId(findSales);
-        // 새로등록할거임
+
+        // 새로등록할거. 어차피 수주 등록상태에서만 수정 가능하기 때문에 출고로 아예 넘어가지 않은 상태라 수정하지 않은 상품들도 로트넘버를 새로 갱신해줘도 상관없음
         List<SalesItem> newItems = new ArrayList<>();
         for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
+            String lotNumber = inventoryService.findTopByProductIdOrderByInventoryExpiryDateAsc(salesDTO.getProductIds().get(i)).getLotNumber();
             SalesItem item = new SalesItem.Builder()
                     .salesId(savedEntity)
                     .productId(salesDTO.getProductIds().get(i))
                     .salesItemsQuantity(salesDTO.getQuantity().get(i))
+                    .lotNumber(lotNumber)
                     .build();
             newItems.add(item);
         }
@@ -206,6 +223,21 @@ public class SalesServiceImpl implements SalesService {
         findSales.setSalesStatus(status);
         findSales.setSalesUpdatedAt(LocalDateTime.now());
         return true;
+    }
+
+    public List<StoreDTO> searchStoresByName(String storeName) {
+        List<StoreDTO> searchResults = storeService.searchByNameContainingAndIsDeletedTrue(storeName);
+        return searchResults;
+    }
+
+    public List<InventoryViewDTO> searchProductsByName(String productName) {
+        List<InventoryViewDTO> searchResults = inventoryService.searchByNameContainingAndIsDeletedTrue(productName);
+        return searchResults;
+    }
+
+    public List<UserDTO> searchUsersByName(String userName) {
+        List<UserDTO> searchResults = userService.searchByNameContainingAndIsDeletedTrue(userName);
+        return searchResults;
     }
 
     @Override

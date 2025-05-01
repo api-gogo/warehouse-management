@@ -1,130 +1,73 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layouts/default-layout}"
-        xmlns:layout="http://www.w3.org/1999/xhtml">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>출고 관리</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf != null}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf != null}"/>
-    <!-- 페이지별 CSS -->
+    <title>출고 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <th:block layout:fragment="css">
-        <link rel="stylesheet" href="/css/예시.css">
+        <link rel="stylesheet" href="/css/products/shipments/shipments.css">
     </th:block>
-    <style>
-        .dark-mode h2 {
-            color: snow;
-        }
-        .form-label {
-            color: #1a1a1a;
-        }
-        .page-link{
-
-        }
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            margin-top: 30px;
-            margin-bottom: 30px;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-        }
-        .badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        .badge-waiting {
-            background-color: #ffeeba;
-            color: #856404;
-        }
-        .badge-inspecting {
-            background-color: #b8daff;
-            color: #004085;
-        }
-        .badge-completed {
-            background-color: #c3e6cb;
-            color: #155724;
-        }
-        .badge-delayed {
-            background-color: #f5c6cb;
-            color: #721c24;
-        }
-        .badge-cancelled {
-            background-color: #d6d8db;
-            color: #1b1e21;
-        }
-        .search-section {
-            background-color: #ffffff;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .error-message {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
-<!-- 페이지 콘텐츠 -->
-<th:block layout:fragment="content" th:with="activeMenu='예시'">
-    <div class="예시-container">
-        <!-- 페이지 내용 -->
+<th:block layout:fragment="content" th:with="activeMenu='shipments'">
+    <main class="main">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>출고 관리</h2>
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addShipmentModal">
-                    + 신규 출고 등록
+            <div class="page-header">
+                <h2 class="page-title">출고 관리</h2>
+                <button class="btn btn-primary add-btn" id="openAddModal">
+                    <i class="ri-add-line"></i> 신규 출고 등록
                 </button>
             </div>
 
-            <!-- 에러 메시지 표시 -->
-            <div th:if="${error != null}" class="error-message">
+            <!-- 에러 메시지 -->
+            <div th:if="${error != null}" class="alert alert-error">
+                <i class="ri-error-warning-line"></i>
                 <span th:text="${error}"></span>
             </div>
 
-            <!-- 성공 메시지 표시 -->
-            <div th:if="${message != null}" class="alert alert-success" role="alert">
+            <!-- 성공 메시지 -->
+            <div th:if="${message != null}" class="alert alert-success">
+                <i class="ri-check-line"></i>
                 <span th:text="${message}"></span>
             </div>
 
-            <!-- 검색 및 필터링 영역 -->
+            <!-- 검색 및 필터링 -->
             <div class="search-section">
-                <form th:action="@{/shipments}" method="get" class="row g-3">
-                    <div class="col-md-3">
+                <form th:action="@{/shipments}" method="get" class="search-grid">
+                    <div class="search-item">
                         <label for="status" class="form-label">상태</label>
                         <select class="form-select" id="status" name="status">
                             <option value="">전체</option>
                             <option value="출고대기" th:selected="${param.status == '출고대기'}">출고대기</option>
-                            <option value="검수중" th:selected="${param.status == '검수중'}">검수중</option>
                             <option value="출고완료" th:selected="${param.status == '출고완료'}">출고완료</option>
                             <option value="출고지연" th:selected="${param.status == '출고지연'}">출고지연</option>
                             <option value="출고취소" th:selected="${param.status == '출고취소'}">출고취소</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="search-item">
                         <label for="searchTerm" class="form-label">검색어</label>
-                        <input type="text" class="form-control" id="searchTerm" name="searchTerm" th:value="${param.searchTerm != null ? param.searchTerm : ''}" placeholder="출고번호, 수주ID 검색">
+                        <div class="search-input-wrapper">
+                            <i class="ri-search-line search-icon"></i>
+                            <input type="text" class="form-input" id="searchTerm" name="searchTerm" th:value="${param.searchTerm != null ? param.searchTerm : ''}" placeholder="출고번호, 수주ID 검색">
+                        </div>
                     </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary btn-sm me-2">검색</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/shipments'">초기화</button>
+                    <div class="search-actions">
+                        <button type="submit" class="btn btn-primary" id="searchBtn">검색</button>
+                        <button type="button" class="btn btn-outline" id="resetBtn" onclick="location.href='/shipments'">초기화</button>
                     </div>
                 </form>
             </div>
 
             <!-- 출고 목록 테이블 -->
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-light">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
                     <tr>
                         <th>출고번호</th>
                         <th>수주 ID</th>
@@ -136,9 +79,9 @@
                         <th>액션</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="shipmentTableBody">
                     <tr th:if="${shipments == null || #lists.isEmpty(shipments)}">
-                        <td colspan="8" class="text-center">등록된 출고 정보가 없습니다.</td>
+                        <td colspan="8" class="empty-state">등록된 출고 정보가 없습니다.</td>
                     </tr>
                     <tr th:each="shipment : ${shipments}">
                         <td th:text="${shipment.shipmentId != null ? shipment.shipmentId : '-'}">-</td>
@@ -146,29 +89,45 @@
                         <td th:text="${shipment.userId != null ? shipment.userId : '-'}">-</td>
                         <td th:text="${shipment.shipmentDate != null ? #temporals.format(shipment.shipmentDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
                         <td>
-                            <span th:class="${'badge ' +
-                                (shipment.shipmentStatus == '출고대기' ? 'badge-waiting' :
-                                (shipment.shipmentStatus == '검수중' ? 'badge-inspecting' :
-                                (shipment.shipmentStatus == '출고완료' ? 'badge-completed' :
-                                (shipment.shipmentStatus == '출고지연' ? 'badge-delayed' :
-                                (shipment.shipmentStatus == '출고취소' ? 'badge-cancelled' : '')))))}"
-                                  th:text="${shipment.shipmentStatus != null ? shipment.shipmentStatus : '-'}">-</span>
+                            <span th:switch="${shipment.shipmentStatus}">
+                                <span th:case="'출고대기'" class="badge badge-warning">
+                                    <i class="ri-time-line"></i>
+                                    <span th:text="${shipment.shipmentStatus}">-</span>
+                                </span>
+                                <span th:case="'출고완료'" class="badge badge-success">
+                                    <i class="ri-check-line"></i>
+                                    <span th:text="${shipment.shipmentStatus}">-</span>
+                                </span>
+                                <span th:case="'출고지연'" class="badge badge-danger">
+                                    <i class="ri-time-line"></i>
+                                    <span th:text="${shipment.shipmentStatus}">-</span>
+                                </span>
+                                <span th:case="'출고취소'" class="badge badge-secondary">
+                                    <i class="ri-close-line"></i>
+                                    <span th:text="${shipment.shipmentStatus}">-</span>
+                                </span>
+                                <span th:case="*" class="badge badge-secondary">
+                                    <i></i>
+                                    <span th:text="${shipment.shipmentStatus != null ? shipment.shipmentStatus : '-'}">-</span>
+                                </span>
+                            </span>
                         </td>
                         <td th:text="${shipment.createdAt != null ? #temporals.format(shipment.createdAt, 'yyyy-MM-dd') : '-'}">-</td>
                         <td th:text="${shipment.updatedAt != null ? #temporals.format(shipment.updatedAt, 'yyyy-MM-dd') : '-'}">-</td>
                         <td>
-                            <div class="btn-group btn-group-sm">
-                                <a class="btn btn-outline-primary btn-sm" th:href="@{/shipments/{id}(id=${shipment.shipmentId})}">상세</a>
-                                <button class="btn btn-outline-secondary btn-sm edit-btn"
+                            <div class="action-buttons">
+                                <a class="btn btn-sm btn-outline detail-btn" th:href="@{/shipments/{id}(id=${shipment.shipmentId})}">
+                                    <i class="ri-file-text-line"></i> 상세
+                                </a>
+                                <button class="btn btn-sm btn-outline edit-btn"
                                         th:if="${shipment.shipmentStatus != '출고완료' && shipment.shipmentStatus != '출고취소'}"
-                                        data-bs-toggle="modal" data-bs-target="#editShipmentModal"
                                         th:attr="data-id=${shipment.shipmentId},
                                                 data-sale-id=${shipment.saleId},
                                                 data-user-id=${shipment.userId},
                                                 data-shipment-date=${shipment.shipmentDate != null ? #temporals.format(shipment.shipmentDate, 'yyyy-MM-dd''T''HH:mm') : ''},
                                                 data-shipment-status=${shipment.shipmentStatus},
-                                                data-shipment-reason=${shipment.shipmentReason}">
-                                    수정
+                                                data-shipment-reason=${shipment.shipmentReason != null ? shipment.shipmentReason : ''}">
+                                    <i class="ri-edit-line"></i> 수정
                                 </button>
                             </div>
                         </td>
@@ -178,155 +137,289 @@
             </div>
 
             <!-- 페이지네이션 -->
-            <nav th:if="${totalPages != null && totalPages > 0}">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{${'/shipments'}(page=0, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">처음</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{${'/shipments'}(page=${currentPage != null ? currentPage - 1 : 0}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">이전</a>
-                    </li>
-                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                        th:if="${i >= (currentPage != null ? currentPage - 2 : 0) and i <= (currentPage != null ? currentPage + 2 : 2)}"
-                        th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:href="@{${'/shipments'}(page=${i}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}" th:text="${i + 1}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage != null && currentPage + 1 >= totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{${'/shipments'}(page=${currentPage != null ? currentPage + 1 : 1}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">다음</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage != null && currentPage + 1 >= totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{${'/shipments'}(page=${totalPages - 1}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">마지막</a>
-                    </li>
-                </ul>
+            <nav th:if="${totalPages != null && totalPages > 0}" class="pagination">
+                <a class="pagination-item" th:classappend="${currentPage == 0} ? 'disabled'"
+                   th:href="@{${'/shipments'}(page=0, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">처음</a>
+                <a class="pagination-item" th:classappend="${currentPage == 0} ? 'disabled'"
+                   th:href="@{${'/shipments'}(page=${currentPage != null ? currentPage - 1 : 0}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">이전</a>
+                <div class="pagination-numbers">
+                    <a class="pagination-number" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                       th:if="${i >= (currentPage != null ? currentPage - 2 : 0) and i <= (currentPage != null ? currentPage + 2 : 2)}"
+                       th:classappend="${i == currentPage} ? 'active'"
+                       th:href="@{${'/shipments'}(page=${i}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}"
+                       th:text="${i + 1}">1</a>
+                </div>
+                <a class="pagination-item" th:classappend="${currentPage != null && currentPage + 1 >= totalPages} ? 'disabled'"
+                   th:href="@{${'/shipments'}(page=${currentPage != null ? currentPage + 1 : 1}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">다음</a>
+                <a class="pagination-item" th:classappend="${currentPage != null && currentPage + 1 >= totalPages} ? 'disabled'"
+                   th:href="@{${'/shipments'}(page=${totalPages - 1}, size=${size != null ? size : 10}, status=${param.status}, searchTerm=${param.searchTerm})}">마지막</a>
             </nav>
         </div>
+    </main>
 
-        <!-- 신규 출고 등록 모달 -->
-        <div class="modal fade" id="addShipmentModal" tabindex="-1" aria-labelledby="addShipmentModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addShipmentModalLabel">신규 출고 등록</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="addShipmentForm" th:action="@{/shipments}" method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="saleId" class="form-label">수주 ID</label>
-                                <input type="number" class="form-control" id="saleId" name="saleId" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="userId" class="form-label">담당자 ID</label>
-                                <input type="number" class="form-control" id="userId" name="userId" min="1" max="2147483647" required oninput="validateUserId(this)">
-                                <div id="userIdError" class="invalid-feedback">
-                                    담당자 ID는 1부터 2147483647 사이의 값이어야 합니다.
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="shipmentDate" class="form-label">출고일</label>
-                                <input type="datetime-local" class="form-control" id="shipmentDate" name="shipmentDate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="shipmentStatus" class="form-label">상태</label>
-                                <select class="form-select" id="shipmentStatus" name="shipmentStatus" required>
-                                    <option value="출고대기">출고대기</option>
-                                    <option value="검수중">검수중</option>
-                                    <option value="출고완료">출고완료</option>
-                                    <option value="출고지연">출고지연</option>
-                                    <option value="출고취소">출고취소</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="shipmentReason" class="form-label">사유 (선택사항)</label>
-                                <textarea class="form-control" id="shipmentReason" name="shipmentReason" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">취소</button>
-                            <button type="submit" class="btn btn-primary btn-sm">등록</button>
-                        </div>
-                    </form>
-                </div>
+    <!-- 신규 출고 등록 모달 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">신규 출고 등록</h3>
+                <button class="modal-close" id="closeAddModal">×</button>
             </div>
-        </div>
-
-        <!-- 출고 정보 수정 모달 -->
-        <div class="modal fade" id="editShipmentModal" tabindex="-1" aria-labelledby="editShipmentModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editShipmentModalLabel">출고 정보 수정</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <form id="addShipmentForm" th:action="@{/shipments}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="saleId" class="form-label">수주 ID</label>
+                        <select class="form-select" id="saleId" name="saleId" required>
+                            <option value="">수주 ID 선택</option>
+                            <option th:each="saleId : ${saleIds}" th:value="${saleId}" th:text="${saleId}"></option>
+                        </select>
                     </div>
-                    <form id="editShipmentForm" method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
-                        <div class="modal-body">
-                            <input type="hidden" id="editShipmentId" name="shipmentId">
-                            <div class="mb-3">
-                                <label for="editSaleId" class="form-label">수주 ID</label>
-                                <input type="number" class="form-control" id="editSaleId" name="saleId" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editUserId" class="form-label">담당자 ID</label>
-                                <input type="number" class="form-control" id="editUserId" name="userId" min="1" max="2147483647" required oninput="validateUserId(this)">
-                                <div id="editUserIdError" class="invalid-feedback">
-                                    담당자 ID는 1부터 2147483647 사이의 값이어야 합니다.
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editShipmentDate" class="form-label">출고일</label>
-                                <input type="datetime-local" class="form-control" id="editShipmentDate" name="shipmentDate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editShipmentStatus" class="form-label">상태</label>
-                                <select class="form-select" id="editShipmentStatus" name="shipmentStatus" required>
-                                    <option value="출고대기">출고대기</option>
-                                    <option value="검수중">검수중</option>
-                                    <option value="출고완료">출고완료</option>
-                                    <option value="출고지연">출고지연</option>
-                                    <option value="출고취소">출고취소</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editShipmentReason" class="form-label">사유 (선택사항)</label>
-                                <textarea class="form-control" id="editShipmentReason" name="shipmentReason" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">취소</button>
-                            <button type="submit" class="btn btn-primary btn-sm">저장</button>
-                        </div>
-                    </form>
+                    <div class="form-group">
+                        <label class="form-label">수주 상품 목록</label>
+                        <table class="table" id="saleItemsTable">
+                            <thead>
+                            <tr>
+                                <th>상품 ID</th>
+                                <th>상품명</th>
+                                <th>수량</th>
+                                <th>재고량</th>
+                                <th>로트 번호</th>
+                            </tr>
+                            </thead>
+                            <tbody id="saleItemsTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        <label for="userId" class="form-label">담당자 ID</label>
+                        <input type="text" class="form-input" id="userId" name="userId" th:value="${currentUserId}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipmentDate" class="form-label">출고일</label>
+                        <input type="datetime-local" class="form-input" id="shipmentDate" name="shipmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipmentStatus" class="form-label">상태</label>
+                        <select class="form-select" id="shipmentStatus" name="shipmentStatus" required>
+                            <option value="출고대기">출고대기</option>
+                            <option value="출고완료">출고완료</option>
+                            <option value="출고지연">출고지연</option>
+                            <option value="출고취소">출고취소</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipmentReason" class="form-label">사유 (선택사항)</label>
+                        <textarea class="form-textarea" id="shipmentReason" name="shipmentReason" rows="3"></textarea>
+                    </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="cancelAddBtn">취소</button>
+                    <button type="submit" class="btn btn-primary">등록</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 출고 정보 수정 모달 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">출고 정보 수정</h3>
+                <button class="modal-close" id="closeEditModal">×</button>
+            </div>
+            <form id="editShipmentForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                <div class="modal-body">
+                    <input type="hidden" id="editShipmentId" name="shipmentId">
+                    <div class="form-group">
+                        <label for="editSaleId" class="form-label">수주 ID</label>
+                        <select class="form-select" id="editSaleId" name="saleId" required>
+                            <option value="">수주 ID 선택</option>
+                            <option th:each="saleId : ${saleIds}" th:value="${saleId}" th:text="${saleId}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">수주 상품 목록</label>
+                        <table class="table" id="editSaleItemsTable">
+                            <thead>
+                            <tr>
+                                <th>상품 ID</th>
+                                <th>상품명</th>
+                                <th>수량</th>
+                                <th>재고량</th>
+                                <th>로트 번호</th>
+                            </tr>
+                            </thead>
+                            <tbody id="editSaleItemsTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        <label for="editUserId" class="form-label">담당자 ID</label>
+                        <input type="text" class="form-input" id="editUserId" name="userId" th:value="${currentUserId}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="editShipmentDate" class="form-label">출고일</label>
+                        <input type="datetime-local" class="form-input" id="editShipmentDate" name="shipmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editShipmentStatus" class="form-label">상태</label>
+                        <select class="form-select" id="editShipmentStatus" name="shipmentStatus" required>
+                            <option value="출고대기">출고대기</option>
+                            <option value="출고완료">출고완료</option>
+                            <option value="출고지연">출고지연</option>
+                            <option value="출고취소">출고취소</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editShipmentReason" class="form-label">사유 (선택사항)</label>
+                        <textarea class="form-textarea" id="editShipmentReason" name="shipmentReason" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="cancelEditBtn">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="scripts">
     <script>
+        console.log('Script loaded');
+
         function validateUserId(input) {
             const value = parseInt(input.value);
             const max = 2147483647;
             const min = 1;
-
+            const errorDiv = input.id === 'userId' ? document.getElementById('userIdError') : document.getElementById('editUserIdError');
             if (value < min || value > max || isNaN(value)) {
-                input.classList.add('is-invalid');
-                input.classList.remove('is-valid');
+                errorDiv.style.display = 'block';
+                return false;
             } else {
-                input.classList.remove('is-invalid');
-                input.classList.add('is-valid');
+                errorDiv.style.display = 'none';
+                return true;
+            }
+        }
+
+        function renderSaleItemsTable(data, tableBodyId) {
+            console.log('Rendering sale items table:', tableBodyId, data);
+            const tbody = document.getElementById(tableBodyId);
+            if (!tbody) {
+                console.error('Table body not found:', tableBodyId);
+                return;
+            }
+            tbody.innerHTML = '';
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.productId || '-'}</td>
+                        <td>${item.productName || '-'}</td>
+                        <td>${item.salesItemsQuantity || '-'}</td>
+                        <td>${item.availableStock || '-'}</td>
+                        <td>${item.lotNumber || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">수주 상품이 없습니다.</td></tr>';
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded event triggered');
+
             const now = new Date();
             const shipmentDateStr = now.toISOString().slice(0, 16);
-            document.getElementById('shipmentDate').value = shipmentDateStr;
+            const shipmentDateInput = document.getElementById('shipmentDate');
+            if (shipmentDateInput) {
+                shipmentDateInput.value = shipmentDateStr;
+            } else {
+                console.error('shipmentDate input not found');
+            }
 
-            // 수정 버튼 클릭 시 모달 데이터 채우기
-            document.querySelectorAll('.edit-btn').forEach(button => {
+            const addModal = document.getElementById('addModal');
+            const editModal = document.getElementById('editModal');
+            if (!addModal || !editModal) {
+                console.error('Modal elements not found');
+            }
+
+            const openAddModalButton = document.getElementById('openAddModal');
+            if (openAddModalButton) {
+                openAddModalButton.addEventListener('click', function() {
+                    console.log('Open Add Modal clicked');
+                    document.getElementById('addShipmentForm').reset();
+                    document.getElementById('shipmentDate').value = shipmentDateStr;
+                    document.getElementById('shipmentStatus').value = '출고대기';
+                    document.getElementById('saleItemsTableBody').innerHTML = '';
+                    const userIdInput = document.getElementById('userId');
+                    const currentUserIdInput = document.querySelector('input[name="currentUserId"]');
+                    if (currentUserIdInput) {
+                        userIdInput.value = currentUserIdInput.value;
+                    } else {
+                        console.error('currentUserId input not found');
+                    }
+                    addModal.style.display = 'block';
+                });
+            } else {
+                console.error('openAddModal button not found');
+            }
+
+            const closeAddModalButton = document.getElementById('closeAddModal');
+            if (closeAddModalButton) {
+                closeAddModalButton.addEventListener('click', function() {
+                    console.log('Close Add Modal clicked');
+                    addModal.style.display = 'none';
+                });
+            } else {
+                console.error('closeAddModal button not found');
+            }
+
+            const cancelAddBtn = document.getElementById('cancelAddBtn');
+            if (cancelAddBtn) {
+                cancelAddBtn.addEventListener('click', function() {
+                    console.log('Cancel Add button clicked');
+                    addModal.style.display = 'none';
+                });
+            } else {
+                console.error('cancelAddBtn not found');
+            }
+
+            const closeEditModalButton = document.getElementById('closeEditModal');
+            if (closeEditModalButton) {
+                closeEditModalButton.addEventListener('click', function() {
+                    console.log('Close Edit Modal clicked');
+                    editModal.style.display = 'none';
+                });
+            } else {
+                console.error('closeEditModal button not found');
+            }
+
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', function() {
+                    console.log('Cancel Edit button clicked');
+                    editModal.style.display = 'none';
+                });
+            } else {
+                console.error('cancelEditBtn not found');
+            }
+
+            window.addEventListener('click', function(event) {
+                if (event.target === addModal) {
+                    console.log('Clicked outside Add Modal');
+                    addModal.style.display = 'none';
+                }
+                if (event.target === editModal) {
+                    console.log('Clicked outside Edit Modal');
+                    editModal.style.display = 'none';
+                }
+            });
+
+            const editButtons = document.querySelectorAll('.edit-btn');
+            editButtons.forEach(button => {
                 button.addEventListener('click', function() {
+                    console.log('Edit button clicked');
                     const id = this.getAttribute('data-id');
                     const saleId = this.getAttribute('data-sale-id');
                     const userId = this.getAttribute('data-user-id');
@@ -341,53 +434,93 @@
                     document.getElementById('editShipmentStatus').value = shipmentStatus;
                     document.getElementById('editShipmentReason').value = shipmentReason || '';
 
-                    // 폼의 action 속성 동적으로 설정
                     const form = document.getElementById('editShipmentForm');
                     form.action = '/shipments/update/' + id;
+
+                    fetch(`/shipments/sale-items/${saleId}`)
+                        .then(response => response.json())
+                        .then(data => renderSaleItemsTable(data, 'editSaleItemsTableBody'))
+                        .catch(error => console.error('수주 상품 조회 오류:', error));
+
+                    editModal.style.display = 'block';
                 });
             });
 
-            // 폼 제출 시 클라이언트 측 유효성 검사
-            document.getElementById('addShipmentForm').addEventListener('submit', function(event) {
-                const userIdInput = document.getElementById('userId');
-                validateUserId(userIdInput);
-                if (userIdInput.classList.contains('is-invalid')) {
-                    event.preventDefault();
-                    alert('담당자 ID는 1부터 2147483647 사이의 값이어야 합니다.');
-                }
-            });
+            const saleIdSelect = document.getElementById('saleId');
+            if (saleIdSelect) {
+                saleIdSelect.addEventListener('change', function() {
+                    console.log('Sale ID changed:', this.value);
+                    const saleId = this.value;
+                    if (saleId) {
+                        fetch(`/shipments/sale-items/${saleId}`)
+                            .then(response => response.json())
+                            .then(data => renderSaleItemsTable(data, 'saleItemsTableBody'))
+                            .catch(error => console.error('수주 상품 조회 오류:', error));
+                    } else {
+                        document.getElementById('saleItemsTableBody').innerHTML = '';
+                    }
+                });
+            } else {
+                console.error('saleId select not found');
+            }
 
-            document.getElementById('editShipmentForm').addEventListener('submit', function(event) {
-                const editUserIdInput = document.getElementById('editUserId');
-                validateUserId(editUserIdInput);
-                if (editUserIdInput.classList.contains('is-invalid')) {
-                    event.preventDefault();
-                    alert('담당자 ID는 1부터 2147483647 사이의 값이어야 합니다.');
-                } else {
-                    const status = document.getElementById('editShipmentStatus').value;
-                    if (status === '출고완료' || status === '출고취소') {
-                        let message = status === '출고완료'
-                            ? '출고완료시 더 이상 수정할 수 없습니다. 계속 진행하시겠습니까?'
-                            : '출고취소시 더 이상 수정할 수 없습니다. 계속 진행하시겠습니까?';
-                        if (!confirm(message)) {
-                            event.preventDefault();
+            const editSaleIdSelect = document.getElementById('editSaleId');
+            if (editSaleIdSelect) {
+                editSaleIdSelect.addEventListener('change', function() {
+                    console.log('Edit Sale ID changed:', this.value);
+                    const saleId = this.value;
+                    if (saleId) {
+                        fetch(`/shipments/sale-items/${saleId}`)
+                            .then(response => response.json())
+                            .then(data => renderSaleItemsTable(data, 'editSaleItemsTableBody'))
+                            .catch(error => console.error('수주 상품 조회 오류:', error));
+                    } else {
+                        document.getElementById('editSaleItemsTableBody').innerHTML = '';
+                    }
+                });
+            } else {
+                console.error('editSaleId select not found');
+            }
+
+            const addShipmentForm = document.getElementById('addShipmentForm');
+            if (addShipmentForm) {
+                addShipmentForm.addEventListener('submit', function(event) {
+                    console.log('Add Shipment Form submitted');
+                    const userIdInput = document.getElementById('userId');
+                    if (!validateUserId(userIdInput)) {
+                        event.preventDefault();
+                        alert('담당자 ID는 1부터 2147483647 사이의 값이어야 합니다.');
+                    }
+                });
+            } else {
+                console.error('addShipmentForm not found');
+            }
+
+            const editShipmentForm = document.getElementById('editShipmentForm');
+            if (editShipmentForm) {
+                editShipmentForm.addEventListener('submit', function(event) {
+                    console.log('Edit Shipment Form submitted');
+                    const editUserIdInput = document.getElementById('editUserId');
+                    if (!validateUserId(editUserIdInput)) {
+                        event.preventDefault();
+                        alert('담당자 ID는 1부터 2147483647 사이의 값이어야 합니다.');
+                    } else {
+                        const status = document.getElementById('editShipmentStatus').value;
+                        if (status === '출고완료' || status === '출고취소') {
+                            let message = status === '출고완료'
+                                ? '출고완료시 더 이상 수정할 수 없습니다. 계속 진행하시겠습니까?'
+                                : '출고취소시 더 이상 수정할 수 없습니다. 계속 진행하시겠습니까?';
+                            if (!confirm(message)) {
+                                event.preventDefault();
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                console.error('editShipmentForm not found');
+            }
         });
     </script>
 </th:block>
-
-<!-- 페이지별 스크립트 -->
-<th:block layout:fragment="scripts">
-    <script>
-        // 스크립트 내용
-
-    </script>
-</th:block>
-
-
-
 </body>
 </html>

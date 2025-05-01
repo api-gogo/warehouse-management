@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/common.css">
     <link rel="stylesheet" href="/css/navigation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/sales/inputSearchBox.css">
 </head>
 <body>
 <div class="layout" th:with="activeMenu='dashboard'">
@@ -33,10 +34,12 @@
                     <form th:action="@{/sales/update/{salesId}(salesId=${salesDTO.salesId})}" method="post">
                         <input type="hidden" name="_method" value="patch"/>
 
-                        <div class="form-group mb-4">
-                            <label for="storeId">점포 ID</label>
-                            <input type="text" id="storeId" name="storeId" class="form-control"
-                                   th:value="${salesDTO.storeId}" required>
+                        <div class="form-group mb-4" style="position: relative;">
+                            <label for="storeSearchInput">점포명</label>
+                            <input type="text" id="storeSearchInput" name="storeSearchName" class="form-control" autocomplete="off"
+                                   th:value="${salesDTO.storeName}" required>
+                            <input type="hidden" id="storeId" name="storeId" />
+                            <ul id="storeSuggestions" class="suggestion-list"></ul>
                         </div>
 
                         <div class="form-group mb-4">
@@ -71,8 +74,8 @@
                                             </button>
                                         </div>
 
-                                        <input type="hidden" th:name="|productIds[${i}]|" th:value="${salesDTO.productIds[i]}" />
-                                        <input type="text" class="form-control mb-2" th:value="${salesDTO.productNames[i]}" readonly placeholder="상품명" />
+                                        <input type="text" class="form-control mb-2" th:name="|productIds[${i}]|" th:value="${salesDTO.productIds[i]}" />
+                                        <input type="hidden" class="form-control mb-2" th:value="${salesDTO.productNames[i]}" readonly placeholder="상품명" />
                                         <input type="number" th:name="|quantity[${i}]|" class="form-control"
                                                th:value="${salesDTO.quantity[i]}" min="1" required placeholder="수량 입력" />
                                     </div>
@@ -126,16 +129,16 @@
                         const itemRow = document.createElement('div');
                         itemRow.className = 'item-row mb-3';
                         itemRow.innerHTML = `
-                <div class="item-header">
-                    <strong>물품</strong>
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-item">
-                        <i class="fas fa-times"></i> 삭제
-                    </button>
-                </div>
-                <input type="hidden" name="productIds[]" class="form-control" value="" />
-                <input type="text" name="productNames[]" class="form-control mb-2" placeholder="상품명" readonly />
-                <input type="number" name="quantity[]" class="form-control" placeholder="수량 입력" min="1" required />
-            `;
+                                <div class="item-header">
+                                    <strong>물품</strong>
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                                        <i class="fas fa-times"></i> 삭제
+                                    </button>
+                                </div>
+                                <input type="text" name="productIds[]" class="form-control mb-2" placeholder="상품입력" value="" />
+                                <input type="hidden" name="productNames[]" class="form-control mb-2" placeholder="상품명" readonly />
+                                <input type="number" name="quantity[]" class="form-control" placeholder="수량 입력" min="1" required />
+                        `;
                         itemsContainer.appendChild(itemRow);
                         updateItemHeaders();
                     });
@@ -149,6 +152,39 @@
                     });
 
                     updateItemHeaders();
+
+                    document.getElementById("storeSearchInput").addEventListener("input", function () {
+                        const keyword = this.value;
+
+                        if (keyword.length < 1) {
+                            document.getElementById("storeSuggestions").innerHTML = "";
+                            return;
+                        }
+
+                        fetch(`/sales/search/stores?storeSearchName=${encodeURIComponent(keyword)}`)
+                            .then(response => {
+                                if (!response.ok) throw new Error("서버 오류 발생");
+                                return response.json();
+                            })
+                            .then(data => {
+                                const list = document.getElementById("storeSuggestions");
+                                list.innerHTML = "";
+
+                                data.forEach(store => {
+                                    const li = document.createElement("li");
+                                    li.textContent = `${store.storeName} (${store.storeAddress})`;
+                                    li.addEventListener("click", function () {
+                                        document.getElementById("storeSearchInput").value = store.storeName;
+                                        document.getElementById("storeId").value = store.storeId;
+                                        list.innerHTML = "";
+                                    });
+                                    list.appendChild(li);
+                                });
+                            })
+                            .catch(error => {
+                                console.error("검색 실패:", error);
+                            });
+                    });
                 });
             </script>
 
