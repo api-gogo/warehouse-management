@@ -104,7 +104,7 @@ public class InventoryServicelmpl implements InventoryService {
 
         Page<InventoryViewDTO> inventoryViewDTOS = inventoryRepository.findInventoryViewDTOByProductName(searchPattern, pageable);
         if (inventoryViewDTOS.isEmpty()) {
-            return Page.empty();
+            throw new IllegalArgumentException("해당 제품의 재고가 존재하지 않습니다.");
 
         } else {
             return inventoryViewDTOS;
@@ -122,7 +122,7 @@ public class InventoryServicelmpl implements InventoryService {
     public void updateInventory(Long inventoryId, InventoryDTO inventoryDTO, String reason, String userId) {
         try {
             Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() ->
-                    new RuntimeException("재고를 찾을 수 없습니다."));
+                    new IllegalArgumentException("재고를 찾을 수 없습니다."));
 
             // 기존에 등록된 재고와 입력한 재고 차이 계산
             long currentstock = inventory.getAvailableStock();
@@ -172,7 +172,13 @@ public class InventoryServicelmpl implements InventoryService {
 
     @Transactional
     public void deleteInventory(Long inventoryId) {
-        inventoryRepository.deleteById(inventoryId);
+        Optional<Inventory> findInventory = inventoryRepository.findById(inventoryId);
+        if (findInventory.isPresent()) {
+            inventoryRepository.deleteById(inventoryId);
+        } else {
+            throw new IllegalArgumentException("존재하지 않는 재고 ID 입니다.");
+        }
+
     }
 
     @Transactional

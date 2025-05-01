@@ -38,22 +38,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     Page<InventoryViewDTO> getInventoryViewListWithPaging(Pageable pageable);
 
 
-
     @Query("SELECT MAX(i.lotNumber) FROM Inventory i WHERE i.product.productId = :productId AND i.lotNumber LIKE :datePrefix")
     String findMaxLotNumberByProductAndDate(Integer productId, String datePrefix);
-
-
-    @Query("SELECT new com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO(" +
-            "i.product.productId, i.product.productName, COUNT(i), SUM(i.availableStock), SUM(i.allocatedStock), SUM(i.disposedStock)) " +
-            "FROM Inventory i GROUP BY i.product.productName, i.product.productId")
-    List<InventoryViewDTO> groupByProductName();
-
-    @Query("SELECT new com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO(\n" +
-            "i.product.productId, i.product.productName, COUNT(i), SUM(i.availableStock), SUM(i.allocatedStock), SUM(i.disposedStock))\n" +
-            "FROM Inventory i \n" +
-            "WHERE i.product.productName LIKE :productName\n" +
-            "GROUP BY i.product.productName, i.product.productId")
-    List<InventoryViewDTO> findgroupByProductName(String productName);
 
 
 

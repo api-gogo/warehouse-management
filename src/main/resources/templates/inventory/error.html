@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>재고 에러</title>
+</head>
+<body>
+<script th:inline="javascript">
+    // 오류 메세지를 출력함
+    alert([[${message}]]);
+    // 이전 페이지로 이동
+    window.history.back();
+</script>
+</body>
+</html>
