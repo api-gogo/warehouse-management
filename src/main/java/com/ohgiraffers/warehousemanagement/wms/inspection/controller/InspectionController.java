@@ -104,9 +104,9 @@ public class InspectionController {
     }
 
     // 검수 수정 페이지 보기
-    @GetMapping("/update/{inspectionId}")
+    @GetMapping("/{inspectionId}/edit")
     public String updateInspection(@PathVariable Long inspectionId, Model model) {
-        log.info("GET : /inspections/update/{}", inspectionId);
+        log.info("GET : /inspections/edit/{}", inspectionId);
 
         InspectionResponseDTO responseDTO = inspectionServiceImpl.getInspectionById(inspectionId);
 
@@ -116,9 +116,9 @@ public class InspectionController {
     }
 
     // 검수 수정하기
-    @PostMapping("/update/{inspectionId}")
+    @PostMapping("/{inspectionId}")
     public String updateInspection(@PathVariable long inspectionId, @Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
-        log.info("POST : /inspections/update/{}", inspectionId);
+        log.info("POST : /inspections/{}", inspectionId);
         log.info("inspectionRequestDTO : {}", requestDTO);
 
         InspectionResponseDTO inspection = inspectionServiceImpl.updateInspection(inspectionId, requestDTO);
@@ -130,6 +130,24 @@ public class InspectionController {
         }
 
         return "redirect:/inspections/" + inspectionId;
+    }
+
+    // 검수 삭제하기
+    @PostMapping("/{inspectionId}/delete")
+    public String deleteInspection(Authentication authentication, @PathVariable Long inspectionId, RedirectAttributes ra) {
+        log.info("DELETE : /inspections/{}/delete", inspectionId);
+
+        AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+        String userRole = authDetails.getUserRole();
+        if(userRole.equals("관리자") || userRole.equals("매니저")) {
+            inspectionServiceImpl.deleteInspection(inspectionId);
+
+            ra.addFlashAttribute("message", inspectionId + "가 삭제되었습니다.");
+        } else {
+            ra.addFlashAttribute("message", "삭제 권한이 없습니다!");
+        }
+
+        return "redirect:/inspections";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

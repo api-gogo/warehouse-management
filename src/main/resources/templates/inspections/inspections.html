@@ -7,6 +7,14 @@
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/common.css">
+    <style>
+      .delete-btn {
+        color: #dc3545;
+      }
+      .delete-btn:hover {
+        color: #b02a37;
+      }
+    </style>
   </th:block>
 </head>
 <body>
@@ -89,9 +97,16 @@
                 <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="action-button" title="상세보기">
                   <i class="fas fa-eye"></i>
                 </a>
-                <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="action-button" title="수정">
+                <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="action-button" title="수정">
                   <i class="fas fa-edit"></i>
                 </a>
+                <a th:if="${#authorization.expression('hasAnyAuthority(''관리자'', ''매니저'')')}"
+                   href="#" class="action-button delete-btn" title="삭제"
+                   th:data-inspection-id="${inspection.inspectionId}" 
+                   onclick="confirmDelete(this.getAttribute('data-inspection-id')); return false;">
+                  <i class="fas fa-trash"></i>
+                </a>
+                <form th:id="'deleteForm-' + ${inspection.inspectionId}" th:action="@{/inspections/{id}/delete(id=${inspection.inspectionId})}" method="post" style="display:none;"></form>
               </td>
             </tr>
             <!-- 데이터가 없을 경우 -->
@@ -135,8 +150,15 @@
       const params = new URLSearchParams(window.location.search);
       const currentType = params.get('inspectionType');
       const urlSearchType = params.get('searchType');
+      
+      // 삭제 확인 함수
+      function confirmDelete(inspectionId) {
+        if (confirm('정말로 이 검수를 삭제하시겠습니까?')) {
+          document.getElementById('deleteForm-' + inspectionId).submit();
+        }
+      }
+      
       document.addEventListener('DOMContentLoaded', function() {
-
         // 탭 전환
         const tabButtons = document.querySelectorAll('.tab-button');
         tabButtons.forEach(button => {

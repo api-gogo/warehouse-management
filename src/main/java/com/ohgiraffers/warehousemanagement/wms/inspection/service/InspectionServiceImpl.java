@@ -136,4 +136,15 @@ public class InspectionServiceImpl implements InspectionService {
                     "검색 ID : " + inspectionId);
         }
     }
+
+    public void deleteInspection(Long inspectionId) {
+        Optional<Inspection> findInspection = inspectionRepository.findById(inspectionId);
+        if (findInspection.isPresent()) {
+            Inspection inspection = findInspection.get();
+            inspectionRepository.delete(inspection);
+        } else {
+            throw new IllegalArgumentException("존재하지 않는 검수 ID입니다! \n" +
+                    "검수 ID : " + inspectionId);
+        }
+    }
 }

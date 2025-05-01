@@ -22,7 +22,7 @@
         </div>
 
         <div class="admin-actions">
-          <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="btn btn-primary">
+          <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="btn btn-primary">
             <i class="fas fa-edit me-2"></i>수정
           </a>
         </div>
@@ -113,7 +113,7 @@
           </div>
 
           <div class="form-actions">
-            <a th:href="@{/inspections/update/{id}(id=${inspection.inspectionId})}" class="btn btn-primary">
+            <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="btn btn-primary">
               <i class="fas fa-edit me-2"></i>검수 정보 수정
             </a>
             <a th:href="@{/inspections}" class="btn btn-secondary ms-2">
