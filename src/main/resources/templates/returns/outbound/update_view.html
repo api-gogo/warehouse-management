@@ -109,7 +109,7 @@
       <h5 class="card-title">반품 정보 수정</h5>
       <p class="card-text text-muted">출고 반품 정보를 수정해주세요.</p>
 
-      <form th:action="@{/returns/outbound/list/{return_shipment_id}/update(return_shipment_id=${ReturnShipmentDTO.returnShipmentId})}" method="post">
+      <form th:action="@{/returns/outbound/list/{returnShipmentId}/update(returnShipmentId=${ReturnShipmentDTO.returnShipmentId})}" method="post">
         <input type="hidden" name="returnShipmentId" th:value="${ReturnShipmentDTO.returnShipmentId}">
         <input type="hidden" name="returnShipmentCreatedAt" th:value="${ReturnShipmentDTO.returnShipmentCreatedAt}">
         <input type="hidden" name="returnShipmentDeletedAt" th:value="${ReturnShipmentDTO.returnShipmentDeletedAt}">

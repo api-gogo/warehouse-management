@@ -143,11 +143,7 @@
     <h2>반품 관리 홈</h2>
     <div class="d-flex gap-2">
       <button class="btn btn-outline-secondary">
-        <i class="bi bi-download"></i> 보고서 다운로드
-      </button>
-      <a th:href="@{/returns/outbound/create}" class="btn btn-primary">
-        <i class="bi bi-plus"></i> 신규 반품
-      </a>
+
     </div>
   </div>
 
@@ -159,20 +155,7 @@
 
   <!-- 대시보드 카드 섹션 -->
   <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="card dashboard-card summary-card bg-primary text-white">
-        <div class="card-body text-center">
-          <div class="card-icon">
-            <i class="bi bi-box-arrow-in-down"></i>
-          </div>
-          <h5 class="card-title">입고 반품</h5>
-          <h2 class="mb-0" th:text="${inboundReturnsCount != null ? inboundReturnsCount : '0'}">0</h2>
-          <p class="card-text mt-2">총 입고 반품 건수</p>
-          <a href="/returns/inbound/list" class="btn btn-light mt-3">입고 반품 관리</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="card dashboard-card summary-card bg-warning text-white">
         <div class="card-body text-center">
           <div class="card-icon">
@@ -185,7 +168,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="card dashboard-card summary-card bg-success text-white">
         <div class="card-body text-center">
           <div class="card-icon">
@@ -194,7 +177,7 @@
           <h5 class="card-title">완료된 반품</h5>
           <h2 class="mb-0" th:text="${completedReturnsCount != null ? completedReturnsCount : '0'}">0</h2>
           <p class="card-text mt-2">처리 완료된 반품</p>
-          <a href="/returns" class="btn btn-light mt-3">전체 반품 보기</a>
+          <a href="/returns/completed" class="btn btn-light mt-3">완료된 반품 보기</a>
         </div>
       </div>
     </div>
@@ -211,7 +194,6 @@
               <thead>
               <tr>
                 <th>상태</th>
-                <th>입고 반품</th>
                 <th>출고 반품</th>
                 <th>전체</th>
               </tr>
@@ -221,7 +203,6 @@
                 <td>
                   <span class="status-badge status-waiting">반품대기</span>
                 </td>
-                <td th:text="${inboundWaitingCount != null ? inboundWaitingCount : '0'}">0</td>
                 <td th:text="${outboundWaitingCount != null ? outboundWaitingCount : '0'}">0</td>
                 <td th:text="${totalWaitingCount != null ? totalWaitingCount : '0'}">0</td>
               </tr>
@@ -229,7 +210,6 @@
                 <td>
                   <span class="status-badge status-approved">반품승인</span>
                 </td>
-                <td th:text="${inboundApprovedCount != null ? inboundApprovedCount : '0'}">0</td>
                 <td th:text="${outboundApprovedCount != null ? outboundApprovedCount : '0'}">0</td>
                 <td th:text="${totalApprovedCount != null ? totalApprovedCount : '0'}">0</td>
               </tr>
@@ -237,7 +217,6 @@
                 <td>
                   <span class="status-badge status-rejected">반품거절</span>
                 </td>
-                <td th:text="${inboundRejectedCount != null ? inboundRejectedCount : '0'}">0</td>
                 <td th:text="${outboundRejectedCount != null ? outboundRejectedCount : '0'}">0</td>
                 <td th:text="${totalRejectedCount != null ? totalRejectedCount : '0'}">0</td>
               </tr>
@@ -245,7 +224,6 @@
                 <td>
                   <span class="status-badge status-approved">반품완료</span>
                 </td>
-                <td th:text="${inboundCompletedCount != null ? inboundCompletedCount : '0'}">0</td>
                 <td th:text="${outboundCompletedCount != null ? outboundCompletedCount : '0'}">0</td>
                 <td th:text="${totalCompletedCount != null ? totalCompletedCount : '0'}">0</td>
               </tr>
@@ -259,7 +237,7 @@
 
   <div class="row">
     <!-- 최근 반품 내역 -->
-    <div class="col-md-8">
+    <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">최근 반품 내역</h5>
@@ -280,7 +258,7 @@
               <tbody>
               <tr th:each="return : ${recentReturns}" th:if="${recentReturns != null && !recentReturns.empty}">
                 <td th:text="${return.returnId}">1</td>
-                <td th:text="${return.type == 'INBOUND' ? '입고 반품' : '출고 반품'}">출고 반품</td>
+                <td>출고 반품</td>
                 <td th:text="${return.storeName}">서울 매장</td>
                 <td th:text="${#temporals.format(return.createdAt, 'yyyy-MM-dd')}">2025-04-30</td>
                 <td>
@@ -292,7 +270,7 @@
                               (return.status == 'RETURN_COMPLETED' ? '반품완료' : '반품거절'))}">반품대기</span>
                 </td>
                 <td>
-                  <a th:href="@{/returns/{type}/{id}/detail(type=${return.type == 'INBOUND' ? 'inbound' : 'outbound'}, id=${return.returnId})}" class="btn btn-sm btn-outline-primary">상세</a>
+                  <a th:href="@{/returns/outbound/list/{id}(id=${return.returnId})}" class="btn btn-sm btn-outline-primary">상세</a>
                 </td>
               </tr>
               <tr th:if="${recentReturns == null || recentReturns.empty}">
@@ -308,42 +286,6 @@
         </div>
       </div>
     </div>
-    
-    <!-- 반품 통계 -->
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">반품 사유 통계</h5>
-          <p class="card-text text-muted">가장 많은 반품 사유 분석</p>
-          
-          <div class="chart-container">
-            <canvas id="returnReasonsChart"></canvas>
-          </div>
-          
-          <div class="mt-4">
-            <h6>주요 반품 사유</h6>
-            <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                유통기한 만료
-                <span class="badge bg-primary rounded-pill" th:text="${expiredCount != null ? expiredCount : '0'}">0</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                손상 또는 결함
-                <span class="badge bg-primary rounded-pill" th:text="${damagedCount != null ? damagedCount : '0'}">0</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                잘못된 상품 배송
-                <span class="badge bg-primary rounded-pill" th:text="${wrongItemCount != null ? wrongItemCount : '0'}">0</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                고객 변심
-                <span class="badge bg-primary rounded-pill" th:text="${changedMindCount != null ? changedMindCount : '0'}">0</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -354,13 +296,13 @@
   document.addEventListener('DOMContentLoaded', function() {
     // 반품 사유 통계 차트
     const ctx = document.getElementById('returnReasonsChart').getContext('2d');
-    
+
     // 서버에서 데이터 가져오기
     const expiredCount = [[${expiredCount != null ? expiredCount : 0}]];
     const damagedCount = [[${damagedCount != null ? damagedCount : 0}]];
     const wrongItemCount = [[${wrongItemCount != null ? wrongItemCount : 0}]];
     const changedMindCount = [[${changedMindCount != null ? changedMindCount : 0}]];
-    
+
     const chart = new Chart(ctx, {
       type: 'pie',
       data: {

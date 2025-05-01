@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/returns")
@@ -171,6 +173,77 @@ public class ReturnHomeController {
         mv.addObject("damagedCount", damagedCount);
         mv.addObject("wrongItemCount", wrongItemCount);
         mv.addObject("changedMindCount", changedMindCount);
+        
+        return mv;
+    }
+
+    @GetMapping("/completed")
+    public ModelAndView showCompletedReturns() {
+        ModelAndView mv = new ModelAndView("returns/completed");
+        
+        try {
+            // 모든 반품 데이터 가져오기
+            List<ReturnShipmentDTO> allReturns = returnShipmentService.getAllReturns();
+            System.out.println("Fetched returns count: " + (allReturns != null ? allReturns.size() : "null"));
+            
+            // RETURN_COMPLETED 상태인 반품만 필터링
+            List<Map<String, Object>> completedReturns = new ArrayList<>();
+            
+            if (allReturns != null && !allReturns.isEmpty()) {
+                // 필터링하기 전 상태 확인
+                System.out.println("Status counts:");
+                for (ReturnShipmentStatus status : ReturnShipmentStatus.values()) {
+                    long count = allReturns.stream()
+                        .filter(r -> r.getReturnShipmentStatus() == status)
+                        .count();
+                    System.out.println(" - " + status + ": " + count);
+                }
+                
+                // 완료 상태인 반품만 필터링
+                allReturns.stream()
+                    .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
+                    .forEach(returnDTO -> {
+                        Map<String, Object> returnMap = new HashMap<>();
+                        returnMap.put("returnId", returnDTO.getReturnShipmentId());
+                        returnMap.put("type", "OUTBOUND"); // 모든 항목을 출고 반품으로 표시
+                        
+                        int storeId = returnDTO.getStoreId();
+                        String storeName = "알 수 없음";
+                        if (storeId == 1) storeName = "서울 매장";
+                        else if (storeId == 2) storeName = "대구 매장";
+                        else if (storeId == 3) storeName = "부산 매장";
+                        else if (storeId == 4) storeName = "인천 매장";
+                        returnMap.put("storeName", storeName);
+                        
+                        returnMap.put("createdAt", returnDTO.getReturnShipmentCreatedAt());
+                        returnMap.put("updatedAt", returnDTO.getReturnShipmentUpdatedAt());
+                        returnMap.put("status", returnDTO.getReturnShipmentStatus().name());
+                        
+                        completedReturns.add(returnMap);
+                    });
+            }
+            
+            System.out.println("Completed returns count: " + completedReturns.size());
+            
+            // 데이터가 없을 경우 테스트용 예시 데이터 추가
+            if (completedReturns.isEmpty()) {
+                System.out.println("Adding sample data for testing...");
+                Map<String, Object> sampleData = new HashMap<>();
+                sampleData.put("returnId", 9999);
+                sampleData.put("type", "OUTBOUND");
+                sampleData.put("storeName", "테스트 매장");
+                sampleData.put("createdAt", LocalDateTime.now().minusDays(5));
+                sampleData.put("updatedAt", LocalDateTime.now().minusDays(2));
+                sampleData.put("status", "RETURN_COMPLETED");
+                completedReturns.add(sampleData);
+            }
+            
+            mv.addObject("completedReturns", completedReturns);
+        } catch (Exception e) {
+            System.err.println("Error in showCompletedReturns: " + e.getMessage());
+            e.printStackTrace();
+            mv.addObject("error", "데이터를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
+        }
         
         return mv;
     }

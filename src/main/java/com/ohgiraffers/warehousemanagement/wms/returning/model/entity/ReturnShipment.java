@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "return_shipments")
-@Where(clause = "is_deleted = true") //삭제 상태가 1인 것만 조회
+//@Where(clause = "is_deleted = true") //활성화 상태인 것만 조회
 
 public class ReturnShipment {
     @Id
@@ -51,7 +51,7 @@ public class ReturnShipment {
     private LocalDateTime returnShipmentDeletedAt;
 
     @Column(name = "is_deleted",nullable = false)
-    private boolean isDeleted = true;
+    private boolean isDeleted = true; // true=활성화, false=삭제
 
     @OneToMany(mappedBy = "returnShipmentId",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ReturnShipmentItem> returnShipmentItems = new ArrayList<>(); //출고반품에 대해 리스트로 받아옴

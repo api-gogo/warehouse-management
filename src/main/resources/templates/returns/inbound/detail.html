@@ -63,6 +63,10 @@
       margin-bottom: 20px;
     }
 
+    .detail-section {
+      margin-bottom: 30px;
+    }
+
     .status-badge {
       padding: 5px 10px;
       border-radius: 20px;
@@ -70,37 +74,19 @@
       font-weight: bold;
     }
 
-    .status-completed {
-      background-color: #d1e7dd;
-      color: #0f5132;
-    }
-
-    .status-pending {
+    .status-waiting {
       background-color: #cfe2ff;
       color: #084298;
     }
 
-    .status-processing {
-      background-color: #fff3cd;
-      color: #664d03;
+    .status-approved {
+      background-color: #d1e7dd;
+      color: #0f5132;
     }
 
     .status-rejected {
       background-color: #f8d7da;
       color: #842029;
-    }
-
-    .detail-label {
-      font-weight: 500;
-      color: #6c757d;
-    }
-
-    .detail-value {
-      font-weight: 400;
-    }
-
-    .detail-row {
-      margin-bottom: 1rem;
     }
   </style>
 </head>
@@ -117,7 +103,7 @@
     <li><a href="#"><i class="bi bi-building"></i> 공급업체 관리</a></li>
     <li><a href="#"><i class="bi bi-credit-card"></i> 카테고리 관리</a></li>
     <li><a href="#"><i class="bi bi-arrow-bar-right"></i> 출고 관리</a></li>
-    <li><a href="#" class="active"><i class="bi bi-arrow-repeat"></i> 반품 관리</a></li>
+    <li><a href="/returns" class="active"><i class="bi bi-arrow-repeat"></i> 반품 관리</a></li>
     <li><a href="#"><i class="bi bi-people"></i> 사용자 관리</a></li>
     <li><a href="#"><i class="bi bi-shop"></i> 매장 관리</a></li>
     <li><a href="#"><i class="bi bi-file-earmark-text"></i> 보고서</a></li>
@@ -128,58 +114,135 @@
 <!-- 메인 콘텐츠 -->
 <div class="main-content">
   <div class="page-header">
-    <h2>입고 반품 상세</h2>
+    <h2>입고 반품 상세 정보</h2>
     <div class="d-flex gap-2">
       <a th:href="@{/returns/inbound/list}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> 목록으로
-      </a>
-      <a th:href="@{/returns/inbound/list/{id}/update(id=${returnsStorage.returnStorageId})}" class="btn btn-outline-primary">
-        <i class="bi bi-pencil"></i> 수정
-      </a>
-      <a th:href="@{/returns/inbound/list/{id}/delete(id=${returnsStorage.returnStorageId})}" class="btn btn-outline-danger"
-         onclick="return confirm('정말로 삭제하시겠습니까?');">
-        <i class="bi bi-trash"></i> 삭제
+        <i class="bi bi-arrow-left"></i> 목록으로 돌아가기
       </a>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">반품 정보</h5>
-      <span class="status-badge status-pending">반품대기</span>
-    </div>
+  <!-- 알림 메시지 표시 -->
+  <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${message}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <!-- 입고 반품 상세 정보 -->
+  <div class="card mb-4">
     <div class="card-body">
-      <div class="row detail-row">
+      <h5 class="card-title d-flex justify-content-between align-items-center">
+        <span>기본 정보</span>
+        <span th:class="${returnsStorage.returnStorageStatus == 'RETURN_WAITING' ? 'status-badge status-waiting' : 
+                  (returnsStorage.returnStorageStatus == 'RETURN_APPROVED' ? 'status-badge status-approved' : 
+                  (returnsStorage.returnStorageStatus == 'RETURN_COMPLETED' ? 'status-badge status-approved' : 'status-badge status-rejected'))}"
+              th:text="${returnsStorage.returnStorageStatus == 'RETURN_WAITING' ? '반품대기' : 
+                  (returnsStorage.returnStorageStatus == 'RETURN_APPROVED' ? '반품승인' : 
+                  (returnsStorage.returnStorageStatus == 'RETURN_COMPLETED' ? '반품완료' : '반품거절'))}">반품대기</span>
+      </h5>
+      <div class="row">
         <div class="col-md-6">
-          <p class="detail-label">반품 번호</p>
-          <p class="detail-value" th:text="${returnsStorage.returnStorageId}">RS001</p>
+          <table class="table">
+            <tr>
+              <th style="width: 150px;">반품 ID</th>
+              <td th:text="${returnsStorage.returnStorageId}">1</td>
+            </tr>
+            <tr>
+              <th>입고 ID</th>
+              <td th:text="${returnsStorage.storageId}">1001</td>
+            </tr>
+            <tr>
+              <th>매장 ID</th>
+              <td th:text="${returnsStorage.storeId}">1</td>
+            </tr>
+            <tr>
+              <th>담당자 ID</th>
+              <td th:text="${returnsStorage.userId}">1</td>
+            </tr>
+          </table>
         </div>
         <div class="col-md-6">
-          <p class="detail-label">입고 번호</p>
-          <p class="detail-value" th:text="${returnsStorage.storageId != null ? returnsStorage.storageId : ''}">ST001</p>
+          <table class="table">
+            <tr>
+              <th style="width: 150px;">생성일</th>
+              <td th:text="${#temporals.format(returnsStorage.returnStorageCreatedAt, 'yyyy-MM-dd HH:mm')}">2025-04-30 14:30</td>
+            </tr>
+            <tr>
+              <th>수정일</th>
+              <td th:text="${returnsStorage.returnStorageUpdatedAt != null ? #temporals.format(returnsStorage.returnStorageUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+            </tr>
+            <tr>
+              <th>삭제일</th>
+              <td th:text="${returnsStorage.returnStorageDeletedAt != null ? #temporals.format(returnsStorage.returnStorageDeletedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+            </tr>
+            <tr>
+              <th>활성 상태</th>
+              <td th:text="${returnsStorage.deleted ? '활성' : '삭제됨'}">활성</td>
+            </tr>
+          </table>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="row detail-row">
-        <div class="col-md-6">
-          <p class="detail-label">담당자</p>
-          <p class="detail-value" th:text="${returnsStorage.userId == 1 ? '김담당' : (returnsStorage.userId == 2 ? '이담당' : '박담당')}">김담당</p>
-        </div>
-        <div class="col-md-6">
-          <p class="detail-label">등록일</p>
-          <p class="detail-value" th:text="${#temporals.format(returnsStorage.returnStorageCreatedAt, 'yyyy-MM-dd HH:mm')}">2024-04-23 14:30</p>
-        </div>
+  <!-- 반품 상품 정보 -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">반품 상품 정보</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>로트 번호</th>
+            <th>반품 수량</th>
+            <th>반품 사유</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="item, itemStat : ${returnsStorage.lotNumber}" th:if="${returnsStorage.lotNumber != null && !returnsStorage.lotNumber.empty}">
+            <td th:text="${item}">LOT12345</td>
+            <td th:text="${returnsStorage.returnStorageQuantity[itemStat.index]}">5</td>
+            <td>
+              <span th:with="cause=${returnsStorage.returnStorageContent[itemStat.index]}"
+                    th:text="${cause == 'EXPIRED' ? '유통기한 만료' : 
+                           (cause == 'DAMAGED_OR_DEFECTIVE' ? '손상 또는 결함' : 
+                           (cause == 'WRONG_ITEM' ? '잘못된 상품 배송' : '고객 변심'))}">
+                유통기한 만료
+              </span>
+            </td>
+          </tr>
+          <tr th:if="${returnsStorage.lotNumber == null || returnsStorage.lotNumber.empty}">
+            <td colspan="3" class="text-center">반품 상품 정보가 없습니다.</td>
+          </tr>
+          </tbody>
+        </table>
       </div>
+    </div>
+  </div>
 
-      <div class="row detail-row" th:if="${returnsStorage.returnStorageQuantity != null && !returnsStorage.returnStorageQuantity.empty}">
-        <div class="col-md-6">
-          <p class="detail-label">반품 수량</p>
-          <p class="detail-value" th:text="${returnsStorage.returnStorageQuantity[0]}">5</p>
-        </div>
-        <div class="col-md-6">
-          <p class="detail-label">반품 사유</p>
-          <p class="detail-value" th:text="${returnsStorage.returnStorageContent != null && !returnsStorage.returnStorageContent.empty ? returnsStorage.returnStorageContent[0].getReturnShipmentCause() : '사유 없음'}">품질 불량</p>
-        </div>
+  <!-- 반품 상태 관리 -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">반품 상태 관리</h5>
+      <form th:action="@{/returns/inbound/list/{id}/update/status(id=${returnsStorage.returnStorageId})}" method="post" class="d-flex align-items-center">
+        <select class="form-select me-2" name="returnStorageStatus" style="max-width: 200px;">
+          <option value="RETURN_WAITING" th:selected="${returnsStorage.returnStorageStatus == 'RETURN_WAITING'}">반품대기</option>
+          <option value="RETURN_APPROVED" th:selected="${returnsStorage.returnStorageStatus == 'RETURN_APPROVED'}">반품승인</option>
+          <option value="RETURN_REJECTED" th:selected="${returnsStorage.returnStorageStatus == 'RETURN_REJECTED'}">반품거절</option>
+          <option value="RETURN_COMPLETED" th:selected="${returnsStorage.returnStorageStatus == 'RETURN_COMPLETED'}">반품완료</option>
+        </select>
+        <button type="submit" class="btn btn-primary">상태 변경</button>
+      </form>
+      
+      <div class="d-flex gap-2 mt-4">
+        <a th:href="@{/returns/inbound/list/{id}/update(id=${returnsStorage.returnStorageId})}" class="btn btn-outline-primary">
+          <i class="bi bi-pencil"></i> 정보 수정
+        </a>
+        <a th:href="@{/returns/inbound/list/{id}/delete(id=${returnsStorage.returnStorageId})}" 
+           class="btn btn-outline-danger"
+           onclick="return confirm('정말로 이 반품 내역을 삭제하시겠습니까?');">
+          <i class="bi bi-trash"></i> 삭제
+        </a>
       </div>
     </div>
   </div>

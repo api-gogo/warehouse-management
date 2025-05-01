@@ -8,18 +8,14 @@ import java.util.List;
 public class ReturnStorageDTO {
 
     private Integer returnStorageId;
+    private Integer storageId; //외래키는 타입만
     private Integer userId;
 
-
     private LocalDateTime returnStorageCreatedAt;
-    private LocalDateTime returnStorageUpdatedAt;
-    private LocalDateTime returnStorageDeletedAt;
-
-    private Integer storageId; //외래키는 타입만
-
-    private List<ReturningStorageCause> returnStorageContent; //사유, 게터세터만
 
     private List<Integer> returnStorageQuantity; //수량
+    private List<ReturningStorageCause> returnStorageContent; //사유, 게터세터만
+
 
 
     public ReturnStorageDTO() {
@@ -41,6 +37,8 @@ public class ReturnStorageDTO {
     }
 
     //게터세터
+
+
     public Integer getReturnStorageId() {
         return returnStorageId;
     }
