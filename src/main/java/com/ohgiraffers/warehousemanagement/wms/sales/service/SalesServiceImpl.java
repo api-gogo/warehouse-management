@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -148,6 +149,7 @@ public class SalesServiceImpl implements SalesService {
     public SalesDTO updateSales(Integer salesId, SalesDTO salesDTO) {
         Sales findSales = salesRepository.findById(salesId).orElseThrow(
                 () -> new NullPointerException("수정할 수주 데이터 없음"));
+        System.out.println("수주서 수정 sv에서 entity 조회 : " + findSales);
 
         // 사용자가 수정한값과 기존값이 다를때만 수정함!
         if (!Objects.equals(salesDTO.getStoreId(), findSales.getStoreId())) {
@@ -170,15 +172,18 @@ public class SalesServiceImpl implements SalesService {
         findSales.setSalesUpdatedAt(LocalDateTime.now());
         Sales savedEntity = salesRepository.save(findSales);
 
-        // 수주 물품 목록 삭제하고
+        // 이 sales Id를 가진 수주 물품 목록 삭제하고
         salesItemsRepository.deleteBySalesId(findSales);
-        // 새로등록할거임
+
+        // 새로등록할거. 어차피 수주 등록상태에서만 수정 가능하기 때문에 출고로 아예 넘어가지 않은 상태라 수정하지 않은 상품들도 로트넘버를 새로 갱신해줘도 상관없음
         List<SalesItem> newItems = new ArrayList<>();
         for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
+            String lotNumber = inventoryService.findTopByProductIdOrderByInventoryExpiryDateAsc(salesDTO.getProductIds().get(i)).getLotNumber();
             SalesItem item = new SalesItem.Builder()
                     .salesId(savedEntity)
                     .productId(salesDTO.getProductIds().get(i))
                     .salesItemsQuantity(salesDTO.getQuantity().get(i))
+                    .lotNumber(lotNumber)
                     .build();
             newItems.add(item);
         }
