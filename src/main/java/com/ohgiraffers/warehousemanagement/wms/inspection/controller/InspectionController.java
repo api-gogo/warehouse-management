@@ -3,7 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.controller;
 import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
-import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.ParamResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.SearchResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class InspectionController {
         log.info("searchType : {}", searchType);
         log.info("search : {}", search);
         Page<InspectionResponseDTO> inspectionList;
-        ParamResponseDTO param = new ParamResponseDTO(inspectionType, searchType, search);
+        SearchResponseDTO param = new SearchResponseDTO(inspectionType, searchType, search);
 
         if (inspectionType != null && !inspectionType.trim().isEmpty()) {
                 inspectionList = inspectionServiceImpl.getAllInspectionByTag(param, page, size);
