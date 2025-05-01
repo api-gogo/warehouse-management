@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class UserDTO {
 
-    private Integer userId;
+    private Long userId;
     private String userCode;
     private String userPass;
     private String userName;
@@ -19,7 +19,7 @@ public class UserDTO {
 
     public UserDTO() {}
 
-    public UserDTO(Integer userId, String userCode, String userPass, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
+    public UserDTO(Long userId, String userCode, String userPass, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
         this.userId = userId;
         this.userCode = userCode;
         this.userPass = userPass;
@@ -34,7 +34,7 @@ public class UserDTO {
         this.userDeletedAt = userDeletedAt;
     }
 
-    public UserDTO(Integer userId, String userCode, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
+    public UserDTO(Long userId, String userCode, String userName, String userEmail, String userPhone, String userPart, String userRole, String userStatus, LocalDateTime userCreatedAt, LocalDateTime userUpdatedAt, LocalDateTime userDeletedAt) {
         this.userId = userId;
         this.userCode = userCode;
         this.userName = userName;
@@ -48,11 +48,11 @@ public class UserDTO {
         this.userDeletedAt = userDeletedAt;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

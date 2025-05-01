@@ -11,8 +11,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class InspectionRequestDTO {
-    @NotNull(message = "검수자는 필수입니다!")
-    private Integer userId;
+    private Long userId;
 
     private Long transactionId = null;
 
@@ -41,7 +40,7 @@ public class InspectionRequestDTO {
 
     protected InspectionRequestDTO() {}
 
-    public InspectionRequestDTO(Integer userId, Long transactionId, InspectionTransactionType transactionType,
+    public InspectionRequestDTO(Long userId, Long transactionId, InspectionTransactionType transactionType,
                                 Integer inspectionQuantity, Integer acceptedQuantity, Integer defectiveQuantity,
                                 InspectionStatus inspectionStatus, LocalDate inspectionDate) {
         this.userId = userId;
@@ -54,11 +53,11 @@ public class InspectionRequestDTO {
         this.inspectionDate = inspectionDate;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

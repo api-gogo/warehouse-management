@@ -1,13 +1,17 @@
 package com.ohgiraffers.warehousemanagement.wms.inventory.controller;
 
+import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.InventoryLog;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.InventoryRepository;
 import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryServicelmpl;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +26,10 @@ import java.util.List;
 public class InventoryController {
 
     private final InventoryServicelmpl inventoryServicelmpl;
-    private final InventoryRepository inventoryRepository;
 
     @Autowired
-    public InventoryController(InventoryServicelmpl inventoryServicelmpl, InventoryRepository inventoryRepository) {
+    public InventoryController(InventoryServicelmpl inventoryServicelmpl) {
         this.inventoryServicelmpl = inventoryServicelmpl;
-        this.inventoryRepository = inventoryRepository;
     }
 
     // 재고 전체 조회
@@ -60,9 +62,9 @@ public class InventoryController {
     }
 
 
-    // 상품에 해당하는 재고들의 상세 정보 확인
+    // 상품에 해당하는 재고 확인
     @GetMapping("/detail/{productId}")
-    public ModelAndView inventoryDetail(@PathVariable("productId") int productId,
+    public ModelAndView inventoryDetailByProductId(@PathVariable("productId") long productId,
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "8") int size, ModelAndView mv) {
 
@@ -80,6 +82,19 @@ public class InventoryController {
 
     }
 
+    // 재고 상세 정보 조회
+    @GetMapping("/{inventoryId}/detail")
+    public ModelAndView inventoryDetail(@PathVariable("inventoryId") Long inventoryId, ModelAndView mv) {
+        InventoryDTO inventory = inventoryServicelmpl.findInventoryById(inventoryId);
+        List<InventoryLog> log = inventoryServicelmpl.getInventoryLogByInventoryId(inventoryId);
+        mv.addObject("inventory", inventory);
+        mv.addObject("logs", log);
+        mv.addObject("activeMenu", "inventory");
+        mv.setViewName("/inventory/inventory-detail");
+        return mv;
+    }
+
+
     // 재고 수정 페이지
     @GetMapping("/edit/{inventoryId}")
     public ModelAndView editInventory(@PathVariable("inventoryId") Long inventoryId, ModelAndView mv) {
@@ -94,10 +109,17 @@ public class InventoryController {
     @PostMapping("/edit/{inventoryId}")
     public String updateInventory(@PathVariable("inventoryId") Long inventoryId,
                                   @ModelAttribute InventoryDTO inventoryDTO,
+                                  @RequestParam String reason,
+                                  HttpSession session,
                                   RedirectAttributes redirectAttributes) {
-        inventoryServicelmpl.updateInventory(inventoryId, inventoryDTO);
+
+        AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = authDetails.getUsername().toString();
+
+
+        inventoryServicelmpl.updateInventory(inventoryId, inventoryDTO, reason, userId);
         redirectAttributes.addFlashAttribute("inventories", inventoryDTO);
-        return "redirect:/inventories/detail/{inventoryId}";
+        return "redirect:/inventories/{inventoryId}/detail";
     }
 
     // 재고 삭제

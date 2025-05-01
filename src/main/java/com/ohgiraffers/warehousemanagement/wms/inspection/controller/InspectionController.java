@@ -65,7 +65,7 @@ public class InspectionController {
         log.info("inspectionRequestDTO : {}", requestDTO);
 
         AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-        Integer userId = authDetails.getUserId();
+        Long userId = authDetails.getUserId();
         requestDTO.setUserId(userId);
 
         InspectionResponseDTO responseDTO = inspectionServiceImpl.createInspection(requestDTO);
@@ -116,7 +116,7 @@ public class InspectionController {
     }
 
     // 검수 수정하기
-    @PostMapping("/{inspectionId}")
+    @PostMapping("/{inspectionId}/edit")
     public String updateInspection(@PathVariable long inspectionId, @Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
         log.info("POST : /inspections/{}", inspectionId);
         log.info("inspectionRequestDTO : {}", requestDTO);

@@ -40,7 +40,7 @@ public class UserController {
     @PostMapping("/signup")
     public String registerUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model, RedirectAttributes redirectAttributes) {
 
-        Integer result = userServiceImpl.registerUser(signupUserDTO);
+        Long result = userServiceImpl.registerUser(signupUserDTO);
         String message = null;
 
         if (result == -1) {
@@ -143,7 +143,7 @@ public class UserController {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
-                Integer userId = authDetails.getUserId();
+                Long userId = authDetails.getUserId();
                 
                 boolean result = userServiceImpl.updateProfile(userId, updateUser);
 

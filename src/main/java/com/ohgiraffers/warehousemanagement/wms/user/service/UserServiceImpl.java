@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
         )).orElse(null);
     }
 
-    public UserDTO findById(Integer userId) {
+    public UserDTO findById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
 
         return user.map(u -> new UserDTO(
@@ -62,16 +62,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public Integer registerUser(SignupUserDTO signupUserDTO) {
+    public Long registerUser(SignupUserDTO signupUserDTO) {
 
         if (userRepository.existsByUserCode(signupUserDTO.getUserCode())) {
-            return -1;
+            return -1L;
         }
         else if (userRepository.existsByUserEmail(signupUserDTO.getUserEmail())) {
-            return -2;
+            return -2L;
         }
         else if (userRepository.existsByUserPhone(signupUserDTO.getUserPhone())) {
-            return -3;
+            return -3L;
         }
 
         try {
@@ -88,12 +88,12 @@ public class UserServiceImpl implements UserService {
             return savedUser.getUserId();
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return 0L;
         }
     }
 
     @Transactional
-    public boolean updateProfile(Integer userId, UserDTO userDTO) {
+    public boolean updateProfile(Long userId, UserDTO userDTO) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LogUserDTO getUserInfoForLogging(Integer userId) {
+    public LogUserDTO getUserInfoForLogging(Long userId) {
         Optional<User> user = userRepository.findById(userId);
 
         return user.map(u -> new LogUserDTO(
