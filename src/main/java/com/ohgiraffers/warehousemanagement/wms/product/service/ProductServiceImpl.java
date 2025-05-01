@@ -1,6 +1,5 @@
 package com.ohgiraffers.warehousemanagement.wms.product.service;
 
-import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
 import com.ohgiraffers.warehousemanagement.wms.category.model.repository.CategoryRepository;
 import com.ohgiraffers.warehousemanagement.wms.category.service.CategoryService;
