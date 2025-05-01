@@ -16,12 +16,15 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
 
     Optional<Store> findByStoreName(String storeName);
     boolean existsByStoreName(String storeName);
+    boolean existsByStoreNameAndStoreIdNot(String storeName, Integer storeId);
 
     Optional<Store> findByStoreManagerPhone(String storeManagerPhone);
     boolean existsByStoreManagerPhone(String storeManagerPhone);
+    boolean existsByStoreManagerPhoneAndStoreIdNot(String storeManagerPhone, Integer storeId);
 
     Optional<Store> findByStoreManagerEmail(String storeManagerEmail);
     boolean existsByStoreManagerEmail(String storeManagerEmail);
+    boolean existsByStoreManagerEmailAndStoreIdNot(String storeManagerEmail, Integer storeId);
 
     @Query("SELECT s FROM Store s " +
             "WHERE (s.isDeleted = :status) " +

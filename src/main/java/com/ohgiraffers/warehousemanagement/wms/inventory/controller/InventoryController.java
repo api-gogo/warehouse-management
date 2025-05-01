@@ -29,17 +29,13 @@ public class InventoryController {
     public String getInventoryList(@RequestParam(name = "productName", required = false) String productName, Model model) {
 
         List<InventoryViewDTO> inventories = null;
-        inventories = inventoryServicelmpl.groupByProductName();
 
-        model.addAttribute("inventories", inventories);
-        return "inventory/list";
-
-        /*try {
+        try {
             // 필터링 없는 전체 조회일 경우
             if (productName == null) {
-                inventories = inventoryServicelmpl.groupByProductName();
+                inventories = inventoryServicelmpl.getInventoryViewList();
             } else {
-                inventories = inventoryServicelmpl.findByProductName(productName);
+                inventories = inventoryServicelmpl.findgroupByProductName(productName);
             }
 
             model.addAttribute("inventories", inventories);
@@ -53,18 +49,20 @@ public class InventoryController {
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "/inventory/list";
-        }*/
+        }
     }
 
 
-    // 재고 상세 정보 확인
-    @GetMapping("/detail/{inventoryId}")
-    public ModelAndView inventoryDetail(@PathVariable("inventoryId") Long inventoryId, ModelAndView mv) {
-        InventoryDTO inventory = inventoryServicelmpl.findInventoryById(inventoryId);
-        mv.addObject("inventory", inventory);
+    // 상품에 해당하는 재고들의 상세 정보 확인
+    @GetMapping("/detail/{productId}")
+    public ModelAndView inventoryDetail(@PathVariable("productId") int productId, ModelAndView mv) {
+        List<InventoryDTO> inventories = inventoryServicelmpl.findByProductName(productId);
+
+        mv.addObject("inventory", inventories);
         mv.addObject("activeMenu", "inventory");
         mv.setViewName("/inventory/detail");
         return mv;
+
     }
 
     // 재고 수정 페이지
