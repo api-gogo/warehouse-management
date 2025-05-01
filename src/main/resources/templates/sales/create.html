@@ -43,12 +43,6 @@
                             <input type="text" id="storeId" name="storeId" class="form-control" placeholder="점포 ID를 입력하세요" required>
                         </div>
 
-                        <!-- 담당자 ID -->
-                        <div class="form-group mb-4">
-                            <label for="userId">담당자 ID</label>
-                            <input type="text" id="userId" name="userId" class="form-control" placeholder="담당자 ID를 입력하세요" required>
-                        </div>
-
                         <!-- 수주일 -->
                         <div class="form-group mb-4">
                             <label for="salesDate">수주일</label>
@@ -68,7 +62,7 @@
                                             <i class="fas fa-times"></i> 삭제
                                         </button>
                                     </div>
-                                    <input type="text" name="items[0]" class="form-control mb-2" placeholder="상품명 입력" required>
+                                    <input type="text" name="productIds[0]" class="form-control mb-2" placeholder="상품명 입력" required>
                                     <input type="number" name="quantity[0]" class="form-control" placeholder="수량 입력" min="1" required>
                                 </div>
                             </div>
@@ -126,7 +120,7 @@
               <i class="fas fa-times"></i> 삭제
             </button>
           </div>
-          <input type="text" name="items[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
+          <input type="text" name="productIds[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
           <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
         `;
                         document.getElementById('items-container').appendChild(itemRow);

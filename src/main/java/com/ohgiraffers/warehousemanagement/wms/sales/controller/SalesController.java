@@ -1,16 +1,19 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.controller;
 
+import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +39,7 @@ public class SalesController {
         } else { // 아무것도 없으면 빈 리스트
             mv.addObject("salesLists", new ArrayList<>());
         }
+
         return mv;
     }
     
@@ -47,13 +51,16 @@ public class SalesController {
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
     @PostMapping("/create")
     public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
-        boolean savedDTO = salesServiceImpl.createSales(salesDTO);
+        AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = authDetails.getUserId();
+
+        int salesId = salesServiceImpl.createSales(salesDTO, userId);
         String resultUrl = null;
 
-        if (savedDTO) {
-            rdtat.addFlashAttribute("salesDTO", savedDTO);
+        if (salesId > 0) {
+            rdtat.addFlashAttribute("salesDTO", salesId);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
-            resultUrl = "redirect:/sales";
+            resultUrl = "redirect:/sales/" + salesId;
         } else {
             rdtat.addFlashAttribute("message","수주서 등록에 실패하였습니다. 다시 시도해주세요.");
             resultUrl = "redirect:/sales";
@@ -72,12 +79,15 @@ public class SalesController {
             rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
             mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감
         }
+
         return mv;
     }
 
     @GetMapping("/update/{salesId}")
     public ModelAndView updateSales(@PathVariable Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
+
         SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
+        System.out.println(findDTO);
 
         if (findDTO != null) {
             mv.addObject("salesDTO", findDTO);
@@ -107,7 +117,7 @@ public class SalesController {
     }
 
     @PatchMapping("/update/status/{salesId}")
-    public String updateStatusSales(@PathVariable Integer salesId, @RequestParam SalesStatus status, RedirectAttributes rdtat) {
+    public String updateStatusSales(@PathVariable Integer salesId, @RequestParam(name = "status") SalesStatus status, RedirectAttributes rdtat) {
         boolean result = salesServiceImpl.updateStatusSales(salesId, status);
         String resultUrl = null;
 
@@ -118,7 +128,7 @@ public class SalesController {
             rdtat.addFlashAttribute("message","상태 변경에 실패했습니다. 다시 시도해주세요.");
             resultUrl = "redirect:/sales/" + salesId;
         }
+
         return resultUrl;
     }
-
 }

@@ -3,6 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.inspection.model.entity;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Comment;
 
@@ -19,13 +20,14 @@ public class Inspection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inspectionId;
 
-    @Column(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     @Comment("검수자")
-    private Integer userId;
+    private User user;
 
     @Column(name = "transaction_id")
     @Comment("검수의 출처 id값[null이면 자체검수]")
-    private Integer transactionId;
+    private Long transactionId;
 
     @Enumerated(EnumType.STRING)
     @Comment("검수 유형")
@@ -57,28 +59,27 @@ public class Inspection {
 
     protected Inspection() {}
 
-    public Inspection(Integer userId, Integer transactionId, InspectionTransactionType transactionType,
+    public Inspection(User user, Long transactionId, InspectionTransactionType transactionType,
                       Integer inspectionQuantity, Integer acceptedQuantity, Integer defectiveQuantity,
-                      InspectionStatus inspectionStatus) {
-        this.userId = userId;
+                      InspectionStatus inspectionStatus, LocalDate inspectionDate) {
+        this.user = user;
         this.transactionId = transactionId;
         this.transactionType = transactionType;
         this.inspectionQuantity = inspectionQuantity;
         this.acceptedQuantity = acceptedQuantity;
         this.defectiveQuantity = defectiveQuantity;
         this.inspectionStatus = inspectionStatus;
-        this.inspectionDate = LocalDate.now();
+        this.inspectionDate = inspectionDate;
     }
 
     public Inspection(InspectionRequestDTO dto) {
-        this.userId = dto.getUserId();
         this.transactionId = dto.getTransactionId();
         this.transactionType = dto.getTransactionType();
         this.inspectionQuantity = dto.getInspectionQuantity();
         this.acceptedQuantity = dto.getAcceptedQuantity();
         this.defectiveQuantity = dto.getDefectiveQuantity();
         this.inspectionStatus = dto.getInspectionStatus();
-        this.inspectionDate = LocalDate.now();
+        this.inspectionDate = dto.getInspectionDate();
     }
 
 
@@ -91,19 +92,19 @@ public class Inspection {
         this.inspectionId = inspectionId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Integer getTransactionId() {
+    public Long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId) {
+    public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
     }
 
@@ -167,19 +168,19 @@ public class Inspection {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Inspection that = (Inspection) o;
-        return inspectionQuantity == that.inspectionQuantity && acceptedQuantity == that.acceptedQuantity && defectiveQuantity == that.defectiveQuantity && Objects.equals(inspectionId, that.inspectionId) && Objects.equals(userId, that.userId) && Objects.equals(transactionId, that.transactionId) && transactionType == that.transactionType && inspectionStatus == that.inspectionStatus && Objects.equals(inspectionDate, that.inspectionDate) && Objects.equals(inspectionUpdatedAt, that.inspectionUpdatedAt);
+        return inspectionQuantity == that.inspectionQuantity && acceptedQuantity == that.acceptedQuantity && defectiveQuantity == that.defectiveQuantity && Objects.equals(inspectionId, that.inspectionId) && Objects.equals(user, that.user) && Objects.equals(transactionId, that.transactionId) && transactionType == that.transactionType && inspectionStatus == that.inspectionStatus && Objects.equals(inspectionDate, that.inspectionDate) && Objects.equals(inspectionUpdatedAt, that.inspectionUpdatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(inspectionId, userId, transactionId, transactionType, inspectionQuantity, acceptedQuantity, defectiveQuantity, inspectionStatus, inspectionDate, inspectionUpdatedAt);
+        return Objects.hash(inspectionId, user, transactionId, transactionType, inspectionQuantity, acceptedQuantity, defectiveQuantity, inspectionStatus, inspectionDate, inspectionUpdatedAt);
     }
 
     @Override
     public String toString() {
         return "검수 : " +
                 "검수 ID : " + inspectionId +
-                ", 검수자 : " + userId +
+                ", 검수자 : " + user +
                 (transactionId != null ? ", 검수 출처 ID : " + transactionId : "") +
                 ", 검수 유형 : " + transactionType.getTransactionType() +
                 ", 검수 수량 : " + inspectionQuantity +

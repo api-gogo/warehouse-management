@@ -1,0 +1,24 @@
+<!-- create.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>신규 입고 등록</title>
+</head>
+<body>
+<h1>신규 입고 등록</h1>
+<form th:action="@{/storage}" method="post">
+    발주 ID: <input type="text" name="purchaseId"><br>
+    입고 상태:
+    <select name="storageStatus" class="form-select" required>
+        <option th:each="status : ${statusList}"
+                th:value="${status}"
+                th:text="${status.description}"></option>
+    </select>
+
+    입고일: <input type="date" name="storageDate"><br>
+    입고 사유: <input type="text" name="storageReason"><br>
+    <button type="submit">등록</button>
+</form>
+<a th:href="@{/storage/list}">목록으로</a>
+</body>
+</html>
