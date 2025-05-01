@@ -2,9 +2,13 @@ package com.ohgiraffers.warehousemanagement.wms.inventory.service;
 
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.InventoryLogTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.Inventory;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.InventoryLog;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.InventoryLogRepository;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.InventoryRepository;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
+import com.ohgiraffers.warehousemanagement.wms.product.model.repository.ProductRepository;
 import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -24,11 +28,13 @@ import java.util.stream.Collectors;
 @Service
 public class InventoryServicelmpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
+    private final InventoryLogRepository inventoryLogRepository;
     private final ProductService productService;
 
     @Autowired
-    public InventoryServicelmpl(InventoryRepository inventoryRepository, ProductService productService) {
+    public InventoryServicelmpl(InventoryRepository inventoryRepository, InventoryLogRepository inventoryLogRepository, ProductService productService) {
         this.inventoryRepository = inventoryRepository;
+        this.inventoryLogRepository = inventoryLogRepository;
         this.productService = productService;
     }
 
@@ -69,8 +75,8 @@ public class InventoryServicelmpl implements InventoryService {
         return findInventory.get();
     };
 
-
-    public Page<InventoryDTO> findByProductProductIdOrderByInventoryExpiryDateAsc(int productId, int page, int size) {
+    // 제품 ID에 해당하는 전체 재고 조회 (유통기한 내림차순)
+    public Page<InventoryDTO> findByProductProductIdOrderByInventoryExpiryDateAsc(long productId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Inventory> inventory = inventoryRepository.findByProductProductIdOrderByInventoryExpiryDateAsc(productId, pageable);
 
@@ -101,14 +107,29 @@ public class InventoryServicelmpl implements InventoryService {
         }
     }
 
-
+    // 개별 재고의 로그 조회
+    public List<InventoryLog> getInventoryLogByInventoryId(Long inventoryId) {
+        Inventory inventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 재고가 존재하지 않습니다."));
+        return inventoryLogRepository.findByInventoryOrderByInventoryLogCreatedDesc(inventory);
+    }
 
     @Transactional
-    public void updateInventory(Long inventoryId, InventoryDTO inventoryDTO) {
+    public void updateInventory(Long inventoryId, InventoryDTO inventoryDTO, String reason, String userId) {
         try {
             Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() ->
-                    new RuntimeException("없는 재고 데이터입니다."));
+                    new RuntimeException("재고를 찾을 수 없습니다."));
 
+            // 기존에 등록된 재고와 입력한 재고 차이 계산
+            long currentstock = inventory.getAvailableStock();
+            long totalstock = inventoryDTO.getAvailableStock();
+            long difference = currentstock - totalstock;
+
+            if (difference == 0) {
+                return;
+            }
+
+            // 재고 테이블 업데이트
             inventory.setInventoryId(inventoryDTO.getInventoryId());
             inventory.setStorageId(inventoryDTO.getStorageId());
 
@@ -119,11 +140,26 @@ public class InventoryServicelmpl implements InventoryService {
             inventory.setLotNumber(createRotNum(product));
             inventory.setLocationCode(inventoryDTO.getLocationCode());
             inventory.setAvailableStock(inventoryDTO.getAvailableStock());
-            inventory.setAllocatedStock(inventoryDTO.getAllocatedStock());
+            inventory.setAllocatedStock(totalstock);
             inventory.setDisposedStock(inventoryDTO.getDisposedStock());
             inventory.setInventoryExpiryDate(inventoryDTO.getInventoryExpiryDate());
             // 수정일자는 현재 시간으로 업데이트, 생성일자는 변경하지 않음 (최초 생성 시점으로 유지)
             inventory.setInventoryUpdatedAt(LocalDateTime.now());
+
+            // 재고 로그 생성
+            InventoryLog log = new InventoryLog();
+            log.setInventory(inventory);
+            log.setQuantityChanged(Math.abs(difference));
+            log.setTransactionType(InventoryLogTransactionType.ADJUSTMENT);
+            log.setUser_id(userId);
+            log.setInventoryLogCreated(LocalDateTime.now());
+
+            // 증가, 감소 여부와 사유 작성
+            String direction = difference < 0 ? "증가" : "감소";
+            log.setInventoryLogContent(direction + " : " + reason);
+
+            inventoryLogRepository.save(log);
+
         } catch (RuntimeException e) {
             throw new IllegalArgumentException("재고 수정 중 문제가 발생되었습니다.");
         }
