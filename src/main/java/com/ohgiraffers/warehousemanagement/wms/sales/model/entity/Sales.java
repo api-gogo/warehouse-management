@@ -20,7 +20,7 @@ public class Sales {
     private Integer storeId; // 점포
 
     @Column(name = "user_id", nullable = false)
-    private Integer userId; // 수주 담당자(작업자)
+    private Long userId; // 수주 담당자(작업자)
 
     @Column(name = "sales_date", nullable = false)
     private LocalDate salesDate; // 수주일
@@ -56,7 +56,7 @@ public class Sales {
 
     public static class Builder {
         private Integer storeId;
-        private Integer userId;
+        private Long userId;
         private LocalDate salesDate;
         private LocalDate shippingDueDate;
         private SalesStatus salesStatus;
@@ -68,7 +68,7 @@ public class Sales {
             this.storeId = storeId;
             return this;
         }
-        public Builder userId(Integer userId) {
+        public Builder userId(Long userId) {
             this.userId = userId;
             return this;
         }
@@ -110,7 +110,7 @@ public class Sales {
         return storeId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
@@ -142,7 +142,7 @@ public class Sales {
         this.storeId = storeId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

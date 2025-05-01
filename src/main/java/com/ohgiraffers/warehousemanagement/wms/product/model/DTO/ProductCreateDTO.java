@@ -11,7 +11,7 @@ public class ProductCreateDTO {
     private Integer productId;
     private Integer categoryId;
     private Integer supplierId;
-    private Integer userId;
+    private Long userId;
     private String productName;
     private Integer expirationDate;
     private String storageMethod;
@@ -22,7 +22,7 @@ public class ProductCreateDTO {
 
     public ProductCreateDTO() {}
 
-    public ProductCreateDTO(Integer productId, Integer categoryId, Integer supplierId, Integer userId, String productName,
+    public ProductCreateDTO(Integer productId, Integer categoryId, Integer supplierId, Long userId, String productName,
                             Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox,
                             LocalDateTime productCreatedAt, Boolean isDeleted) {
         this.productId = productId;
@@ -65,14 +65,11 @@ public class ProductCreateDTO {
         this.supplierId = supplierId;
     }
 
-    @NotNull(message = "담당자 ID는 필수 입력 항목입니다.")
-    @Min(value = 1, message = "담당자 ID는 1 이상이어야 합니다.")
-    @Max(value = 2147483647, message = "담당자 ID는 2,147,483,647을 초과할 수 없습니다.")
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

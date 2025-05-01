@@ -65,7 +65,7 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Transactional
-    public int createSales(SalesDTO salesDTO, Integer userId) {
+    public int createSales(SalesDTO salesDTO, Long userId) {
 
         // 수주 정보 저장
         Sales salesEntity = new Sales.Builder()

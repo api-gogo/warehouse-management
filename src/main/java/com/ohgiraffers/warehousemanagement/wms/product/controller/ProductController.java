@@ -78,7 +78,7 @@ public class ProductController {
     public String createProductForm(Model model) {
         // 현재 인증된 사용자의 ID를 가져옴
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Integer userId = null;
+        Long userId = null;
         if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof AuthDetails) {
             userId = ((AuthDetails) authentication.getPrincipal()).getUserId();
         }
