@@ -5,6 +5,47 @@
   <!-- 페이지별 CSS -->
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/common.css">
+    <style>
+      /* 페이지네이션 스타일 */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1.5rem;
+        gap: 0.5rem;
+      }
+      
+      .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0 0.75rem;
+        border-radius: 4px;
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+        text-decoration: none;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s;
+      }
+      
+      .page-link:hover {
+        background-color: var(--bg-secondary);
+      }
+      
+      .page-link.active {
+        background-color: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+      }
+      
+      .page-link.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+        cursor: default;
+      }
+    </style>
   </th:block>
 </head>
 <body>
@@ -32,7 +73,7 @@
           <h2 class="section-title" th:text="${inventory[0].productName}">상품명</h2>
           <p class="section-description">
             상품 ID: <span th:text="${inventory[0].productId}">상품 ID</span> / 
-            총 재고 항목: <span th:text="${inventory.size()}">항목 수</span>개
+            총 재고 항목: <span th:text="${totalItems}">항목 수</span>개
           </p>
           
           <!-- 재고 목록 테이블 -->
@@ -60,7 +101,7 @@
                   <td th:text="${#temporals.format(item.inventoryExpiryDate, 'yyyy-MM-dd')}">유통기한</td>
                   <td>
                     <span class="status-badge" 
-                          th:classappend="${item.availableStock > 50 ? 'status-active' : 'status-low'}"
+                          th:classappend="${item.availableStock > 50 ? 'status-active' : 'status-rejected'}"
                           th:text="${item.availableStock > 50 ? '정상' : '부족'}">
                       상태
                     </span>
@@ -78,6 +119,44 @@
               </tbody>
             </table>
           </div>
+          
+          <!-- 페이지네이션 -->
+          <div class="pagination" th:if="${totalPages > 0}">
+            <!-- 처음 페이지로 -->
+            <a th:href="@{/inventories/detail/{id}(id=${inventory[0].productId}, page=0, size=${size})}"
+               class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+              <i class="fas fa-angle-double-left"></i>
+            </a>
+            
+            <!-- 이전 페이지로 -->
+            <a th:href="@{/inventories/detail/{id}(id=${inventory[0].productId}, page=${currentPage - 1}, size=${size})}"
+               class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+              <i class="fas fa-angle-left"></i>
+            </a>
+            
+            <!-- 페이지 번호 -->
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+              <!-- 현재 페이지 주변 최대 5개 페이지만 표시 -->
+              <th:block th:if="${i >= currentPage - 2 && i <= currentPage + 2 && i >= 0 && i < totalPages}">
+                <a th:href="@{/inventories/detail/{id}(id=${inventory[0].productId}, page=${i}, size=${size})}"
+                   class="page-link"
+                   th:text="${i + 1}"
+                   th:classappend="${currentPage == i ? 'active' : ''}">1</a>
+              </th:block>
+            </th:block>
+            
+            <!-- 다음 페이지로 -->
+            <a th:href="@{/inventories/detail/{id}(id=${inventory[0].productId}, page=${currentPage + 1}, size=${size})}"
+               class="page-link" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+              <i class="fas fa-angle-right"></i>
+            </a>
+            
+            <!-- 마지막 페이지로 -->
+            <a th:href="@{/inventories/detail/{id}(id=${inventory[0].productId}, page=${totalPages - 1}, size=${size})}"
+               class="page-link" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+              <i class="fas fa-angle-double-right"></i>
+            </a>
+          </div>
         </div>
         
         <!-- 데이터가 없을 경우 -->
@@ -92,8 +171,8 @@
             </a>
           </div>
         </div>
-      </div>
-    </div>
+      </div> <!-- .common-content 닫는 태그 -->
+    </div> <!-- .common-container 닫는 태그 -->
   </th:block>
   
   <!-- 페이지별 스크립트 -->

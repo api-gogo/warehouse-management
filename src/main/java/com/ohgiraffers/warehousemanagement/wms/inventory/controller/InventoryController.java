@@ -2,8 +2,12 @@ package com.ohgiraffers.warehousemanagement.wms.inventory.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.InventoryRepository;
 import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryServicelmpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,33 +22,36 @@ import java.util.List;
 public class InventoryController {
 
     private final InventoryServicelmpl inventoryServicelmpl;
+    private final InventoryRepository inventoryRepository;
 
     @Autowired
-    public InventoryController(InventoryServicelmpl inventoryServicelmpl) {
+    public InventoryController(InventoryServicelmpl inventoryServicelmpl, InventoryRepository inventoryRepository) {
         this.inventoryServicelmpl = inventoryServicelmpl;
+        this.inventoryRepository = inventoryRepository;
     }
 
     // 재고 전체 조회
     @GetMapping
-    public String getInventoryList(@RequestParam(name = "productName", required = false) String productName, Model model) {
-
-        List<InventoryViewDTO> inventories = null;
-
+    public String getInventoryList(@RequestParam(name = "productName", required = false) String productName,
+                                   @RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size, Model model) {
         try {
-            // 필터링 없는 전체 조회일 경우
-            if (productName == null) {
-                inventories = inventoryServicelmpl.getInventoryViewList();
+            Page<InventoryViewDTO> inventoriesPage;
+
+            if (productName != null && !productName.isEmpty()) {
+                inventoriesPage = inventoryServicelmpl.findInventoryViewDTOByProductName(productName, page, size);
             } else {
-                inventories = inventoryServicelmpl.findgroupByProductName(productName);
+                inventoriesPage = inventoryServicelmpl.getInventoryViewListWithPaging(page, size);
             }
 
-            model.addAttribute("inventories", inventories);
+            model.addAttribute("inventories", inventoriesPage.getContent());
+            model.addAttribute("currentPage", inventoriesPage.getNumber());
+            model.addAttribute("totalPages", inventoriesPage.getTotalPages());
             model.addAttribute("productName", productName);
+            model.addAttribute("size", size);
             model.addAttribute("activeMenu", "inventory");
             model.addAttribute("today", LocalDate.now());
 
-            // 로그 추가
-            System.out.println("인벤토리 목록 조회 - 데이터 개수: " + inventories.size());
             return "/inventory/list";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -55,10 +62,18 @@ public class InventoryController {
 
     // 상품에 해당하는 재고들의 상세 정보 확인
     @GetMapping("/detail/{productId}")
-    public ModelAndView inventoryDetail(@PathVariable("productId") int productId, ModelAndView mv) {
-        List<InventoryDTO> inventories = inventoryServicelmpl.findByProductName(productId);
+    public ModelAndView inventoryDetail(@PathVariable("productId") int productId,
+                                        @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "8") int size, ModelAndView mv) {
 
-        mv.addObject("inventory", inventories);
+        Page<InventoryDTO> inventoriesPage = inventoryServicelmpl.findByProductProductIdOrderByInventoryExpiryDateAsc(productId, page, size);
+
+
+        mv.addObject("inventory", inventoriesPage.getContent());
+        mv.addObject("currentPage", inventoriesPage.getNumber());
+        mv.addObject("totalPages", inventoriesPage.getTotalPages());
+        mv.addObject("totalItems", inventoriesPage.getTotalElements());
+        mv.addObject("size", size);
         mv.addObject("activeMenu", "inventory");
         mv.setViewName("/inventory/detail");
         return mv;
