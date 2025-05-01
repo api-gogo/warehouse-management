@@ -98,11 +98,11 @@ public class ReturnStorageService {
             List<Integer> returnStorageQuantity = new ArrayList<>();
 
             for (ReturnStorageItem item : findStorage.getReturnStorageItems()) {
-//                returnStorageContent.add(item.getReturnStorageContent());
+                returnStorageContent.add(item.getReturnStorageContent());
                 returnStorageQuantity.add(item.getReturnStorageQuantity());
                 /*디버깅 로그*/
-//                System.out.println("Item: Cause=" + item.getReturnStorageContent() +
-//                        ", Quantity=" + item.getReturnStorageQuantity());
+                System.out.println("Item: Cause=" + item.getReturnStorageContent() +
+                        ", Quantity=" + item.getReturnStorageQuantity());
 
             }
             findDTO.setReturnStorageContent(returnStorageContent);
