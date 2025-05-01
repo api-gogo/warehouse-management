@@ -39,6 +39,6 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
                                          @Param("search") String search,
                                          Pageable pageable);
 
-    List<Store> findByStoreNameContainingAndIsDeletedTrue(String storeName); // 점포이름으로 검색함
+    List<Store> findByStoreNameContainingAndIsDeletedFalse(String storeName); // 점포이름으로 검색함
 
 }
