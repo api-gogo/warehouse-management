@@ -1,9 +1,13 @@
 package com.ohgiraffers.warehousemanagement.wms.product.model.DTO;
 
 import com.ohgiraffers.warehousemanagement.wms.category.model.entity.Category;
+import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 
 import java.time.LocalDateTime;
 
+/**
+ * 상품 정보를 클라이언트에 전달하기 위한 DTO 클래스
+ */
 public class ProductResponseDTO {
 
     private Integer productId;
@@ -21,13 +25,15 @@ public class ProductResponseDTO {
     private LocalDateTime productUpdatedAt;
     private LocalDateTime productDeletedAt;
     private Boolean isDeleted;
+    private Product.ProductStatus status;
 
     public ProductResponseDTO() {}
 
     public ProductResponseDTO(Integer productId, Category category, Integer supplierId, String supplierName, Integer userId, String userName,
-                                String productName, Integer expirationDate, String storageMethod,
-                                Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
-                                LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted) {
+                              String productName, Integer expirationDate, String storageMethod,
+                              Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
+                              LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted,
+                              Product.ProductStatus status) {
         this.productId = productId;
         this.category = category;
         this.supplierId = supplierId;
@@ -43,6 +49,7 @@ public class ProductResponseDTO {
         this.productUpdatedAt = productUpdatedAt;
         this.productDeletedAt = productDeletedAt;
         this.isDeleted = isDeleted;
+        this.status = status;
     }
 
     public Integer getProductId() {
@@ -176,6 +183,14 @@ public class ProductResponseDTO {
         this.isDeleted = isDeleted;
     }
 
+    public Product.ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(Product.ProductStatus status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "ProductResponseDTO{" +
@@ -194,6 +209,7 @@ public class ProductResponseDTO {
                 ", 수정시간=" + productUpdatedAt +
                 ", 삭제시간=" + productDeletedAt +
                 ", 삭제상태=" + isDeleted +
+                ", 상태=" + status +
                 '}';
     }
 }

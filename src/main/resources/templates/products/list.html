@@ -3,11 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>WMS - 상품 관리</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../static/css/products/list.css" th:href="@{/css/products/list.css}">
   <link rel="stylesheet" href="/common.css?v=1">
   <link rel="stylesheet" href="/css/navigation.css?v=1">
+  <style>
+    .search-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 300px;
+    }
+    .search-container .fa-search {
+      position: absolute;
+      left: 10px;
+      color: #666;
+    }
+    .search-container .search-input {
+      padding-left: 30px;
+      width: 100%;
+      height: 34px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .filter-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  </style>
 </head>
 <body>
 <div class="layout">
@@ -30,6 +58,12 @@
             <i class="fas fa-list"></i>
             카테고리 관리
           </a>
+          <a th:href="@{/products/pending}" class="btn btn-outline btn-sm"
+             th:if="${#authorization.expression('hasAnyAuthority(''상품_매니저'',''상품_관리자'',''통합_관리자'')')}"
+             aria-label="대기 상품 관리">
+            <i class="fas fa-clock"></i>
+            대기 상품
+          </a>
         </div>
       </div>
       <div class="card">
@@ -43,9 +77,6 @@
               <i class="fas fa-search"></i>
               <input type="search" name="searchKeyword" placeholder="상품명 검색..." class="search-input" th:value="${searchKeyword}" aria-label="상품명 검색">
             </div>
-            <button type="submit" class="btn btn-outline btn-icon" aria-label="검색">
-              <i class="fas fa-search"></i>
-            </button>
           </form>
           <div class="table-container">
             <table class="table">
@@ -78,15 +109,28 @@
                 <td th:text="${product.quantityPerBox}"></td>
                 <td th:text="${#temporals.format(product.productCreatedAt, 'yyyy-MM-dd')}"></td>
                 <td>
-                  <span class="badge badge-outline"
-                        th:classappend="${product.isDeleted == false} ? 'badge-success' : 'badge-danger'"
-                        th:text="${product.isDeleted == false} ? '활성' : '비활성'"></span>
+                  <span th:switch="${product.status.name}">
+                    <span th:case="'APPROVED'" class="badge badge-success">활성</span>
+                    <span th:case="'DELETED'" class="badge badge-danger">삭제</span>
+                    <span th:case="'PENDING_CREATE'" class="badge badge-warning">등록대기</span>
+                    <span th:case="'PENDING_UPDATE'" class="badge badge-warning">수정대기</span>
+                    <span th:case="'PENDING_DELETE'" class="badge badge-warning">삭제대기</span>
+                    <span th:case="'REJECTED'" class="badge badge-warning">거절</span>
+                  </span>
                 </td>
                 <td class="text-right">
-                  <a th:href="@{/products/{id}(id=${product.productId})}" class="btn btn-outline btn-sm" aria-label="상품 수정">수정</a>
-                  <form th:action="@{/products/delete/{id}(id=${product.productId})}" method="post" style="display:inline;">
+                  <a th:href="@{/products/{id}(id=${product.productId})}" class="btn btn-outline btn-sm" aria-label="상품 수정"
+                     th:if="${product.status.name == 'APPROVED' or product.status.name == 'PENDING_UPDATE'}">수정</a>
+                  <form th:action="@{/products/delete/{id}(id=${product.productId})}" method="post" style="display:inline;"
+                        th:if="${product.status.name == 'APPROVED' or product.status.name == 'PENDING_DELETE'}">
                     <button type="submit" class="btn btn-outline btn-sm" aria-label="상품 삭제">삭제</button>
                   </form>
+                  <form th:action="@{/products/restore/{id}(id=${product.productId})}" method="post" style="display:inline;"
+                        th:if="${product.status.name == 'DELETED' and #authorization.expression('hasAnyAuthority(''상품_관리자'',''통합_관리자'')')}">
+                    <button type="submit" class="btn btn-outline btn-sm" aria-label="상품 복구">복구</button>
+                  </form>
+                  <a th:href="@{/products/pending}" class="btn btn-outline btn-sm" aria-label="승인/거절"
+                     th:if="${(product.status.name == 'PENDING_CREATE' or product.status.name == 'PENDING_UPDATE' or product.status.name == 'PENDING_DELETE') and #authorization.expression('hasAnyAuthority(''상품_매니저'',''상품_관리자'',''통합_관리자'')')}">승인/거절</a>
                 </td>
               </tr>
               <tr th:if="${#lists.isEmpty(products)}">
@@ -100,13 +144,13 @@
               <span th:text="'총 ' + ${totalItems} + '개 항목 중 ' + ${startItem} + '-' + ${endItem} + ' 표시 중'"></span>
             </div>
             <div class="flex space-x-2">
-              <a th:href="@{/products(page=${currentPage - 1}, searchKeyword=${searchKeyword})}"
+              <a th:href="@{/products(page=${currentPage - 1}, searchKeyword=${searchKeyword}, statusFilter=${statusFilter})}"
                  th:class="'btn btn-outline btn-sm' + (${currentPage == 1} ? ' disabled' : '')"
                  aria-label="이전 페이지">
                 <i class="fas fa-chevron-left"></i>
               </a>
               <span th:text="${currentPage} + ' / ' + ${totalPages}"></span>
-              <a th:href="@{/products(page=${currentPage + 1}, searchKeyword=${searchKeyword})}"
+              <a th:href="@{/products(page=${currentPage + 1}, searchKeyword=${searchKeyword}, statusFilter=${statusFilter})}"
                  th:class="'btn btn-outline btn-sm' + (${currentPage == totalPages} ? ' disabled' : '')"
                  aria-label="다음 페이지">
                 <i class="fas fa-chevron-right"></i>
