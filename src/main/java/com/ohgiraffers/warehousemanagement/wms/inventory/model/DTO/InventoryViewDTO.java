@@ -2,6 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO;
 
 public class InventoryViewDTO {
 
+    private Integer productId;
     private String productName;
     private Long Count;
     private Long TotalAvailableStock;
@@ -11,7 +12,8 @@ public class InventoryViewDTO {
     public InventoryViewDTO() {
     }
 
-    public InventoryViewDTO(String productName, Long count, Long totalAvailableStock, Long totalAllocatedStock, Long totalDisposedStock) {
+    public InventoryViewDTO(Integer productId, String productName, Long count, Long totalAvailableStock, Long totalAllocatedStock, Long totalDisposedStock) {
+        this.productId = productId;
         this.productName = productName;
         Count = count;
         TotalAvailableStock = totalAvailableStock;
@@ -19,15 +21,12 @@ public class InventoryViewDTO {
         TotalDisposedStock = totalDisposedStock;
     }
 
-    @Override
-    public String toString() {
-        return "InventoryViewDTO{" +
-                "productName='" + productName + '\'' +
-                ", Count=" + Count +
-                ", TotalAvailableStock=" + TotalAvailableStock +
-                ", TotalAllocatedStock=" + TotalAllocatedStock +
-                ", TotalDisposedStock=" + TotalDisposedStock +
-                '}';
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
     }
 
     public String getProductName() {
@@ -68,5 +67,17 @@ public class InventoryViewDTO {
 
     public void setTotalDisposedStock(Long totalDisposedStock) {
         TotalDisposedStock = totalDisposedStock;
+    }
+
+    @Override
+    public String toString() {
+        return "InventoryViewDTO{" +
+                "productId=" + productId +
+                ", productName='" + productName + '\'' +
+                ", Count=" + Count +
+                ", TotalAvailableStock=" + TotalAvailableStock +
+                ", TotalAllocatedStock=" + TotalAllocatedStock +
+                ", TotalDisposedStock=" + TotalDisposedStock +
+                '}';
     }
 }

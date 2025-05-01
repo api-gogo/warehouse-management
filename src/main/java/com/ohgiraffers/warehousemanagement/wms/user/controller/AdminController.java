@@ -63,28 +63,27 @@ public class AdminController {
     }
 
     @GetMapping("/users/{userId}")
-    public String showUserDetail(@PathVariable Integer userId, Model model) {
+    public String showUserDetail(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
         UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            model.addAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
+            return "redirect:/admin/users";
         }
+        
         model.addAttribute("user", userDTO);
         return "admin/users/detail";
     }
 
     @GetMapping("/users/{userId}/edit")
-    public String showUserEditForm(@PathVariable Integer userId, Model model) {
+    public String showUserEditForm(@PathVariable Integer userId, Model model, RedirectAttributes redirectAttributes) {
         UserDTO userDTO = userServiceImpl.findById(userId);
 
         if (userDTO == null) {
-            String message = null;
-            message = "해당 id의 유저 정보가 없습니다.";
-            model.addAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message", "해당 id의 유저 정보가 없습니다.");
             return "redirect:/admin/users";
         }
+        
         model.addAttribute("user", userDTO);
         return "admin/users/edit";
     }

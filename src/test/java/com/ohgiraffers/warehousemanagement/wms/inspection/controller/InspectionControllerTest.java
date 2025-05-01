@@ -4,6 +4,7 @@ import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.Inspectio
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.SearchResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.service.InspectionServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,7 +88,8 @@ class InspectionControllerTest {
     @Test
     @DisplayName("메인 페이지 조회 테스트")
     void getAllInspections() {
-        Page<InspectionResponseDTO> allInspection = inspectionService.getAllInspection(1, 10);
+        SearchResponseDTO param = new SearchResponseDTO(null, null, null);
+        Page<InspectionResponseDTO> allInspection = inspectionService.getAllInspection(param, 1, 10);
 
         log.info("조회된 Inspection 목록\n{}", allInspection.getContent());
 
@@ -97,7 +99,8 @@ class InspectionControllerTest {
     @Test
     @DisplayName("태그로 조회 테스트")
     void getAllTagInspections() {
-        Page<InspectionResponseDTO> allTagInspection = inspectionService.getAllInspectionByTag("INSPECTION", 1, 10);
+        SearchResponseDTO param = new SearchResponseDTO("INSPECTION", null, null);
+        Page<InspectionResponseDTO> allTagInspection = inspectionService.getAllInspectionByTag(param, 1, 10);
 
         log.info("조회된 Inspection 목록\n{}", allTagInspection.getContent());
 
@@ -107,8 +110,9 @@ class InspectionControllerTest {
     @Test
     @DisplayName("없는 태그 조회 테스트 [예외 발생]")
     void getAllTagInspections_NotFound() {
+        SearchResponseDTO param = new SearchResponseDTO("없는태그", null, null);
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            inspectionService.getAllInspectionByTag("없는태그",1, 10);
+            inspectionService.getAllInspectionByTag(param,1, 10);
         });
 
         Assertions.assertEquals("존재하지 않는 유형입니다!", exception.getMessage());
@@ -137,8 +141,8 @@ class InspectionControllerTest {
     @Test
     @DisplayName("다중 등록 테스트")
     void createMultiInspection() {
-        for(int i = 1; i <= 43; i++) {
-            InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, i, i, 0, InspectionStatus.OK, LocalDate.now());
+        for(long i = 1; i <= 43; i++) {
+            InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, (int)i, (int)i, 0, InspectionStatus.OK, LocalDate.now());
             if(i % 2 == 0) {
                 dto.setTransactionType(InspectionTransactionType.PURCHASE);
                 dto.setTransactionId(i);
@@ -162,8 +166,8 @@ class InspectionControllerTest {
                 dto.setInspectionStatus(InspectionStatus.HOLD);
             }
             if(i % 3 == 2) {
-                dto.setDefectiveQuantity(i / 4);
-                dto.setAcceptedQuantity(dto.getInspectionQuantity() - (i / 4));
+                dto.setDefectiveQuantity((int) (i / 4));
+                dto.setAcceptedQuantity( (dto.getInspectionQuantity() - (int) (i / 4)));
             }
 
 

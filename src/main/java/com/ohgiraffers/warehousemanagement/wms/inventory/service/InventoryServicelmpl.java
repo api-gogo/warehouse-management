@@ -7,9 +7,12 @@ import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.Invent
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,7 +33,7 @@ public class InventoryServicelmpl implements InventoryService {
     }
 
 
-    // Entity를 DTO로 변환
+    // Entity를 InventoryDTO로 변환
     public InventoryDTO convertToDTO(Inventory inventory) {
         InventoryDTO result = new InventoryDTO(
                 inventory.getInventoryId(),
@@ -50,22 +53,15 @@ public class InventoryServicelmpl implements InventoryService {
     }
 
 
-    public List<InventoryDTO> findAllInventories() {
-        return inventoryRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
 
     public InventoryDTO findInventoryById(Long inventoryId) {
-        Optional<Inventory> findInventory = inventoryRepository.findById(inventoryId);
-        if (findInventory.isEmpty()) {
+        Optional<Inventory> inventory = inventoryRepository.findById(inventoryId);
+        if (inventory.isEmpty()){
             throw new IllegalArgumentException("해당 재고가 존재하지 않습니다.");
         } else {
-            return convertToDTO(findInventory.get());
+            return convertToDTO(inventory.get());
         }
     }
-
 
     public Inventory findTopByProductIdOrderByInventoryExpiryDateAsc(Integer productId){
         Optional<Inventory> findInventory = inventoryRepository.findTopByProductProductIdOrderByInventoryExpiryDateAsc(productId);
@@ -73,22 +69,38 @@ public class InventoryServicelmpl implements InventoryService {
         return findInventory.get();
     };
 
-    // 입력한 상품명에 해당되는 재고 조회
-    public List<InventoryDTO> findByProductName(String productName) {
-        String searchPattern = "%" + productName + "%";
-        List<Inventory> inventory = inventoryRepository.findByProductName(searchPattern);
+
+    public Page<InventoryDTO> findByProductProductIdOrderByInventoryExpiryDateAsc(int productId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Inventory> inventory = inventoryRepository.findByProductProductIdOrderByInventoryExpiryDateAsc(productId, pageable);
+
         if (inventory.isEmpty()) {
-            throw new IllegalArgumentException(productName + "을 포함하는 상품명이 존재하지 않습니다.");
+            throw new IllegalArgumentException(productId + "에 해당하는 재고가 존재하지 않습니다.");
         } else {
-            return inventory.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
+            return inventory.map(inventory1 -> convertToDTO(inventory1));
         }
     }
 
-    public List<InventoryViewDTO> groupByProductName() {
-        return inventoryRepository.groupByProductName();
+    // 페이징네이션 구현 - 전체 목록 조회
+    public Page<InventoryViewDTO> getInventoryViewListWithPaging(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return inventoryRepository.getInventoryViewListWithPaging(pageable);
     }
+
+    // 페이징네이션 구현 - 상품명 검색 조회
+    public Page<InventoryViewDTO> findInventoryViewDTOByProductName(String productName, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String searchPattern = "%" + productName + "%";
+
+        Page<InventoryViewDTO> inventoryViewDTOS = inventoryRepository.findInventoryViewDTOByProductName(searchPattern, pageable);
+        if (inventoryViewDTOS.isEmpty()) {
+            return Page.empty();
+
+        } else {
+            return inventoryViewDTOS;
+        }
+    }
+
 
 
     @Transactional
@@ -159,7 +171,7 @@ public class InventoryServicelmpl implements InventoryService {
 
     }
 
-    // 로트 번호 생성
+    // 로트 번호 생성 메소드
     public String createRotNum(Product product) {
         int categoryId = product.getCategory().getCategoryId();
 
@@ -177,6 +189,7 @@ public class InventoryServicelmpl implements InventoryService {
         return lotNumber;
     }
 
+    // 로트 번호 생성 시 필요한 일련 번호 생성 메소드
     public int getNextSequenceForProductToday(Integer productId) {
         // 당일 날짜 접두사 생성
         LocalDate today = LocalDate.now();
@@ -193,5 +206,7 @@ public class InventoryServicelmpl implements InventoryService {
         String sequencePart = maxLotNumber.substring(maxLotNumber.length() - 3);
         return Integer.parseInt(sequencePart) + 1; // 다음 일련번호
     }
+
+
 
 }

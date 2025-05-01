@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WMS - 입고 반품 수정</title>
+  <style>
+    .form-label {
+      font-weight: 500;
+    }
+
+    .required-field::after {
+      content: "*";
+      color: red;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div layout:fragment="content">
+    <div class="page-header">
+      <h2>입고 반품 수정</h2>
+      <a th:href="@{/returns/{id}/detail_inbound(id=${detail.returnStorageId})}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> 상세로 돌아가기
+      </a>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">반품 정보 수정</h5>
+        <p class="card-text text-muted">입고 반품 정보를 수정해주세요.</p>
+
+        <form th:action="@{/returns/{id}/update_inbound(id=${detail.returnStorageId})}" method="post">
+          <input type="hidden" name="returnStorageId" th:value="${detail.returnStorageId}">
+          <input type="hidden" name="returnStorageCreatedAt" th:value="${detail.returnStorageCreatedAt}">
+          <div th:if="${detail.returnStorageDeletedAt != null}">
+            <input type="hidden" name="returnStorageDeletedAt" th:value="${detail.returnStorageDeletedAt}">
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="storageId" class="form-label required-field">입고 번호</label>
+              <input type="text" class="form-control" id="storageId" name="storageId" th:value="${detail.storageId}" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="supplierId" class="form-label required-field">공급업체</label>
+              <select class="form-select" id="supplierId" name="supplierId" required>
+                <option value="1" th:selected="${detail.supplierId == 1}">공급업체 A</option>
+                <option value="2" th:selected="${detail.supplierId == 2}">공급업체 B</option>
+                <option value="3" th:selected="${detail.supplierId == 3}">공급업체 C</option>
+                <option value="4" th:selected="${detail.supplierId == 4}">공급업체 D</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="userId" class="form-label required-field">담당자</label>
+              <select class="form-select" id="userId" name="userId" required>
+                <option value="1" th:selected="${detail.userId == 1}">김담당</option>
+                <option value="2" th:selected="${detail.userId == 2}">이담당</option>
+                <option value="3" th:selected="${detail.userId == 3}">박담당</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="returnStorageQuantity" class="form-label required-field">반품 수량</label>
+              <input type="number" class="form-control" id="returnStorageQuantity" name="returnStorageQuantity" th:value="${detail.returnStorageQuantity}" min="1" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <label for="returnStorageContent" class="form-label required-field">반품 사유</label>
+              <textarea class="form-control" id="returnStorageContent" name="returnStorageContent" rows="3" required th:text="${detail.returnStorageContent}"></textarea>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <a th:href="@{/returns/{id}/detail_inbound(id=${detail.returnStorageId})}" class="btn btn-outline-secondary">취소</a>
+            <button type="submit" class="btn btn-primary">수정</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

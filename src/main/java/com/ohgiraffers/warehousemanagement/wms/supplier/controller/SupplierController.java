@@ -87,14 +87,79 @@ public class SupplierController {
             message = "중복된 담당자 이메일이 존재합니다.";
             redirectAttributes.addFlashAttribute("message", message);
             return "redirect:/suppliers/create";
-        } else if (result == 0) {
-            message = "서버에 오류가 발생하였습니다.";
-            redirectAttributes.addFlashAttribute("message", message);
-            return "redirect:/suppliers/create";
-        } else {
-            message = "거래처 추가가 완료되었습니다.";
         }
 
+        message = "거래처 추가가 완료되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers";
+    }
+
+    @GetMapping("/{supplierId}/edit")
+    public String showSupplierEditForm(@PathVariable Integer supplierId, Model model, RedirectAttributes redirectAttributes) {
+        SupplierDTO supplierDTO = supplierServiceImpl.findById(supplierId);
+
+        if (supplierDTO == null) {
+            redirectAttributes.addFlashAttribute("message", "해당 id의 거래처가 없습니다.");
+            return "redirect:/suppliers";
+        }
+
+        model.addAttribute("supplier", supplierDTO);
+        return "suppliers/edit";
+    }
+
+    @PatchMapping("/{supplierId}")
+    public String updateSupplier(@PathVariable Integer supplierId,
+                                 SupplierDTO supplierDTO, RedirectAttributes redirectAttributes) {
+        String message = null;
+        Integer result = supplierServiceImpl.updateSupplier(supplierId, supplierDTO);
+
+        if (result == -1) {
+            message = "중복된 거래처 이름이 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/" + supplierId + "/edit";
+        } else if (result == -2) {
+            message = "중복된 담당자 전화번호가 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/" + supplierId + "/edit";
+        } else if (result == -3) {
+            message = "중복된 담당자 이메일이 존재합니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers/" + supplierId + "/edit";
+        }
+
+        message = "거래처 정보가 업데이트 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers/" + supplierId;
+    }
+
+    @PostMapping("/{supplierId}/delete")
+    public String deleteSupplier(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.deleteSupplier(supplierId);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처가 삭제 되었습니다.";
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/suppliers";
+    }
+
+    @PostMapping("/{supplierId}/restore")
+    public String restoreSupplier(@PathVariable Integer supplierId, RedirectAttributes redirectAttributes) {
+        String message = null;
+        boolean result = supplierServiceImpl.restoreSupplier(supplierId);
+
+        if (!result) {
+            message = "거래처 정보를 찾을 수 없습니다.";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/suppliers";
+        }
+
+        message = "거래처가 복구 되었습니다.";
         redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/suppliers";
     }

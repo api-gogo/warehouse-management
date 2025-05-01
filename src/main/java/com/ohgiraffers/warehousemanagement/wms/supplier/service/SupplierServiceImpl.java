@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -81,6 +83,7 @@ public class SupplierServiceImpl implements SupplierService {
         )).orElse(null);
     }
 
+    @Transactional
     public Integer createSupplier(SupplierDTO supplierDTO) {
 
         if (supplierRepository.existsBySupplierName(supplierDTO.getSupplierName())) {
@@ -91,20 +94,66 @@ public class SupplierServiceImpl implements SupplierService {
             return -3;
         }
 
-        try {
-            Supplier supplier = new Supplier(
-                    supplierDTO.getSupplierName(),
-                    supplierDTO.getSupplierAddress(),
-                    supplierDTO.getSupplierManagerName(),
-                    supplierDTO.getSupplierManagerPhone(),
-                    supplierDTO.getSupplierManagerEmail()
-            );
+        Supplier supplier = new Supplier(
+                supplierDTO.getSupplierName(),
+                supplierDTO.getSupplierAddress(),
+                supplierDTO.getSupplierManagerName(),
+                supplierDTO.getSupplierManagerPhone(),
+                supplierDTO.getSupplierManagerEmail()
+        );
 
-            supplierRepository.save(supplier);
-            return supplier.getSupplierId();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
+        supplierRepository.save(supplier);
+        return supplier.getSupplierId();
+    }
+
+    @Transactional
+    public Integer updateSupplier(Integer supplierId, SupplierDTO supplierDTO) {
+
+        if (supplierRepository.existsBySupplierNameAndSupplierIdNot(supplierDTO.getSupplierName(), supplierId)) {
+            return -1;
+        } else if (supplierRepository.existsBySupplierManagerPhoneAndSupplierIdNot(supplierDTO.getSupplierManagerPhone(), supplierId)) {
+            return -2;
+        } else if (supplierRepository.existsBySupplierManagerEmailAndSupplierIdNot(supplierDTO.getSupplierManagerEmail(), supplierId)) {
+            return -3;
         }
+
+        Supplier supplier = supplierRepository.findBySupplierId(supplierId).orElse(null);
+
+        supplier.setSupplierAddress(supplierDTO.getSupplierAddress());
+        supplier.setSupplierManagerName(supplierDTO.getSupplierManagerName());
+        supplier.setSupplierManagerPhone(supplierDTO.getSupplierManagerPhone());
+        supplier.setSupplierManagerEmail(supplierDTO.getSupplierManagerEmail());
+        supplier.setSupplierUpdatedAt(LocalDateTime.now());
+
+        supplierRepository.save(supplier);
+        return supplier.getSupplierId();
+    }
+
+    @Transactional
+    public boolean deleteSupplier(Integer supplierId) {
+        Supplier supplier = supplierRepository.findBySupplierId(supplierId).orElse(null);
+        if (supplier == null) {
+            return false;
+        }
+
+        supplier.setDeleted(true);
+        supplier.setSupplierUpdatedAt(LocalDateTime.now());
+        supplier.setSupplierDeletedAt(LocalDateTime.now());
+        supplierRepository.save(supplier);
+        return true;
+    }
+
+    @Transactional
+    public boolean restoreSupplier(Integer supplierId) {
+        Supplier supplier = supplierRepository.findBySupplierId(supplierId).orElse(null);
+        if (supplier == null) {
+            return false;
+        }
+
+        supplier.setDeleted(false);
+        supplier.setSupplierUpdatedAt(LocalDateTime.now());
+        supplier.setSupplierDeletedAt(null);
+        supplierRepository.save(supplier);
+        return true;
     }
 }

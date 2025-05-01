@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 public class InspectionResponseDTO {
     private Long inspectionId;
     private Integer userId;
-    private Integer transactionId = null;
+    private String userName;
+    private Long transactionId = null;
     private String transactionType;
     private Integer inspectionQuantity;
     private Integer acceptedQuantity;
@@ -21,12 +22,13 @@ public class InspectionResponseDTO {
 
     protected InspectionResponseDTO() {}
 
-    public InspectionResponseDTO(Long inspectionId, Integer userId, Integer transactionId,
+    public InspectionResponseDTO(Long inspectionId, Integer userId, String userName, Long transactionId,
                                  InspectionTransactionType transactionType, Integer inspectionQuantity,
                                  Integer acceptedQuantity, Integer defectiveQuantity, InspectionStatus inspectionStatus,
                                  LocalDate inspectionDate, LocalDateTime inspectionUpdatedAt) {
         this.inspectionId = inspectionId;
         this.userId = userId;
+        this.userName = userName;
         this.transactionId = transactionId;
         this.transactionType = transactionType.getTransactionType();
         this.inspectionQuantity = inspectionQuantity;
@@ -39,7 +41,8 @@ public class InspectionResponseDTO {
 
     public InspectionResponseDTO(Inspection saveInspection) {
         this.inspectionId = saveInspection.getInspectionId();
-        this.userId = saveInspection.getUserId();
+        this.userId = saveInspection.getUser().getUserId();
+        this.userName = saveInspection.getUser().getUserName();
         this.transactionId = saveInspection.getTransactionId();
         this.transactionType = saveInspection.getTransactionType().getTransactionType();
         this.inspectionQuantity = saveInspection.getInspectionQuantity();
@@ -66,11 +69,19 @@ public class InspectionResponseDTO {
         this.userId = userId;
     }
 
-    public Integer getTransactionId() {
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId) {
+    public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
     }
 
@@ -135,6 +146,7 @@ public class InspectionResponseDTO {
         return "InspectionResponseDTO{" +
                 "inspectionId=" + inspectionId +
                 ", userId=" + userId +
+                ", userName='" + userName +
                 ", transactionId=" + transactionId +
                 ", transactionType=" + transactionType +
                 ", inspectionQuantity=" + inspectionQuantity +

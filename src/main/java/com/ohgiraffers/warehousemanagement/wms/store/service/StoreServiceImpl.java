@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -81,6 +83,7 @@ public class StoreServiceImpl implements StoreService {
         )).orElse(null);
     }
 
+    @Transactional
     public Integer createStore(StoreDTO storeDTO) {
 
         if (storeRepository.existsByStoreName(storeDTO.getStoreName())) {
@@ -91,20 +94,65 @@ public class StoreServiceImpl implements StoreService {
             return -3;
         }
 
-        try {
-            Store store = new Store(
-                    storeDTO.getStoreName(),
-                    storeDTO.getStoreAddress(),
-                    storeDTO.getStoreManagerName(),
-                    storeDTO.getStoreManagerPhone(),
-                    storeDTO.getStoreManagerEmail()
-            );
+        Store store = new Store(
+                storeDTO.getStoreName(),
+                storeDTO.getStoreAddress(),
+                storeDTO.getStoreManagerName(),
+                storeDTO.getStoreManagerPhone(),
+                storeDTO.getStoreManagerEmail());
 
-            storeRepository.save(store);
-            return store.getStoreId();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
+        storeRepository.save(store);
+        return store.getStoreId();
+    }
+
+    @Transactional
+    public Integer updateStore(Integer storeId, StoreDTO storeDTO) {
+
+        if (storeRepository.existsByStoreNameAndStoreIdNot(storeDTO.getStoreName(), storeId)) {
+            return -1;
+        } else if (storeRepository.existsByStoreManagerPhoneAndStoreIdNot(storeDTO.getStoreManagerPhone(), storeId)) {
+            return -2;
+        } else if (storeRepository.existsByStoreManagerEmailAndStoreIdNot(storeDTO.getStoreManagerEmail(), storeId)) {
+            return -3;
         }
+
+        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+
+        store.setStoreAddress(storeDTO.getStoreAddress());
+        store.setStoreManagerName(storeDTO.getStoreManagerName());
+        store.setStoreManagerPhone(storeDTO.getStoreManagerPhone());
+        store.setStoreManagerEmail(storeDTO.getStoreManagerEmail());
+        store.setStoreUpdatedAt(LocalDateTime.now());
+
+        storeRepository.save(store);
+        return store.getStoreId();
+    }
+
+    @Transactional
+    public boolean deleteStore(Integer storeId) {
+        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+        if (store == null) {
+            return false;
+        }
+
+        store.setDeleted(true);
+        store.setStoreUpdatedAt(LocalDateTime.now());
+        store.setStoreDeletedAt(LocalDateTime.now());
+        storeRepository.save(store);
+        return true;
+    }
+
+    @Transactional
+    public boolean restoreStore(Integer storeId) {
+        Store store = storeRepository.findByStoreId(storeId).orElse(null);
+        if (store == null) {
+            return false;
+        }
+
+        store.setDeleted(false);
+        store.setStoreUpdatedAt(LocalDateTime.now());
+        store.setStoreDeletedAt(null);
+        storeRepository.save(store);
+        return true;
     }
 }
