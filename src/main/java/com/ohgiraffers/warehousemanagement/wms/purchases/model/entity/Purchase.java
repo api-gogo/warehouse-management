@@ -33,7 +33,7 @@ public class Purchase {
 
     // 발주 담당자
     @Column(name = "user_id")
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "purchase_date")
     private LocalDate purchaseDate;
@@ -69,11 +69,11 @@ public class Purchase {
 
 
     public Purchase(
-                    Integer purchaseId,
-                    Integer userId, LocalDate purchaseDate, LocalDate purchaseDueDate,
-                    PurchaseStatus purchaseStatus, LocalDate purchaseCreatedAt,
-                    LocalDate purchase_updated_at, String notes) {
-//        Supplier supplier, Storages storages,
+            Integer purchaseId,
+            Long userId, LocalDate purchaseDate, LocalDate purchaseDueDate,
+            PurchaseStatus purchaseStatus, LocalDate purchaseCreatedAt,
+            LocalDate purchase_updated_at, String notes) {
+        //Supplier supplier, Storages storages,
 
 
         this.supplier = supplier;
@@ -134,11 +134,11 @@ public class Purchase {
         this.purchaseId = purchaseId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

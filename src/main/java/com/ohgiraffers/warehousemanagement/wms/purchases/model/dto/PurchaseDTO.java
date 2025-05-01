@@ -11,7 +11,8 @@ import java.util.List;
 
 public class PurchaseDTO {
     private Integer purchaseId;
-    private Integer userId;
+    private Long userId;
+//    private Integer userId;
     private Integer supplierId;    // 추가: 거래처 ID 필드
     private LocalDate purchaseDate;
     private LocalDate purchaseDueDate;
@@ -27,13 +28,14 @@ public class PurchaseDTO {
 
 
 //    private Supplier supplier;
+//    private List<PurchaseItem> items = new ArrayList<>();
 //    private Storages storages;
 
 
     public PurchaseDTO() {}
 
 
-    public PurchaseDTO(Integer purchaseId, Integer userId,LocalDate purchaseCreatedAt ,LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, LocalDate purchaseUpdatedAt,String purchaseNotes
+    public PurchaseDTO(Integer purchaseId, Long userId, LocalDate purchaseCreatedAt , LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, LocalDate purchaseUpdatedAt, String purchaseNotes
                        )
     {  //Supplier supplier, List<PurchaseItem> items,Storages storages
         this.purchaseId = purchaseId;
@@ -48,10 +50,10 @@ public class PurchaseDTO {
 //        this.items = items;
 //        this.storages = storages;
     }
-    
+
     // 거래처 ID를 포함하는 생성자 추가
-    public PurchaseDTO(Integer purchaseId, Integer userId, Integer supplierId, LocalDate purchaseCreatedAt, 
-                    LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus, 
+    public PurchaseDTO(Integer purchaseId, Long userId, Integer supplierId, LocalDate purchaseCreatedAt,
+                    LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus,
                     LocalDate purchaseUpdatedAt, String purchaseNotes) {
         this.purchaseId = purchaseId;
         this.userId = userId;
@@ -63,7 +65,7 @@ public class PurchaseDTO {
         this.purchaseCreatedAt = purchaseCreatedAt;
         this.purchaseNotes = purchaseNotes;
     }
-    
+
     public  PurchaseDTO(Supplier Supplier){
         this.supplier = Supplier;
     }
@@ -84,14 +86,14 @@ public class PurchaseDTO {
         this.purchaseId = purchaseId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
-    
+
     public Integer getSupplierId() {
         return supplierId;
     }

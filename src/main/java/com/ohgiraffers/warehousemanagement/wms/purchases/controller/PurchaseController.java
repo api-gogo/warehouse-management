@@ -42,7 +42,7 @@ public class PurchaseController {
         this.purchasesItemService = purchasesItemService;
     }
 
-    // Helper method to convert status string to PurchaseStatus enum
+
     private PurchaseStatus getStatusFromString(String statusStr) {
         if (statusStr == null || statusStr.isEmpty()) {
             throw new IllegalArgumentException("상태가 지정되지 않았습니다.");
