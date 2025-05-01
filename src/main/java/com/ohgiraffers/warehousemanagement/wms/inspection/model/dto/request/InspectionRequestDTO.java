@@ -14,7 +14,7 @@ public class InspectionRequestDTO {
     @NotNull(message = "검수자는 필수입니다!")
     private Integer userId;
 
-    private Integer transactionId = null;
+    private Long transactionId = null;
 
     @NotNull(message = "검수 유형은 필수입니다!")
     @Enumerated(EnumType.STRING)
@@ -41,7 +41,7 @@ public class InspectionRequestDTO {
 
     protected InspectionRequestDTO() {}
 
-    public InspectionRequestDTO(Integer userId, Integer transactionId, InspectionTransactionType transactionType,
+    public InspectionRequestDTO(Integer userId, Long transactionId, InspectionTransactionType transactionType,
                                 Integer inspectionQuantity, Integer acceptedQuantity, Integer defectiveQuantity,
                                 InspectionStatus inspectionStatus, LocalDate inspectionDate) {
         this.userId = userId;
@@ -62,11 +62,11 @@ public class InspectionRequestDTO {
         this.userId = userId;
     }
 
-    public Integer getTransactionId() {
+    public Long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId) {
+    public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
     }
 

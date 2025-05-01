@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 public interface InspectionService {
     InspectionResponseDTO createInspection(InspectionRequestDTO requestDTO);
 
-    InspectionResponseDTO getInspectionByTagAndTagId(String type, int typeId);
+    InspectionResponseDTO getInspectionByTagAndTagId(String type, Long typeId);
 }

@@ -62,8 +62,9 @@
                 <i class="fas fa-phone me-2"></i>전화번호
               </label>
               <input type="tel" class="form-control" id="userPhone" name="userPhone" 
-                     th:value="${user.userPhone}" placeholder="전화번호 (예: 010-1234-5678)" 
-                     pattern="^\d{3}-\d{4}-\d{4}$" title="010-1234-5678 형식으로 입력해주세요." required>
+                     th:value="${user.userPhone}" placeholder="전화번호를 입력하세요 (자동으로 하이픈 추가)" 
+                     required maxlength="13">
+              <small class="form-text text-muted">숫자만 입력하면 하이픈(-)이 자동으로 추가됩니다.</small>
             </div>
           </div>
           
@@ -111,6 +112,33 @@
         const form = document.getElementById('updateForm');
         const userPass = document.getElementById('userPass');
         const confirmUserPass = document.getElementById('confirmUserPass');
+        const userPhone = document.getElementById('userPhone');
+
+        // 전화번호에 하이픈 자동 추가 기능
+        userPhone.addEventListener('input', function(e) {
+          // 입력된 값에서 모든 하이픈 제거
+          let phoneNumber = e.target.value.replace(/-/g, '');
+          
+          // 숫자만 입력받도록 처리
+          phoneNumber = phoneNumber.replace(/[^\d]/g, '');
+          
+          // 최대 11자리만 받음
+          if (phoneNumber.length > 11) {
+            phoneNumber = phoneNumber.slice(0, 11);
+          }
+          
+          // 하이픈 자동 추가 (3-4-4 형식)
+          if (phoneNumber.length >= 3 && phoneNumber.length <= 7) {
+            // 앞 3자리 + "-" + 나머지
+            phoneNumber = phoneNumber.slice(0, 3) + '-' + phoneNumber.slice(3);
+          } else if (phoneNumber.length > 7) {
+            // 앞 3자리 + "-" + 중간 4자리 + "-" + 나머지
+            phoneNumber = phoneNumber.slice(0, 3) + '-' + phoneNumber.slice(3, 7) + '-' + phoneNumber.slice(7);
+          }
+          
+          // 변환된 값 설정
+          e.target.value = phoneNumber;
+        });
 
         form.addEventListener('submit', function(event) {
           // 비밀번호 입력 확인

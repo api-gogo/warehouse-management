@@ -34,11 +34,11 @@ public class UserController {
     @GetMapping("/signup")
     public String showSignupForm(Model model) {
         model.addAttribute("signupUserDTO", new SignupUserDTO());
-        return "register";
+        return "user/register";
     }
 
     @PostMapping("/signup")
-    public String registerUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model) {
+    public String registerUser(@ModelAttribute SignupUserDTO signupUserDTO, Model model, RedirectAttributes redirectAttributes) {
 
         Integer result = userServiceImpl.registerUser(signupUserDTO);
         String message = null;
@@ -61,8 +61,8 @@ public class UserController {
             return "user/register";
         } else {
             message = "회원가입이 완료되었습니다.";
-            model.addAttribute("message", message);
-            return "auth/login";
+            redirectAttributes.addFlashAttribute("message", message);
+            return "redirect:/auth/login";
         }
     }
 
@@ -78,12 +78,13 @@ public class UserController {
             }
         }
 
-        System.out.println("디버깅용");
         return "redirect:/";
     }
 
     @GetMapping("/password-verify")
-    public String showPasswordVerificationForm(Authentication authentication, Model model) {
+    public String showPasswordVerificationForm(Authentication authentication, 
+                                              Model model,
+                                              RedirectAttributes redirectAttributes) {
         // 로그인 상태 확인
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
@@ -92,7 +93,7 @@ public class UserController {
                 
                 // 승인대기 상태는 프로필 수정 불가
                 if (status.equals(UserStatus.승인대기.getStatus())) {
-                    model.addAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
+                    redirectAttributes.addFlashAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
                     return "redirect:/user/profile";
                 }
                 
@@ -104,24 +105,24 @@ public class UserController {
     }
 
     @PostMapping("/password-verify")
-    public String verifyPassword(Authentication authentication, @RequestParam String verifyPassword, Model model) {
-        String message = null;
-
+    public String verifyPassword(Authentication authentication, 
+                                @RequestParam String verifyPassword, 
+                                Model model,
+                                RedirectAttributes redirectAttributes) {
         if (authentication != null && authentication.isAuthenticated()) {
             if (authentication.getPrincipal() instanceof AuthDetails) {
                 AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
                 
                 // 승인대기 상태 확인
                 if (authDetails.getUserStatus().equals(UserStatus.승인대기.getStatus())) {
-                    model.addAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
+                    redirectAttributes.addFlashAttribute("message", "승인대기 상태에서는 프로필을 수정할 수 없습니다.");
                     return "redirect:/user/profile";
                 }
 
                 String encodedPassword = authDetails.getPassword();
 
                 if (!passwordEncoder.matches(verifyPassword, encodedPassword)) {
-                    message = "비밀번호가 일치하지 않습니다.";
-                    model.addAttribute("message", message);
+                    model.addAttribute("message", "비밀번호가 일치하지 않습니다.");
                     return "user/verify";
                 }
 

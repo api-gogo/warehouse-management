@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/default-layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,9 +10,6 @@
   <link rel="stylesheet" href="../../static/css/products/list.css" th:href="@{/css/products/list.css}">
   <!-- 공통 CSS -->
   <link rel="stylesheet" href="/common.css?v=1">
-  <th:block layout:fragment="css">
-    <link rel="stylesheet" href="/css/예시.css">
-  </th:block>
   <!-- 네비게이션 CSS -->
   <link rel="stylesheet" href="/css/navigation.css?v=1">
 </head>
