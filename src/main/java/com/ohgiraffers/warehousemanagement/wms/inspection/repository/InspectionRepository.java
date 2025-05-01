@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface InspectionRepository extends JpaRepository<Inspection, Long> {
     Optional<Inspection> findByTransactionTypeAndTransactionId(InspectionTransactionType transactionType, Long transactionId);
 
+    @Query("SELECT i FROM Inspection i WHERE i.transactionType = :transactionType AND CAST(i.transactionId AS long) = :transactionId")
+    Optional<Inspection> findByTransactionTypeAndTransactionId(InspectionTransactionType transactionType, Integer transactionId);
+
     Page<Inspection> findAllByOrderByInspectionIdDesc(Pageable pageable);
 
     Page<Inspection> findAllByTransactionTypeOrderByInspectionIdDesc(InspectionTransactionType transactionType, Pageable pageable);

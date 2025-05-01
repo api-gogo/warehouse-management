@@ -1,11 +1,20 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.service;
 
+import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionStatus;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.common.InspectionTransactionType;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.request.InspectionRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.InspectionResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response.SearchResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.inspection.model.entity.Inspection;
 import com.ohgiraffers.warehousemanagement.wms.inspection.repository.InspectionRepository;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseItemRepository;
+import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShipment;
+import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShipmentItem;
+import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnShipmentItemRepository;
+import com.ohgiraffers.warehousemanagement.wms.storage.model.entity.Storage;
+import com.ohgiraffers.warehousemanagement.wms.storage.model.repository.StorageRepository;
 import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
 import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -16,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,10 +33,20 @@ public class InspectionServiceImpl implements InspectionService {
     private final InspectionRepository inspectionRepository;
     private final UserRepository userRepository;
 
+    private final PurchaseItemRepository purchaseItemRepository;
+    private final StorageRepository storageRepository;
+
+    private final ReturnShipmentItemRepository returnShipmentItemRepository;
+
     @Autowired
-    public InspectionServiceImpl(InspectionRepository inspectionRepository, UserRepository userRepository) {
+    public InspectionServiceImpl(InspectionRepository inspectionRepository, UserRepository userRepository,
+                                 PurchaseItemRepository purchaseItemRepository, StorageRepository storageRepository
+    , ReturnShipmentItemRepository returnShipmentItemRepository) {
         this.inspectionRepository = inspectionRepository;
         this.userRepository = userRepository;
+        this.purchaseItemRepository = purchaseItemRepository;
+        this.storageRepository = storageRepository;
+        this.returnShipmentItemRepository = returnShipmentItemRepository;
     }
 
     @Override
@@ -54,7 +74,18 @@ public class InspectionServiceImpl implements InspectionService {
 
         Inspection saveInspection = inspectionRepository.save(inspection);
 
-        return new InspectionResponseDTO(saveInspection);
+        switch (saveInspection.getTransactionType()) {
+            case PURCHASE -> {
+                return changeStorageStatus(saveInspection);
+            }
+            case SALES -> {
+
+            }
+            case SHIPMENT -> {
+                return changeShipments(saveInspection);
+            }
+        }
+
     }
 
     public Page<InspectionResponseDTO> getAllInspection(SearchResponseDTO dto, int page, int size) {
@@ -127,6 +158,7 @@ public class InspectionServiceImpl implements InspectionService {
             }
         }
 
+        Inspection saveInspection = null;
         Optional<Inspection> findInspection = inspectionRepository.findById(inspectionId);
         if (findInspection.isPresent()) {
             Inspection inspection = findInspection.get();
@@ -140,12 +172,23 @@ public class InspectionServiceImpl implements InspectionService {
                 throw new IllegalArgumentException("변경사항이 없습니다!");
             else {
                 dtoToInspection.setInspectionUpdatedAt(LocalDateTime.now());
-                Inspection saveInspection = inspectionRepository.save(dtoToInspection);
-                return new InspectionResponseDTO(saveInspection);
+                saveInspection = inspectionRepository.save(dtoToInspection);
             }
         } else {
             throw new IllegalArgumentException("존재하지 않는 검수 ID입니다! \n" +
                     "검색 ID : " + inspectionId);
+        }
+
+        switch (saveInspection.getTransactionType()) {
+            case PURCHASE -> {
+                return changeStorageStatus(saveInspection);
+            }
+            case SALES -> {
+
+            }
+            case SHIPMENT -> {
+                return changeShipments(saveInspection);
+            }
         }
     }
 
@@ -157,6 +200,49 @@ public class InspectionServiceImpl implements InspectionService {
         } else {
             throw new IllegalArgumentException("존재하지 않는 검수 ID입니다! \n" +
                     "검수 ID : " + inspectionId);
+        }
+    }
+
+    private InspectionResponseDTO changeStorageStatus(Inspection saveInspection) {
+        // 발주의 경우 발주 목록에 개수만큼 채워지면 입고에 이상없음으로 변경해주기
+        PurchaseItem purchaseItem = purchaseItemRepository.findById(saveInspection.getTransactionId()).get();
+        Purchase purchase = purchaseItem.getPurchase();
+        List<Storage> byPurchaseId = storageRepository.findByPurchase_PurchaseId(purchase.getPurchaseId());
+        if (saveInspection.getInspectionStatus().equals(InspectionStatus.DEFECTIVE)) {
+            for (Storage storage : byPurchaseId) {
+                storage.setInspectionStatus("검수 이상");
+                storageRepository.save(storage);
+            }
+        }
+        int count = 0;
+        for (PurchaseItem item : purchase.getItems()) {
+            Optional<Inspection> inspectionOptional = inspectionRepository.findByTransactionTypeAndTransactionId(InspectionTransactionType.PURCHASE, item.getProductId());
+            if (inspectionOptional.isPresent()) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        if (count == purchase.getItems().size()) {
+            if (byPurchaseId.isEmpty()) {
+                throw new IllegalArgumentException("입고가 등록되지 않았습니다!");
+            }
+            for (Storage storage : byPurchaseId) {
+                storage.setInspectionStatus("검수 완료");
+                storageRepository.save(storage);
+            }
+        }
+        return new InspectionResponseDTO(saveInspection);
+    }
+
+    private InspectionResponseDTO changeShipments(Inspection saveInspection) {
+        // 출고반품 경우 출고반품 목록에 개수만큼 채워지면 입고에 이상없음으로 변경해주기
+        ReturnShipmentItem shipmentItem = returnShipmentItemRepository.findById(saveInspection.getInspectionId());
+        ReturnShipment shipment = shipmentItem.getReturnShipmentId();
+
+        List<ReturnShipmentItem> returnShipmentItems = shipment.getReturnShipmentItems();
+        if (saveInspection.getInspectionStatus().equals(InspectionStatus.DEFECTIVE)) {
+
         }
     }
 }

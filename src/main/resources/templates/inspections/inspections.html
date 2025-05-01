@@ -45,7 +45,6 @@
       <button class="tab-button" data-type="INSPECTION">상시</button>
       <button class="tab-button" data-type="PURCHASE">발주</button>
       <button class="tab-button" data-type="SALES">수주</button>
-      <button class="tab-button" data-type="STORAGE">입고반품</button>
       <button class="tab-button" data-type="SHIPMENT">출고반품</button>
     </div>
 
@@ -75,8 +74,7 @@
                       th:classappend="${inspection.transactionType == '상시' ? 'status-active' :
                                     (inspection.transactionType == '발주' ? 'status-inactive' :
                                     (inspection.transactionType == '수주' ? 'status-pending' :
-                                    (inspection.transactionType == '입고반품' ? 'status-rejected' :
-                                    (inspection.transactionType == '출고반품' ? 'status-resigned' : ''))))}"
+                                    (inspection.transactionType == '출고반품' ? 'status-resigned' : '')))}"
                       th:text="${inspection.transactionType}">상시</span>
             </td>
             <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>

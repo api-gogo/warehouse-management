@@ -23,8 +23,8 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Rollback
-@Transactional
+//@Rollback
+//@Transactional
 class InspectionControllerTest {
     private static final Logger log = LoggerFactory.getLogger(InspectionControllerTest.class);
     private final InspectionServiceImpl inspectionService;
@@ -151,10 +151,6 @@ class InspectionControllerTest {
                 dto.setTransactionType(InspectionTransactionType.SALES);
                 dto.setTransactionId(i);
             }
-            if(i % 5 == 0) {
-                dto.setTransactionType(InspectionTransactionType.STORAGE);
-                dto.setTransactionId(i);
-            }
             if(i % 7 == 0) {
                 dto.setTransactionType(InspectionTransactionType.SHIPMENT);
                 dto.setTransactionId(i);
@@ -165,7 +161,7 @@ class InspectionControllerTest {
             if(i % 6 == 0) {
                 dto.setInspectionStatus(InspectionStatus.HOLD);
             }
-            if(i % 3 == 2) {
+            if(i % 5 == 0) {
                 dto.setDefectiveQuantity((int) (i / 4));
                 dto.setAcceptedQuantity( (dto.getInspectionQuantity() - (int) (i / 4)));
             }
