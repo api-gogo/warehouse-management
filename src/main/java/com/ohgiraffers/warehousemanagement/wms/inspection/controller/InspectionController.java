@@ -116,7 +116,7 @@ public class InspectionController {
     }
 
     // 검수 수정하기
-    @PostMapping("/{inspectionId}")
+    @PostMapping("/{inspectionId}/edit")
     public String updateInspection(@PathVariable long inspectionId, @Validated InspectionRequestDTO requestDTO, RedirectAttributes ra) {
         log.info("POST : /inspections/{}", inspectionId);
         log.info("inspectionRequestDTO : {}", requestDTO);

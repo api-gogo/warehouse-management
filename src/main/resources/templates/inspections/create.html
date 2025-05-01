@@ -43,12 +43,24 @@
                     <!-- 등록 폼 시작 -->
                     <form th:action="@{/inspections/create}" method="post">
 
-                        <!-- 담당자 ID -->
                         <div class="form-group mb-4">
-                            <label for="userName" class="required-mark">담당자 이름</label>
-                            <input type="text" id="userName" name="userName" class="form-control" th:value="${#authentication.principal.userRealName}" readonly>
-                            <label for="userId" class="required-mark" hidden></label>
-                            <input type="hidden" id="userId" name="userId" class="form-control" th:value="${#authentication.principal.userId}">
+                            <!-- 관리자 권한이 없는 경우: userRealName 표시 (수정 불가) -->
+                            <div th:if="${#authentication.principal.userRole != '관리자'}">
+                                <label for="userName" class="required-mark">담당자 이름</label>
+                                <input type="text" id="userName" name="userName" class="form-control"
+                                       th:value="${#authentication.principal.userRealName}" readonly>
+
+                                <!-- userId는 hidden으로 포함 -->
+                                <input type="hidden" id="userId" name="userId"
+                                       th:value="${#authentication.principal.userId}">
+                            </div>
+
+                            <!-- 관리자 권한이 있는 경우: userId를 수정 가능하게 표시 -->
+                            <div th:if="${#authentication.principal.userRole == '관리자'}">
+                                <label for="userId" class="required-mark">담당자 ID</label>
+                                <input type="text" id="userId" name="userId" class="form-control"
+                                       th:value="${#authentication.principal.userId}">
+                            </div>
                         </div>
 
                         <!-- 검수 유형 -->

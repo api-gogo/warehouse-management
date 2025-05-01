@@ -115,6 +115,15 @@ public class InspectionServiceImpl implements InspectionService {
 
     @Transactional
     public InspectionResponseDTO updateInspection(Long inspectionId, InspectionRequestDTO requestDTO) {
+        Optional<Inspection> findDTOInspection = inspectionRepository.findByTransactionTypeAndTransactionId(
+                requestDTO.getTransactionType(), requestDTO.getTransactionId()
+        );
+        if (findDTOInspection.isPresent()) {
+            throw new IllegalArgumentException("이미 검수했습니다.\n" +
+                    "검수 유형 : " + requestDTO.getTransactionType().getTransactionType() +
+                    "\n검수 ID : " + requestDTO.getTransactionId());
+        }
+
         Optional<Inspection> findInspection = inspectionRepository.findById(inspectionId);
         if (findInspection.isPresent()) {
             Inspection inspection = findInspection.get();
