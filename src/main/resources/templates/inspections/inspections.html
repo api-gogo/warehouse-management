@@ -30,6 +30,7 @@
         <select id="typeFilter" class="filter-select">
           <option value="inspectionId">검수 ID</option>
           <option value="userId">검수자 ID</option>
+          <option value="userName">검수자</option>
           <option value="transactionId">검수유형 ID</option>
           <option value="inspectionDate">검수일자</option>
         </select>
@@ -97,7 +98,7 @@
               <a th:href="@{/inspections/{id}/edit(id=${inspection.inspectionId})}" class="action-button" title="수정">
                 <i class="fas fa-edit"></i>
               </a>
-              <a th:if="${#authorization.expression('hasAnyAuthority(''통합_관리자'', ''매니저'')')}"
+              <a th:if="${#authentication.principal.userRole == '관리자' || #authentication.principal.userRole == '매니저'}"
                  th:href="@{#}" class="action-button" id="delete-btn" title="삭제"
                  th:data-inspection-id="${inspection.inspectionId}"
                  onclick="confirmDelete(this.getAttribute('data-inspection-id')); return false;">
