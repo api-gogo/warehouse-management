@@ -32,10 +32,11 @@ public class ReturnShipmentController {
     //(반품서) 전체 조회
     //getALlReturning메서드 호출해서 데이터들(List) 받아오기
 
+
     @GetMapping
     public ModelAndView getAllReturns(ModelAndView mv) {
 
-        //서비스의 getALLReturning 호출
+        //서비스의 getALLReturning 호출 - 활성화된 항목만 조회
         List<ReturnShipmentDTO> returnLists = returnShipmentService.getAllReturns();
 
         if (returnLists != null) {
@@ -90,8 +91,8 @@ public class ReturnShipmentController {
             ReturnShipmentDTO returnShipmentDTO = returnShipmentService.getReturnsByID(returnShipmentId);
             //returnShipmentDTO.setReturnShipmentId(returnShipmentId); 서비스에서 이미 설정
             if (returnShipmentDTO != null) {
-                mv.addObject("returns", returnShipmentDTO);
-                mv.setViewName("returns/outbound/detail"); //상세 페이지로 이동
+                mv.addObject("detail", returnShipmentDTO);
+                mv.setViewName("returns/detail"); //상세 페이지로 이동
             } else {
                 rdtat.addFlashAttribute("message", "반품 데이터를 찾을 수 없습니다.");
                 mv.setViewName("redirect:/returns/outbound/list");//전체조회 페이지로 이동
@@ -131,8 +132,8 @@ public class ReturnShipmentController {
         //updateReturning메서드
 
         //수정 화면 - html필요
-        @GetMapping("/{return_shipment_id}/update")
-        public ModelAndView updateReturnsById (@PathVariable("return_shipment_id") Integer
+        @GetMapping("/{returnShipmentId}/update")
+        public ModelAndView updateReturnsById (@PathVariable("returnShipmentId") Integer
         returnShipmentId, ModelAndView mv, RedirectAttributes rdtat)
         {
             ReturnShipmentDTO rsDTO = returnShipmentService.getReturnsByID(returnShipmentId);
@@ -150,8 +151,8 @@ public class ReturnShipmentController {
         //수정 - 데이터를 받고 DTO로 저장 (서비스 클래스에서 DTO를 엔티티로 바꿔서 DB에 저장할 예정)
         //html 작성이후 @RequestParam 삭제하기..@@@@@@
 
-        @PostMapping("/{return_shipment_id}/update")
-        public String updateReturns (@PathVariable("return_shipment_id") Integer returnShipmentId,
+        @PostMapping("/{returnShipmentId}/update")
+        public String updateReturns (@PathVariable("returnShipmentId") Integer returnShipmentId,
                 @Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO,
                 RedirectAttributes rdtat){
             ReturnShipmentDTO updateDTO = returnShipmentService.updateReturns(returnShipmentId, returnShipmentDTO);
@@ -163,13 +164,13 @@ public class ReturnShipmentController {
                 resultUrl = "redirect:/returns/outbound/list";
             } else {
                 rdtat.addFlashAttribute("message", "반품서 수정에 실패했습니다. 다시 시도해주세요");
-                resultUrl = "redirect:/returns/outbound/list" + returnShipmentId;
+                resultUrl = "redirect:/returns/outbound/list/" + returnShipmentId;
             }
             return resultUrl;
         }
 
-        @PostMapping("{return_shipment_id}/update/status/")
-        public String updateStatusReturns (@PathVariable Integer returnShipmentId, @RequestParam ReturnShipmentStatus
+        @PostMapping("/{returnShipmentId}/update/status/")
+        public String updateStatusReturns (@PathVariable("returnShipmentId") Integer returnShipmentId, @RequestParam ReturnShipmentStatus
         returnShipmentStatus, RedirectAttributes rdtat){
             boolean result = returnShipmentService.updateStatusReturns(returnShipmentId, returnShipmentStatus);
             String resultUrl = null;

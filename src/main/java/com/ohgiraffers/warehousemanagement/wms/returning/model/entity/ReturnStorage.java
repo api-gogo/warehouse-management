@@ -19,13 +19,10 @@ public class ReturnStorage {
     private Integer storageId; //-> 나중에 입고에서 외래키로 받아줘야됨
 
     @Column(name = "user_id",nullable = false)
-    private Integer userId;
-
-    @Column(name = "return_storages_content",nullable = false)
-    private String returnStoragesContent; //사유인데 위치 바뀔 수도
+    private Long userId;
 
     @Column(name = "return_storages_created_at",nullable = false)
-    private LocalDateTime returnStoragesCreatedAt;
+    private LocalDateTime returnStorageCreatedAt;
 
     @OneToMany(mappedBy = "returnStorage", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ReturnStorageItem> returnStorageItems = new ArrayList<>(); //입고반품에 대해 받아올 리스트
@@ -34,19 +31,17 @@ public class ReturnStorage {
     public ReturnStorage() {
     }
     /*조회 및 수정용 PK값 있음*/
-    public ReturnStorage(Integer returnStorageId, Integer storageId, Integer userId, String returnStoragesContent, LocalDateTime returnStoragesCreatedAt) {
+    public ReturnStorage(Integer returnStorageId, Integer storageId, Long userId, LocalDateTime returnStorageCreatedAt) {
         this.returnStorageId = returnStorageId;
         this.storageId = storageId;
         this.userId = userId;
-        this.returnStoragesContent = returnStoragesContent;
-        this.returnStoragesCreatedAt = returnStoragesCreatedAt;
+        this.returnStorageCreatedAt = returnStorageCreatedAt;
     }
     /* 등록용 - PK값 없음 */
-    public ReturnStorage(Integer storageId, Integer userId, LocalDateTime returnStoragesCreatedAt, String returnStoragesContent) {
+    public ReturnStorage(Integer storageId, Long userId, LocalDateTime returnStorageCreatedAt) {
         this.storageId = storageId;
         this.userId = userId;
-        this.returnStoragesCreatedAt = returnStoragesCreatedAt;
-        this.returnStoragesContent = returnStoragesContent;
+        this.returnStorageCreatedAt = returnStorageCreatedAt;
     }
 
     /*게터세터*/
@@ -75,27 +70,19 @@ public class ReturnStorage {
         this.storageId = storageId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public String getReturnStoragesContent() {
-        return returnStoragesContent;
-    }
-
-    public void setReturnStoragesContent(String returnStoragesContent) {
-        this.returnStoragesContent = returnStoragesContent;
-    }
-
     public LocalDateTime getReturnStoragesCreatedAt() {
-        return returnStoragesCreatedAt;
+        return returnStorageCreatedAt;
     }
 
     public void setReturnStoragesCreatedAt(LocalDateTime returnStoragesCreatedAt) {
-        this.returnStoragesCreatedAt = returnStoragesCreatedAt;
+        this.returnStorageCreatedAt = returnStoragesCreatedAt;
     }
 }

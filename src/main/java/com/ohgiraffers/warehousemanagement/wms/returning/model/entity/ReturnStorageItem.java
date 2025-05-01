@@ -16,9 +16,9 @@ public class ReturnStorageItem {
     @JoinColumn(name = "return_storage_id",nullable = false)
     private ReturnStorage returnStorage; //외래키, 반품번호
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "return_storage_content",nullable = false)
-//    private ReturningStorageCause returnStorageContent; //반품사유
+    @Enumerated(EnumType.STRING)
+    @Column(name = "return_storage_content",nullable = false)
+    private ReturningStorageCause returnStorageContent; //반품사유
 
     @Column(name = "return_storage_quantity")
     private Integer returnStorageQuantity; //수량
@@ -31,7 +31,7 @@ public class ReturnStorageItem {
     public ReturnStorageItem(Integer returnStorageItemId, ReturnStorage returnStorage, ReturningStorageCause returnStorageContent, Integer returnStorageQuantity) {
         this.returnStorageItemId = returnStorageItemId;
         this.returnStorage = returnStorage;
-//        this.returnStorageContent = returnStorageContent;
+        this.returnStorageContent = returnStorageContent;
         this.returnStorageQuantity = returnStorageQuantity;
     }
 
@@ -51,13 +51,13 @@ public class ReturnStorageItem {
         this.returnStorage = returnStorage;
     }
 
-//    public ReturningStorageCause getReturnStorageContent() {
-//        return returnStorageContent;
-//    }
-//
-//    public void setReturnStorageContent(ReturningStorageCause returnStorageContent) {
-//        this.returnStorageContent = returnStorageContent;
-//    }
+    public ReturningStorageCause getReturnStorageContent() {
+        return returnStorageContent;
+    }
+
+    public void setReturnStorageContent(ReturningStorageCause returnStorageContent) {
+        this.returnStorageContent = returnStorageContent;
+    }
 
     public Integer getReturnStorageQuantity() {
         return returnStorageQuantity;
@@ -72,7 +72,7 @@ public class ReturnStorageItem {
         return "ReturnStorageItem{" +
                 "returnStorageItemId=" + returnStorageItemId +
                 ", returnStorageId=" + returnStorage +
-//                ", returnStorageContent=" + returnStorageContent +
+                ", returnStorageContent=" + returnStorageContent +
                 ", returnStorageQuantity=" + returnStorageQuantity +
                 '}';
     }
