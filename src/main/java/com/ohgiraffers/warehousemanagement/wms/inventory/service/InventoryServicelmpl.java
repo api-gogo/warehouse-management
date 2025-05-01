@@ -10,6 +10,8 @@ import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.Invent
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.product.model.repository.ProductRepository;
 import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +25,23 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
 public class InventoryServicelmpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final InventoryLogRepository inventoryLogRepository;
-    private final ProductService productService;
+    private final PurchaseItemRepository purchaseItemRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    public InventoryServicelmpl(InventoryRepository inventoryRepository, InventoryLogRepository inventoryLogRepository, ProductService productService) {
+
+    public InventoryServicelmpl(InventoryRepository inventoryRepository, InventoryLogRepository inventoryLogRepository, PurchaseItemRepository purchaseItemRepository, ProductRepository productRepository) {
         this.inventoryRepository = inventoryRepository;
         this.inventoryLogRepository = inventoryLogRepository;
-        this.productService = productService;
+        this.purchaseItemRepository = purchaseItemRepository;
+        this.productRepository = productRepository;
     }
-
 
     // Entity를 InventoryDTO로 변환
     public InventoryDTO convertToDTO(Inventory inventory) {
@@ -59,25 +63,26 @@ public class InventoryServicelmpl implements InventoryService {
     }
 
 
-
     public InventoryDTO findInventoryById(Long inventoryId) {
         Optional<Inventory> inventory = inventoryRepository.findById(inventoryId);
-        if (inventory.isEmpty()){
+        if (inventory.isEmpty()) {
             throw new IllegalArgumentException("해당 재고가 존재하지 않습니다.");
         } else {
             return convertToDTO(inventory.get());
         }
     }
 
-    public Inventory findTopByProductIdOrderByInventoryExpiryDateAsc(Integer productId){
+    public Inventory findTopByProductIdOrderByInventoryExpiryDateAsc(Integer productId) {
         Optional<Inventory> findInventory = inventoryRepository.findTopByProductProductIdOrderByInventoryExpiryDateAsc(productId);
-        if (findInventory.isPresent()){
+        if (findInventory.isPresent()) {
             return findInventory.get();
         } else {
             throw new IllegalArgumentException("해당 재고 아이디의 재고가 없습니다. \n" +
                     "재고 ID : " + productId);
         }
-    };
+    }
+
+    ;
 
     // 제품 ID에 해당하는 전체 재고 조회 (유통기한 내림차순)
     public Page<InventoryDTO> findByProductProductIdOrderByInventoryExpiryDateAsc(long productId, int page, int size) {
@@ -104,7 +109,7 @@ public class InventoryServicelmpl implements InventoryService {
 
         Page<InventoryViewDTO> inventoryViewDTOS = inventoryRepository.findInventoryViewDTOByProductName(searchPattern, pageable);
         if (inventoryViewDTOS.isEmpty()) {
-            return Page.empty();
+            throw new IllegalArgumentException("해당 제품의 재고가 존재하지 않습니다.");
 
         } else {
             return inventoryViewDTOS;
@@ -122,7 +127,7 @@ public class InventoryServicelmpl implements InventoryService {
     public void updateInventory(Long inventoryId, InventoryDTO inventoryDTO, String reason, String userId) {
         try {
             Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() ->
-                    new RuntimeException("재고를 찾을 수 없습니다."));
+                    new IllegalArgumentException("재고를 찾을 수 없습니다."));
 
             // 기존에 등록된 재고와 입력한 재고 차이 계산
             long currentstock = inventory.getAvailableStock();
@@ -138,7 +143,7 @@ public class InventoryServicelmpl implements InventoryService {
             inventory.setStorageId(inventoryDTO.getStorageId());
 
             // Product 객체를 찾아서 설정
-            Product product = productService.findProductById(inventoryDTO.getProductId().intValue());
+            Product product = productRepository.findProductByProductId(inventoryDTO.getProductId().intValue());
             inventory.setProduct(product);
 
             inventory.setLotNumber(createRotNum(product));
@@ -172,7 +177,13 @@ public class InventoryServicelmpl implements InventoryService {
 
     @Transactional
     public void deleteInventory(Long inventoryId) {
-        inventoryRepository.deleteById(inventoryId);
+        Optional<Inventory> findInventory = inventoryRepository.findById(inventoryId);
+        if (findInventory.isPresent()) {
+            inventoryRepository.deleteById(inventoryId);
+        } else {
+            throw new IllegalArgumentException("존재하지 않는 재고 ID 입니다.");
+        }
+
     }
 
     @Transactional
@@ -186,7 +197,7 @@ public class InventoryServicelmpl implements InventoryService {
             inventory.setStorageId(inventoryDTO.getStorageId());
 
             // Product 객체를 찾아서 설정
-            Product product = productService.findProductById(inventoryDTO.getProductId().intValue());
+            Product product = productRepository.findProductByProductId(inventoryDTO.getProductId().intValue());
             inventory.setProduct(product);
 
             inventory.setLotNumber(createRotNum(product));
@@ -247,6 +258,65 @@ public class InventoryServicelmpl implements InventoryService {
         return Integer.parseInt(sequencePart) + 1;
     }
 
+    @Override
+    @Transactional
+    public void notifyStorageCompleted(Integer purchaseId) {
+        System.out.println("입고 완료된 발주 ID: " + purchaseId + " 에 대한 재고 등록 작업을 수행합니다.");
 
+        // 1. 해당 발주 ID에 대한 발주 아이템 리스트 가져오기
+        List<PurchaseItem> purchaseItems = purchaseItemRepository.findByPurchasePurchaseId(purchaseId);
 
+        // 2. 각 PurchaseItem에 대해 Inventory 생성
+        for (PurchaseItem purchaseItem : purchaseItems) {
+            try {
+                Product product = productRepository.findProductByProductId(purchaseItem.getProductId());
+                if (product == null) {
+                    System.err.println("제품 ID가 유효하지 않습니다: " + purchaseItem.getProductId());
+                    continue;
+                }
+
+                // 랜덤 위치 코드
+                Random random = new Random();
+                long locationCode = 100 + random.nextInt(900);
+
+                // 유통기한 계산 (현재 날짜 + 상품의 유통기한 일수)
+                LocalDate expiryDate = LocalDate.now().plusDays(product.getExpirationDate());
+
+                // 재고 생성
+                Inventory inventory = new Inventory();
+                inventory.setStorageId(purchaseId.longValue()); // 발주 ID를 입고 ID로 사용
+                inventory.setProduct(product);
+                inventory.setLotNumber(createRotNum(product));
+                inventory.setLocationCode(locationCode);
+                inventory.setAvailableStock(purchaseItem.getProductQuantity());
+                inventory.setAllocatedStock(0);
+                inventory.setDisposedStock(0);
+                inventory.setInventoryExpiryDate(expiryDate);
+                inventory.setInventoryCreatedAt(LocalDateTime.now());
+                inventory.setInventoryUpdatedAt(LocalDateTime.now());
+
+                Inventory savedInventory = inventoryRepository.save(inventory);
+
+                // 3. 재고 로그 생성
+                InventoryLog log = new InventoryLog();
+                log.setInventory(savedInventory);
+                log.setQuantityChanged(purchaseItem.getProductQuantity());
+                log.setTransactionType(InventoryLogTransactionType.STORAGE);
+                log.setUser_id(String.valueOf(purchaseId));
+                log.setInventoryLogContent("입고 완료에 따른 재고 등록");
+                log.setInventoryLogCreated(LocalDateTime.now());
+
+                inventoryLogRepository.save(log);
+
+                System.out.println("재고 등록 완료: 제품 ID = " + purchaseItem.getProductId() +
+                        ", 수량 = " + purchaseItem.getProductQuantity());
+            } catch (Exception e) {
+                System.err.println("재고 등록 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 }
+
+
+

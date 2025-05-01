@@ -1,7 +1,9 @@
 package com.ohgiraffers.warehousemanagement.wms.storage.model.entity;
 
+import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.StorageStatus;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,9 +16,12 @@ public class Storage {
     @Column(name = "storage_id")
     private Integer storageId;
 
-    @Column(name = "purchase_id")
-    private Integer purchaseId;
+    //  1:1 관계 - Purchase (연관관계 주인)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_id", referencedColumnName = "purchase_id", nullable = false)
+    private Purchase purchase;
 
+    // (입고 등록자 ID - Optional)
     @Column(name = "user_id")
     private Integer userId;
 
@@ -24,8 +29,8 @@ public class Storage {
     @Column(name = "storage_status")
     private StorageStatus storageStatus;
 
-    @Column(name = "inspection_status")  // 검수 상태 필드 추가
-    private String inspectionStatus;  // 검수 상태 (예: 이상, 완료 등)
+    @Column(name = "inspection_status")
+    private String inspectionStatus;
 
     @Column(name = "storage_date")
     private LocalDate storageDate;
@@ -39,9 +44,14 @@ public class Storage {
     @Column(name = "storage_updated_at")
     private LocalDateTime storageUpdatedAt;
 
-    public Storage(Integer storageId, Integer purchaseId, Integer userId, StorageStatus storageStatus, String inspectionStatus, LocalDate storageDate, String storageReason, LocalDateTime storageCreatedAt, LocalDateTime storageUpdatedAt) {
+    // 생성자
+    public Storage() {}
+
+    public Storage(Integer storageId, Purchase purchase, Integer userId, StorageStatus storageStatus,
+                   String inspectionStatus, LocalDate storageDate, String storageReason,
+                   LocalDateTime storageCreatedAt, LocalDateTime storageUpdatedAt) {
         this.storageId = storageId;
-        this.purchaseId = purchaseId;
+        this.purchase = purchase;
         this.userId = userId;
         this.storageStatus = storageStatus;
         this.inspectionStatus = inspectionStatus;
@@ -51,9 +61,7 @@ public class Storage {
         this.storageUpdatedAt = storageUpdatedAt;
     }
 
-    public Storage() {
-    }
-
+    // Getters & Setters
     public Integer getStorageId() {
         return storageId;
     }
@@ -62,12 +70,12 @@ public class Storage {
         this.storageId = storageId;
     }
 
-    public Integer getPurchaseId() {
-        return purchaseId;
+    public Purchase getPurchase() {
+        return purchase;
     }
 
-    public void setPurchaseId(Integer purchaseId) {
-        this.purchaseId = purchaseId;
+    public void setPurchase(Purchase purchase) {
+        this.purchase = purchase;
     }
 
     public Integer getUserId() {
@@ -128,16 +136,16 @@ public class Storage {
 
     @Override
     public String toString() {
-        return "입고{" +
-                "입고 Id : " + storageId +
-                ", 발주Id : " + purchaseId +
-                ", 사용자 Id : " + userId +
-                ", 입고 상태 : " + storageStatus +
-                ", 검수 상태 : '" + inspectionStatus + '\'' +
-                ", 입고 날짜 : =" + storageDate +
-                ", 입고 이유 : ='" + storageReason + '\'' +
-                ", 입고 등록일 : " + storageCreatedAt +
-                ", 입고 수정일 : " + storageUpdatedAt +
+        return "Storage{" +
+                "storageId=" + storageId +
+                ", purchaseId=" + (purchase != null ? purchase.getPurchaseId() : "null") +
+                ", userId=" + userId +
+                ", storageStatus=" + storageStatus +
+                ", inspectionStatus='" + inspectionStatus + '\'' +
+                ", storageDate=" + storageDate +
+                ", storageReason='" + storageReason + '\'' +
+                ", storageCreatedAt=" + storageCreatedAt +
+                ", storageUpdatedAt=" + storageUpdatedAt +
                 '}';
     }
 }
