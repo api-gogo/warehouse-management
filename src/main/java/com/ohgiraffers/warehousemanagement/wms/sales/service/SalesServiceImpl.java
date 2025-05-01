@@ -230,7 +230,7 @@ public class SalesServiceImpl implements SalesService {
         return searchResults;
     }
 
-    public List<InventoryViewDTO> searchProductsByName(String productName) {
+    /*public List<InventoryViewDTO> searchProductsByName(String productName) {
         List<InventoryViewDTO> searchResults = inventoryService.searchByNameContainingAndIsDeletedTrue(productName);
         return searchResults;
     }
@@ -238,7 +238,7 @@ public class SalesServiceImpl implements SalesService {
     public List<UserDTO> searchUsersByName(String userName) {
         List<UserDTO> searchResults = userService.searchByNameContainingAndIsDeletedTrue(userName);
         return searchResults;
-    }
+    }*/
 
     @Override
     public Sales getSalesBySalesId(Integer salesId) {
