@@ -33,9 +33,6 @@ public class SupplierController {
         }
 
         Page<SupplierDTO> supplierPage = supplierServiceImpl.findAll(search, status, pageable);
-        if (supplierPage.isEmpty()) {
-            model.addAttribute("message", "조건에 맞는 거래처가 없습니다.");
-        }
 
         model.addAttribute("suppliers", supplierPage.getContent());
         model.addAttribute("currentPage", supplierPage.getNumber());
