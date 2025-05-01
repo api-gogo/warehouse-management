@@ -1,13 +1,13 @@
 package com.ohgiraffers.warehousemanagement.wms.inspection.model.dto.response;
 
-public class ParamResponseDTO {
+public class SearchResponseDTO {
     private String inspectionType;
     private String searchType;
     private String search;
 
-    protected ParamResponseDTO() {}
+    protected SearchResponseDTO() {}
 
-    public ParamResponseDTO(String inspectionType, String searchType, String search) {
+    public SearchResponseDTO(String inspectionType, String searchType, String search) {
         this.inspectionType = inspectionType;
         this.searchType = searchType;
         this.search = search;

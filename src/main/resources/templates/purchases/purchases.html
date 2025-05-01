@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMS - 발주 관리</title>
+    <!-- 폰트어썸 아이콘 (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 기본 스타일 - 최소화 */
+        * {margin: 0; padding: 0; box-sizing: border-box;}
+        body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f9fafb; color: #111827; line-height: 1.5;}
+        a {text-decoration: none; color: inherit;}
+        ul {list-style: none;}
+        button {background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;}
+
+        /* 레이아웃 */
+        .page-content {padding: 1.5rem; min-height: 100vh;}
+        .card {background-color: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); margin-bottom: 1.5rem;}
+        .card-header {padding: 1rem; border-bottom: 1px solid #e5e7eb;}
+        .card-title {font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem;}
+        .card-description {font-size: 0.875rem; color: #6b7280;}
+        .card-content {padding: 1rem;}
+
+        /* 버튼 스타일 */
+        .btn {display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; border-radius: 0.25rem; transition: all 0.2s;}
+        .btn-primary {background-color: #3b82f6; color: white;}
+        .btn-primary:hover {background-color: #2563eb;}
+        .btn-outline {background-color: transparent; border: 1px solid #e5e7eb; color: #111827;}
+        .btn-outline:hover {background-color: #f9fafb;}
+        .btn-danger {background-color: #ef4444; color: white;}
+        .btn-danger:hover {background-color: #dc2626;}
+        .btn-sm {padding: 0.25rem 0.5rem; font-size: 0.75rem;}
+        .btn i {margin-right: 0.5rem;}
+
+        /* 필터링과 검색 */
+        .filter-area {display: flex; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;}
+        .select-container {position: relative; width: 180px;}
+        .select {width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background-color: #fff; color: #111827; font-size: 0.875rem; appearance: none; cursor: pointer;}
+        .select-container::after {content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); color: #9ca3af; pointer-events: none;}
+        .search-container {position: relative; width: 300px;}
+        .search-container i {position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #9ca3af;}
+        .search-input {width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background-color: #f9fafb; color: #111827; font-size: 0.875rem;}
+
+        /* 날짜 검색 스타일 */
+        .date-search-area {display: flex; align-items: center; margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap;}
+        .date-input {padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background-color: #fff; color: #111827; font-size: 0.875rem;}
+
+        /* 테이블 */
+        .table-container {overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem;}
+        .table {width: 100%; border-collapse: collapse;}
+        .table th, .table td {padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;}
+        .table th {font-weight: 500; color: #6b7280; background-color: #f9fafb; font-size: 0.875rem;}
+        .table tr:last-child td {border-bottom: none;}
+        .table td {font-size: 0.875rem;}
+        .table .text-right {text-align: right;}
+
+        /* 상태 배지 */
+        .badge {display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; border: 1px solid transparent;}
+        .badge-outline {border-color: #e5e7eb;}
+        .badge-success {background-color: rgba(16, 185, 129, 0.1); color: #065f46;}
+        .badge-warning {background-color: rgba(245, 158, 11, 0.1); color: #92400e;}
+        .badge-info {background-color: rgba(99, 102, 241, 0.1); color: #4f46e5;}
+        .badge-danger {background-color: rgba(239, 68, 68, 0.1); color: #b91c1c;}
+
+        /* 유틸리티 클래스 */
+        .flex {display: flex;}
+        .items-center {align-items: center;}
+        .justify-between {justify-content: space-between;}
+        .space-x-2 > * + * {margin-left: 0.5rem;}
+        .font-medium {font-weight: 500;}
+        .page-title {font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;}
+        
+        /* 모달 */
+        .modal {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;}
+        .modal-content {background-color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); width: 600px; max-width: 90%;}
+        .modal-title {font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;}
+        .modal-body {margin-bottom: 1.5rem;}
+        .modal-footer {display: flex; justify-content: flex-end; gap: 0.5rem;}
+    </style>
+</head>
+<body>
+
+<!-- 페이지 콘텐츠 영역 - 발주 관리 페이지 -->
+<main class="page-content">
+    <div class="flex items-center justify-between">
+        <h1 class="page-title" th:text="${pageTitle}">발주 관리</h1>
+        <div class="flex items-center space-x-2">
+            <a th:href="@{/}" class="btn btn-outline btn-sm">
+                <i class="fas fa-home"></i>
+                메인화면
+            </a>
+            <a th:href="@{/purchases/create}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i>
+                신규 발주
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title" th:text="${cardTitle}">발주 목록</h2>
+            <p class="card-description" th:text="${cardDescription}">모든 발주 내역을 확인하고 관리할 수 있습니다.</p>
+        </div>
+        <div class="card-content">
+            <!-- 날짜 검색 영역 추가 -->
+            <div class="date-search-area">
+                <form id="dateSearchForm" th:action="@{/purchases/search/date}" method="get" class="flex items-center space-x-2">
+                    <div>
+                        <label for="startDate" class="font-medium" style="font-size: 0.875rem;">시작일:</label>
+                        <input type="date" id="startDate" name="startDate" class="date-input" required>
+                    </div>
+                    <div>
+                        <label for="endDate" class="font-medium" style="font-size: 0.875rem;">종료일:</label>
+                        <input type="date" id="endDate" name="endDate" class="date-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-search"></i>
+                        날짜 검색
+                    </button>
+                    <a th:href="@{/purchases}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-redo"></i>
+                        초기화
+                    </a>
+
+                </form>
+            </div>
+            
+            <div class="filter-area">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="search" placeholder="발주 ID 검색..." class="search-input" th:value="${searchKeyword}">
+                </div>
+                <div class="select-container">
+                    <select class="select" id="statusFilter" onchange="filterByStatus(this.value)">
+                        <option value="all">상태 전체</option>
+                        <option value="발주대기">발주대기</option>
+                        <option value="발주완료">발주완료</option>
+                        <option value="발주거절">발주거절</option>
+                        <option value="발주취소">발주취소</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>담당자</th>
+                        <th>발주일</th>
+                        <th>납기일</th>
+                        <th>상태</th>
+                        <th class="text-right">관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="purchase : ${purchases}" th:id="'purchase-' + ${purchase.purchaseId}">
+                        <td th:text="${purchase.userId}">김담당</td>
+                        <td th:text="${#temporals.format(purchase.purchaseDate, 'yyyy-MM-dd')}">2024-04-20</td>
+                        <td th:text="${#temporals.format(purchase.purchaseDueDate, 'yyyy-MM-dd')}">2024-04-30</td>
+                        <td>
+                            <span class="badge badge-outline" 
+                                  th:classappend="${
+                                    purchase.purchaseStatus == '발주대기' ? 'badge-info' : 
+                                    purchase.purchaseStatus == '발주완료' ? 'badge-success' : 
+                                    purchase.purchaseStatus == '발주거절' ? 'badge-danger' : 'badge-warning'
+                                  }"
+                                  th:text="${purchase.purchaseStatus}">발주완료</span>
+                        </td>
+                        <td class="text-right">
+                            <a th:href="@{/purchases/{id}(id=${purchase.purchaseId})}" class="btn btn-outline btn-sm">상세</a>
+                            <th:block th:if="${purchase.purchaseStatus == '발주대기'}">
+                                <button class="btn btn-primary btn-sm" th:onclick="'openCompleteModal(' + ${purchase.purchaseId} + ')'">완료</button>
+                                <button class="btn btn-danger btn-sm" th:onclick="'openRejectModal(' + ${purchase.purchaseId} + ')'">거절</button>
+                                <a th:href="@{/purchases/cancel/{id}(id=${purchase.purchaseId})}" class="btn btn-outline btn-sm" 
+                                   onclick="return confirm('정말 취소하시겠습니까?')">취소</a>
+                            </th:block>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(purchases)}">
+                        <td colspan="5" style="text-align: center; padding: 2rem;">등록된 발주가 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 발주 상세 정보 모달 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">발주 상세 정보</div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>내용</th>
+                            <th>항목</th>
+                            <th>내용</th>
+                        </tr>
+                        </thead>
+                        <tbody id="detailTableBody">
+                        <!-- JavaScript로 내용이 동적으로 채워집니다 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeDetailModal()" class="btn btn-outline btn-sm">닫기</button>
+                <div class="flex items-center space-x-2" id="detailActionButtons">
+                    <!-- JavaScript로 버튼이 동적으로 추가됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 발주 완료 확인 모달 -->
+    <div id="completeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">발주 완료 확인</div>
+            <div class="modal-body">
+                <p>이 발주를 완료 처리하시겠습니까?</p>
+                <p>완료 후에는 수정이 불가능합니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeCompleteModal()" class="btn btn-outline btn-sm">취소</button>
+                <button id="confirmCompleteButton" class="btn btn-primary btn-sm">확인</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 발주 거절 확인 모달 -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">발주 거절 확인</div>
+            <div class="modal-body">
+                <p>이 발주를 거절 처리하시겠습니까?</p>
+                <p>거절 후에는 취소할 수 없습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeRejectModal()" class="btn btn-outline btn-sm">취소</button>
+                <button id="confirmRejectButton" class="btn btn-danger btn-sm">확인</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // 날짜 검색 폼 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+        // URL에서 현재 날짜 파라미터 가져와서 입력란에 설정
+        const urlParams = new URLSearchParams(window.location.search);
+        const startDate = urlParams.get('startDate');
+        const endDate = urlParams.get('endDate');
+        
+        if (startDate) {
+            document.getElementById('startDate').value = startDate;
+        } else {
+            // 기본값은 1개월 전
+            const defaultStartDate = new Date();
+            defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+            document.getElementById('startDate').value = formatDateForInput(defaultStartDate);
+        }
+        
+        if (endDate) {
+            document.getElementById('endDate').value = endDate;
+        } else {
+            // 기본값은 오늘
+            document.getElementById('endDate').value = formatDateForInput(new Date());
+        }
+        
+        // 날짜 폼 유효성 검사
+        document.getElementById('dateSearchForm').addEventListener('submit', function(event) {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            
+            if (startDate > endDate) {
+                event.preventDefault();
+                alert('시작일은 종료일보다 이전이어야 합니다.');
+            }
+        });
+        
+        // 상태 필터 설정
+        const status = urlParams.get('status');
+        if (status) {
+            document.getElementById('statusFilter').value = status;
+        }
+    });
+    
+    // 날짜 포맷 함수 (입력란용)
+    function formatDateForInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // 상태별 필터링 함수
+    function filterByStatus(status) {
+        if (status === 'all') {
+            window.location.href = '/purchases';
+        } else {
+            window.location.href = '/purchases/search/status?status=' + status;
+        }
+    }
+
+    // 발주 상세 정보 모달 함수
+    function openDetailModal(purchaseId) {
+        // 서버에서 발주 상세 정보 가져오기
+        fetch(`/purchases/api/${purchaseId}`)
+            .then(response => response.json())
+            .then(purchase => {
+                // 상세 정보 테이블 내용 채우기
+                const tbody = document.getElementById('detailTableBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td class="font-medium">발주 ID</td>
+                        <td>${purchase.purchaseId}</td>
+                        <td class="font-medium">담당자</td>
+                        <td>${purchase.userId}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">발주일</td>
+                        <td>${formatDate(purchase.purchaseDate)}</td>
+                        <td class="font-medium">납기일</td>
+                        <td>${formatDate(purchase.purchaseDueDate)}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">상태</td>
+                        <td>
+                            <span class="badge badge-outline ${getStatusBadgeClass(purchase.purchaseStatus)}">
+                                ${purchase.purchaseStatus}
+                            </span>
+                        </td>
+                        <td class="font-medium">생성일</td>
+                        <td>${formatDate(purchase.purchaseCreatedAt)}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">수정일</td>
+                        <td>${formatDate(purchase.purchaseUpdatedAt)}</td>
+                        <td class="font-medium">비고</td>
+                        <td>${purchase.purchaseNotes || '-'}</td>
+                    </tr>
+                `;
+
+                // 상태에 따라 버튼 표시 제어
+                const actionButtons = document.getElementById('detailActionButtons');
+                actionButtons.innerHTML = '';
+                
+                if (purchase.purchaseStatus === '발주대기') {
+                    // 완료 버튼
+                    const completeButton = document.createElement('button');
+                    completeButton.className = 'btn btn-primary btn-sm';
+                    completeButton.innerHTML = '<i class="fas fa-check"></i> 완료';
+                    completeButton.onclick = function() {
+                        closeDetailModal();
+                        openCompleteModal(purchase.purchaseId);
+                    };
+                    actionButtons.appendChild(completeButton);
+                    
+                    // 거절 버튼
+                    const rejectButton = document.createElement('button');
+                    rejectButton.className = 'btn btn-danger btn-sm';
+                    rejectButton.innerHTML = '<i class="fas fa-times"></i> 거절';
+                    rejectButton.onclick = function() {
+                        closeDetailModal();
+                        openRejectModal(purchase.purchaseId);
+                    };
+                    actionButtons.appendChild(rejectButton);
+                    
+                    // 취소 버튼
+                    const cancelButton = document.createElement('button');
+                    cancelButton.className = 'btn btn-outline btn-sm';
+                    cancelButton.style.color = '#ef4444';
+                    cancelButton.innerHTML = '<i class="fas fa-times"></i> 취소';
+                    cancelButton.onclick = function() {
+                        if (confirm('정말 취소하시겠습니까?')) {
+                            window.location.href = `/purchases/cancel/${purchase.purchaseId}`;
+                        }
+                    };
+                    actionButtons.appendChild(cancelButton);
+                }
+                
+                // 모달 표시
+                document.getElementById('detailModal').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('발주 정보를 가져오는 중 오류가 발생했습니다:', error);
+                alert('발주 정보를 가져오는 중 오류가 발생했습니다.');
+            });
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    // 날짜 포맷 함수
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+    }
+
+    // 상태에 따른 배지 클래스 반환
+    function getStatusBadgeClass(status) {
+        switch (status) {
+            case '발주대기': return 'badge-info';
+            case '발주완료': return 'badge-success';
+            case '발주거절': return 'badge-danger';
+            case '발주취소': return 'badge-warning';
+            default: return '';
+        }
+    }
+
+    // 발주 완료 모달 관련 함수
+    function openCompleteModal(purchaseId) {
+        document.getElementById('completeModal').style.display = 'flex';
+        document.getElementById('confirmCompleteButton').onclick = function() {
+            confirmComplete(purchaseId);
+        };
+    }
+
+    function closeCompleteModal() {
+        document.getElementById('completeModal').style.display = 'none';
+    }
+
+    function confirmComplete(purchaseId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/purchases/complete/' + purchaseId;
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    // 발주 거절 모달 관련 함수
+    function openRejectModal(purchaseId) {
+        document.getElementById('rejectModal').style.display = 'flex';
+        document.getElementById('confirmRejectButton').onclick = function() {
+            confirmReject(purchaseId);
+        };
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').style.display = 'none';
+    }
+
+    function confirmReject(purchaseId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/purchases/reject/' + purchaseId;
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    // ESC 키로 모달 닫기
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeDetailModal();
+            closeCompleteModal();
+            closeRejectModal();
+        }
+    });
+    
+    // 모달 바깥 클릭 시 닫기
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('detailModal')) {
+            closeDetailModal();
+        }
+        if (event.target === document.getElementById('completeModal')) {
+            closeCompleteModal();
+        }
+        if (event.target === document.getElementById('rejectModal')) {
+            closeRejectModal();
+        }
+    });
+</script>
+</body>
+</html>

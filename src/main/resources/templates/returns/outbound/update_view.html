@@ -99,7 +99,7 @@
 <div class="main-content">
   <div class="page-header">
     <h2>출고 반품 수정</h2>
-    <a th:href="@{/returns/outbound/{id}/detail(id=${detail.returnShipmentId})}" class="btn btn-outline-secondary">
+    <a th:href="@{/returns/outbound/list/{id}(id=${ReturnShipmentDTO.returnShipmentId})}" class="btn btn-outline-secondary">
       <i class="bi bi-arrow-left"></i> 상세로 돌아가기
     </a>
   </div>
@@ -109,38 +109,38 @@
       <h5 class="card-title">반품 정보 수정</h5>
       <p class="card-text text-muted">출고 반품 정보를 수정해주세요.</p>
 
-      <form th:action="@{/returns/outbound/{id}/update(id=${detail.returnShipmentId})}" method="post">
-        <input type="hidden" name="returnShipmentId" th:value="${detail.returnShipmentId}">
-        <input type="hidden" name="returnShipmentCreatedAt" th:value="${detail.returnShipmentCreatedAt}">
-        <input type="hidden" name="returnShipmentDeletedAt" th:value="${detail.returnShipmentDeletedAt}">
+      <form th:action="@{/returns/outbound/list/{return_shipment_id}/update(return_shipment_id=${ReturnShipmentDTO.returnShipmentId})}" method="post">
+        <input type="hidden" name="returnShipmentId" th:value="${ReturnShipmentDTO.returnShipmentId}">
+        <input type="hidden" name="returnShipmentCreatedAt" th:value="${ReturnShipmentDTO.returnShipmentCreatedAt}">
+        <input type="hidden" name="returnShipmentDeletedAt" th:value="${ReturnShipmentDTO.returnShipmentDeletedAt}">
 
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="shipmentId" class="form-label required-field">출고 번호</label>
-            <input type="text" class="form-control" id="shipmentId" name="shipment_id" th:value="${detail.shipmentId != null ? detail.shipmentId.shipmentId : ''}" readonly>
+            <input type="text" class="form-control" id="shipmentId" name="shipmentId" th:value="${ReturnShipmentDTO.shipmentId != null ? ReturnShipmentDTO.shipmentId : ''}" readonly>
           </div>
           <div class="col-md-6">
             <label for="lotNumber" class="form-label required-field">로트 번호</label>
-            <input type="text" class="form-control" id="lotNumber" name="lot_number" th:value="${detail.lotNumber}" required>
+            <input type="text" class="form-control" id="lotNumber" name="lotNumber[0]" th:value="${ReturnShipmentDTO.lotNumber != null && !ReturnShipmentDTO.lotNumber.empty ? ReturnShipmentDTO.lotNumber[0] : ''}" required>
           </div>
         </div>
 
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="storeId" class="form-label required-field">매장</label>
-            <select class="form-select" id="storeId" name="store_id" required>
-              <option value="1" th:selected="${detail.storeId == 1}">서울 매장</option>
-              <option value="2" th:selected="${detail.storeId == 2}">대구 매장</option>
-              <option value="3" th:selected="${detail.storeId == 3}">부산 매장</option>
-              <option value="4" th:selected="${detail.storeId == 4}">인천 매장</option>
+            <select class="form-select" id="storeId" name="storeId" required>
+              <option value="1" th:selected="${ReturnShipmentDTO.storeId == 1}">서울 매장</option>
+              <option value="2" th:selected="${ReturnShipmentDTO.storeId == 2}">대구 매장</option>
+              <option value="3" th:selected="${ReturnShipmentDTO.storeId == 3}">부산 매장</option>
+              <option value="4" th:selected="${ReturnShipmentDTO.storeId == 4}">인천 매장</option>
             </select>
           </div>
           <div class="col-md-6">
             <label for="userId" class="form-label required-field">담당자</label>
-            <select class="form-select" id="userId" name="user_id" required>
-              <option value="1" th:selected="${detail.userId == 1}">김담당</option>
-              <option value="2" th:selected="${detail.userId == 2}">이담당</option>
-              <option value="3" th:selected="${detail.userId == 3}">박담당</option>
+            <select class="form-select" id="userId" name="userId" required>
+              <option value="1" th:selected="${ReturnShipmentDTO.userId == 1}">김담당</option>
+              <option value="2" th:selected="${ReturnShipmentDTO.userId == 2}">이담당</option>
+              <option value="3" th:selected="${ReturnShipmentDTO.userId == 3}">박담당</option>
             </select>
           </div>
         </div>
@@ -148,25 +148,29 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="returnShipmentQuantity" class="form-label required-field">반품 수량</label>
-            <input type="number" class="form-control" id="returnShipmentQuantity" name="return_shipment_quantity" th:value="${detail.returnShipmentQuantity}" min="1" required>
+            <input type="number" class="form-control" id="returnShipmentQuantity" name="returnShipmentQuantity[0]" th:value="${ReturnShipmentDTO.returnShipmentQuantity != null && !ReturnShipmentDTO.returnShipmentQuantity.empty ? ReturnShipmentDTO.returnShipmentQuantity[0] : 0}" min="1" required>
           </div>
           <div class="col-md-6">
             <label for="returnShipmentStatus" class="form-label required-field">반품 상태</label>
-            <select class="form-select" id="returnShipmentStatus" name="return_shipment_status" required>
-              <option value="PENDING" th:selected="${detail.returnShipmentStatus == 'PENDING'}">반품대기</option>
-              <option value="PROCESSING" th:selected="${detail.returnShipmentStatus == 'PROCESSING'}">반품중</option>
-              <option value="COMPLETED" th:selected="${detail.returnShipmentStatus == 'COMPLETED'}">반품완료</option>
+            <select class="form-select" id="returnShipmentStatus" name="returnShipmentStatus" required>
+              <option value="RETURN_WAITING" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_WAITING'}">반품 대기</option>
+              <option value="RETURN_APPROVED" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_APPROVED'}">반품 승인</option>
+              <option value="RETURN_REJECTED" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_REJECTED'}">반품 거절</option>
+              <option value="RETURN_COMPLETED" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_COMPLETED'}">반품 완료</option>
             </select>
           </div>
         </div>
 
         <div class="mb-3">
           <label for="returnShipmentContent" class="form-label required-field">반품 사유</label>
-          <textarea class="form-control" id="returnShipmentContent" name="return_shipment_content" rows="3" required th:text="${detail.returnShipmentContent}"></textarea>
+          <select class="form-select" id="returnShipmentContent" name="returnShipmentContent[0]" required>
+            <option value="EXPIRED" th:selected="${ReturnShipmentDTO.returnShipmentContent != null && !ReturnShipmentDTO.returnShipmentContent.empty && ReturnShipmentDTO.returnShipmentContent[0] == T(com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause).EXPIRED}">유통기한 만료</option>
+            <option value="DAMAGED_OR_DEFECTIVE" th:selected="${ReturnShipmentDTO.returnShipmentContent != null && !ReturnShipmentDTO.returnShipmentContent.empty && ReturnShipmentDTO.returnShipmentContent[0] == T(com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause).DAMAGED_OR_DEFECTIVE}">손상 또는 결함</option>
+          </select>
         </div>
 
         <div class="d-flex justify-content-end gap-2">
-          <a th:href="@{/returns/outbound/{id}/detail(id=${detail.returnShipmentId})}" class="btn btn-outline-secondary">취소</a>
+          <a th:href="@{/returns/outbound/list}" class="btn btn-outline-secondary">취소</a>
           <button type="submit" class="btn btn-primary">수정</button>
         </div>
       </form>
