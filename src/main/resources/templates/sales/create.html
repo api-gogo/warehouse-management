@@ -114,15 +114,15 @@
                         const itemRow = document.createElement('div');
                         itemRow.className = 'item-row mb-3';
                         itemRow.innerHTML = `
-          <div class="item-header">
-            <strong>물품 ${itemIndex + 1}</strong>
-            <button type="button" class="btn btn-outline-danger btn-sm remove-item">
-              <i class="fas fa-times"></i> 삭제
-            </button>
-          </div>
-          <input type="text" name="productIds[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
-          <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
-        `;
+                              <div class="item-header">
+                                <strong>물품 ${itemIndex + 1}</strong>
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-item">
+                                  <i class="fas fa-times"></i> 삭제
+                                </button>
+                              </div>
+                              <input type="text" name="productIds[${itemIndex}]" class="form-control mb-2" placeholder="상품명 입력" required>
+                              <input type="number" name="quantity[${itemIndex}]" class="form-control" placeholder="수량 입력" min="1" required>
+                        `;
                         document.getElementById('items-container').appendChild(itemRow);
                         itemIndex++;
 
@@ -140,6 +140,8 @@
                     });
 
                     updateItemHeaders(); // 최초 1개만 있을 때 삭제버튼 숨김
+
+                    document.getElementById('salesDate').value = new Date().toISOString().substring(0, 10);
                 });
             </script>
         </main>

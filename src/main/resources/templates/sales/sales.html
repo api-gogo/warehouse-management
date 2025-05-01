@@ -62,7 +62,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="sales : ${salesLists}">
+                            <tr th:each="sales : ${salesLists}" th:attr="data-status=${sales.salesStatus.name()}">
                                 <td th:text="${sales.salesId}">수주ID</td>
                                 <td th:text="${sales.storeName}">점포명</td>
                                 <td th:text="${sales.userName}">담당자명</td>
@@ -119,6 +119,25 @@
                 </div>
             </div>
         </main>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const statusFilter = document.getElementById("statusFilter");
+                const rows = document.querySelectorAll("tbody tr[data-status]");
+
+                statusFilter.addEventListener("change", function () {
+                    const selectedStatus = this.value;
+
+                    rows.forEach(row=> {
+                        const rowStatus = row.getAttribute("data-status");
+                        if (selectedStatus === "all" || rowStatus === selectedStatus) {
+                            row.style.display = "";
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+                });
+            })
+        </script>
     </div>
 </div>
 
