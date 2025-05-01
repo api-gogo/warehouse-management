@@ -8,194 +8,203 @@
   <th:block layout:fragment="css">
     <link rel="stylesheet" href="/common.css">
     <style>
-      .delete-btn {
-        color: #dc3545;
-      }
-      .delete-btn:hover {
+      #delete-btn:hover {
         color: #b02a37;
       }
     </style>
   </th:block>
 </head>
 <body>
-  <!-- 페이지 콘텐츠 -->
-  <th:block layout:fragment="content" th:with="activeMenu='inspection'">
-    <div class="common-container">
-      <div class="common-header">
-        <h1 class="common-title">검수 관리</h1>
-        <div class="common-actions">
-          <div class="search-box">
-            <input type="text" id="inspectionSearch" placeholder="검수ID, 검수자ID 검색..." class="search-input" th:value="${param.search}" th:if="${param.search != null || param.search != ''}">
-            <button class="search-button">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-          <select id="typeFilter" class="filter-select">
-            <option value="inspectionId">검수 ID</option>
-            <option value="userId">검수자 ID</option>
-            <option value="transactionId">검수유형 ID</option>
-            <option value="inspectionDate">검수일자</option>
-          </select>
-          <a th:href="@{/inspections/create}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>검수 등록
-          </a>
+<!-- 페이지 콘텐츠 -->
+<th:block layout:fragment="content" th:with="activeMenu='inspection'">
+  <div class="common-container">
+    <div class="common-header">
+      <h1 class="common-title">검수 관리</h1>
+      <div class="common-actions">
+        <div class="search-box">
+          <input type="text" id="inspectionSearch" placeholder="검수ID, 검수자ID 검색..." class="search-input" th:value="${param.search}" th:if="${param.search != null || param.search != ''}">
+          <button class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
+        <select id="typeFilter" class="filter-select">
+          <option value="inspectionId">검수 ID</option>
+          <option value="userId">검수자 ID</option>
+          <option value="transactionId">검수유형 ID</option>
+          <option value="inspectionDate">검수일자</option>
+        </select>
+        <a th:href="@{/inspections/create}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>검수 등록
+        </a>
       </div>
+    </div>
 
-      <div class="common-tabs">
-        <button class="tab-button" data-type="">전체</button>
-        <button class="tab-button" data-type="INSPECTION">상시</button>
-        <button class="tab-button" data-type="PURCHASE">발주</button>
-        <button class="tab-button" data-type="SALES">수주</button>
-        <button class="tab-button" data-type="STORAGE">입고반품</button>
-        <button class="tab-button" data-type="SHIPMENT">출고반품</button>
-      </div>
+    <div class="common-tabs">
+      <button class="tab-button" data-type="">전체</button>
+      <button class="tab-button" data-type="INSPECTION">상시</button>
+      <button class="tab-button" data-type="PURCHASE">발주</button>
+      <button class="tab-button" data-type="SALES">수주</button>
+      <button class="tab-button" data-type="STORAGE">입고반품</button>
+      <button class="tab-button" data-type="SHIPMENT">출고반품</button>
+    </div>
 
-      <div class="common-content">
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-            <tr>
-              <th>검수ID</th>
-              <th>검수유형ID</th>
-              <th>검수유형</th>
-              <th>검수일자</th>
-              <th>검수자</th>
-              <th>검수상태</th>
-              <th>검수수량</th>
-              <th>정상수량</th>
-              <th>불량수량</th>
-              <th>액션</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="inspection : ${inspectionList.content}" th:if="${inspectionList.content != null}">
-              <td th:text="${inspection.inspectionId}"></td>
-              <td th:text="${inspection.transactionId != null ? inspection.transactionId : '상시'}"></td>
-              <td>
+    <div class="common-content">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>검수ID</th>
+            <th>검수유형ID</th>
+            <th>검수유형</th>
+            <th>검수일자</th>
+            <th>검수자</th>
+            <th>검수상태</th>
+            <th>검수수량</th>
+            <th>정상수량</th>
+            <th>불량수량</th>
+            <th>액션</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="inspection : ${inspectionList.content}" th:if="${inspectionList.content != null}">
+            <td th:text="${inspection.inspectionId}"></td>
+            <td th:text="${inspection.transactionId != null ? inspection.transactionId : '상시'}"></td>
+            <td>
                 <span class="status-badge"
-                    th:classappend="${inspection.transactionType == '상시' ? 'status-active' :
+                      th:classappend="${inspection.transactionType == '상시' ? 'status-active' :
                                     (inspection.transactionType == '발주' ? 'status-inactive' :
                                     (inspection.transactionType == '수주' ? 'status-pending' :
                                     (inspection.transactionType == '입고반품' ? 'status-rejected' :
                                     (inspection.transactionType == '출고반품' ? 'status-resigned' : ''))))}"
-                    th:text="${inspection.transactionType}">상시</span>
-              </td>
-              <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>
-              <td th:text="${inspection.userName}"></td>
-              <td>
+                      th:text="${inspection.transactionType}">상시</span>
+            </td>
+            <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>
+            <td th:text="${inspection.userName}"></td>
+            <td>
                 <span class="status-badge"
                       th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
                                     (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
                                     (inspection.inspectionStatus == '보류' ? 'status-pending' : ''))}"
                       th:text="${inspection.inspectionStatus}">이상 없음</span>
-              </td>
-              <td th:text="${inspection.inspectionQuantity}"></td>
-              <td th:text="${inspection.acceptedQuantity}"></td>
-              <td th:text="${inspection.defectiveQuantity}"></td>
-              <td class="actions">
-                <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="action-button" title="상세보기">
-                  <i class="fas fa-eye"></i>
-                </a>
-                <a th:href="@{/inspections/{id}/update(id=${inspection.inspectionId})}" class="action-button" title="수정">
-                  <i class="fas fa-edit"></i>
-                </a>
-                <a th:if="${#authorization.expression('hasAnyAuthority(''관리자'', ''매니저'')')}"
-                   href="#" class="action-button delete-btn" title="삭제"
-                   th:data-inspection-id="${inspection.inspectionId}" 
-                   onclick="confirmDelete(this.getAttribute('data-inspection-id')); return false;">
-                  <i class="fas fa-trash"></i>
-                </a>
-                <form th:id="'deleteForm-' + ${inspection.inspectionId}" th:action="@{/inspections/{id}/delete(id=${inspection.inspectionId})}" method="post" style="display:none;"></form>
-              </td>
-            </tr>
-            <!-- 데이터가 없을 경우 -->
-            <tr th:if="${#lists.isEmpty(inspectionList.content)}">
-              <td colspan="10" class="no-data">조회된 검수 기록이 없습니다.</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+            </td>
+            <td th:text="${inspection.inspectionQuantity}"></td>
+            <td th:text="${inspection.acceptedQuantity}"></td>
+            <td th:text="${inspection.defectiveQuantity}"></td>
+            <td class="actions">
+              <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="action-button" title="상세보기">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a th:href="@{/inspections/{id}/edit(id=${inspection.inspectionId})}" class="action-button" title="수정">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a th:if="${#authorization.expression('hasAnyAuthority(''통합_관리자'', ''매니저'')')}"
+                 th:href="@{#}" class="action-button" id="delete-btn" title="삭제"
+                 th:data-inspection-id="${inspection.inspectionId}"
+                 onclick="confirmDelete(this.getAttribute('data-inspection-id')); return false;">
+                <i class="fas fa-trash"></i>
+              </a>
+              <form th:id="'deleteForm-' + ${inspection.inspectionId}" th:action="@{/inspections/{id}/delete(id=${inspection.inspectionId})}" method="post" style="display:none;"></form>
+            </td>
+          </tr>
+          <!-- 데이터가 없을 경우 -->
+          <tr th:if="${#lists.isEmpty(inspectionList.content)}">
+            <td colspan="10" class="no-data">조회된 검수 기록이 없습니다.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
-        <!-- 페이지네이션 -->
-        <div class="pagination" th:if="${inspectionList != '검수 목록이 없습니다.' && inspectionList.totalPages > 1}">
-          <a th:href="@{/inspections(page=1, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
-            <i class="fas fa-angle-double-left"></i>
-          </a>
-          <a th:href="@{/inspections(page=${inspectionList.number}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
-            <i class="fas fa-angle-left"></i>
-          </a>
+      <!-- 페이지네이션 -->
+      <div class="pagination" th:if="${inspectionList != '검수 목록이 없습니다.' && inspectionList.totalPages > 1}">
+        <a th:href="@{/inspections(page=1, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
+        <a th:href="@{/inspections(page=${inspectionList.number}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == 0 ? 'disabled' : ''}">
+          <i class="fas fa-angle-left"></i>
+        </a>
 
-          <th:block th:each="i : ${#numbers.sequence(0, inspectionList.totalPages - 1)}">
-            <a th:href="@{/inspections(page=${i + 1}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}"
-               class="page-link"
-               th:text="${i + 1}"
-               th:classappend="${inspectionList.number == i ? 'active' : ''}">1</a>
-          </th:block>
+        <th:block th:each="i : ${#numbers.sequence(0, inspectionList.totalPages - 1)}">
+          <a th:href="@{/inspections(page=${i + 1}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}"
+             class="page-link"
+             th:text="${i + 1}"
+             th:classappend="${inspectionList.number == i ? 'active' : ''}">1</a>
+        </th:block>
 
-          <a th:href="@{/inspections(page=${inspectionList.number + 2}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
-            <i class="fas fa-angle-right"></i>
-          </a>
-          <a th:href="@{/inspections(page=${inspectionList.totalPages}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
-            <i class="fas fa-angle-double-right"></i>
-          </a>
-        </div>
+        <a th:href="@{/inspections(page=${inspectionList.number + 2}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
+          <i class="fas fa-angle-right"></i>
+        </a>
+        <a th:href="@{/inspections(page=${inspectionList.totalPages}, size=${inspectionList.size}, inspectionType=${param.inspectionType}, searchType=${param.searchType}, search=${param.search})}" class="page-link" th:classappend="${inspectionList.number == inspectionList.totalPages - 1 ? 'disabled' : ''}">
+          <i class="fas fa-angle-double-right"></i>
+        </a>
       </div>
     </div>
-  </th:block>
+  </div>
+</th:block>
 
-  <!-- 페이지별 스크립트 -->
-  <th:block layout:fragment="scripts">
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const currentType = params.get('inspectionType');
-      const urlSearchType = params.get('searchType');
-      
-      // 삭제 확인 함수
-      function confirmDelete(inspectionId) {
-        if (confirm('정말로 이 검수를 삭제하시겠습니까?')) {
-          document.getElementById('deleteForm-' + inspectionId).submit();
+<!-- 페이지별 스크립트 -->
+<th:block layout:fragment="scripts">
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const currentType = params.get('inspectionType');
+    const urlSearchType = params.get('searchType');
+
+    // 삭제 확인 함수
+    function confirmDelete(inspectionId) {
+      if (confirm('정말로 이 검수를 삭제하시겠습니까?')) {
+        document.getElementById('deleteForm-' + inspectionId).submit();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // 탭 전환
+      const tabButtons = document.querySelectorAll('.tab-button');
+      tabButtons.forEach(button => {
+        const type = button.getAttribute('data-type');
+        if((currentType === null || currentType === '') &&
+                (type === null || type === '')) {
+          button.classList.add('active');
+        }else if (button.dataset.type === currentType) {
+          button.classList.add('active');
+        }
+        button.addEventListener('click', function() {
+          // 활성 클래스 제거
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          // 클릭된 버튼에 활성 클래스 추가
+          this.classList.add('active');
+
+          // 상태값 가져오기
+          const inspectionType = this.dataset.type;
+          // 페이지 이동
+          window.location.href = `/inspections?inspectionType=${inspectionType}`;
+        });
+      });
+
+      // 검색 기능
+      const searchInput = document.getElementById('inspectionSearch');
+      const searchType = document.getElementById('typeFilter');
+      const searchButton = document.querySelector('.search-button');
+
+      if (urlSearchType && searchType) {
+        const optionExists = Array.from(searchType.options).some(option => option.value === urlSearchType);
+        if (optionExists) {
+          searchType.value = urlSearchType;
         }
       }
-      
-      document.addEventListener('DOMContentLoaded', function() {
-        // 탭 전환
-        const tabButtons = document.querySelectorAll('.tab-button');
-        tabButtons.forEach(button => {
-          const type = button.getAttribute('data-type');
-          if((currentType === null || currentType === '') &&
-                  (type === null || type === '')) {
-            button.classList.add('active');
-          }else if (button.dataset.type === currentType) {
-            button.classList.add('active');
-          }
-          button.addEventListener('click', function() {
-            // 활성 클래스 제거
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            // 클릭된 버튼에 활성 클래스 추가
-            this.classList.add('active');
 
-            // 상태값 가져오기
-            const inspectionType = this.dataset.type;
-            // 페이지 이동
-            window.location.href = `/inspections?inspectionType=${inspectionType}`;
-          });
-        });
-
-        // 검색 기능
-        const searchInput = document.getElementById('inspectionSearch');
-        const searchType = document.getElementById('typeFilter');
-        const searchButton = document.querySelector('.search-button');
-
-        if (urlSearchType && searchType) {
-          const optionExists = Array.from(searchType.options).some(option => option.value === urlSearchType);
-          if (optionExists) {
-            searchType.value = urlSearchType;
-          }
+      // 클릭으로 검색하는 경우
+      searchButton.addEventListener('click', function() {
+        const search = searchInput.value.trim();
+        if (search) {
+          if(currentType !== null) {
+            window.location.href = `/inspections?inspectionType=${currentType}&searchType=${searchType.value}&search=${search}`;
+          } else
+            window.location.href = `/inspections?searchType=${searchType.value}&search=${search}`;
         }
+      });
 
-        // 클릭으로 검색하는 경우
-        searchButton.addEventListener('click', function() {
+      // 엔터로 검색하는 경우
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
           const search = searchInput.value.trim();
           if (search) {
             if(currentType !== null) {
@@ -203,22 +212,10 @@
             } else
               window.location.href = `/inspections?searchType=${searchType.value}&search=${search}`;
           }
-        });
-
-        // 엔터로 검색하는 경우
-        searchInput.addEventListener('keypress', function(e) {
-          if (e.key === 'Enter') {
-            const search = searchInput.value.trim();
-            if (search) {
-              if(currentType !== null) {
-                window.location.href = `/inspections?inspectionType=${currentType}&searchType=${searchType.value}&search=${search}`;
-              } else
-                window.location.href = `/inspections?searchType=${searchType.value}&search=${search}`;
-            }
-          }
-        });
+        }
       });
-    </script>
-  </th:block>
+    });
+  </script>
+</th:block>
 </body>
 </html>
