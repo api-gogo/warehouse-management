@@ -7,10 +7,12 @@ import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.Purcha
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.request.StorageRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.response.PurchaseInfoResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.response.StorageResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.storage.model.StorageStatus;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.entity.Storage;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.repository.StorageRepository;
 import com.ohgiraffers.warehousemanagement.wms.supplier.repository.SupplierRepository;
 import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
+import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,18 +27,21 @@ public class StorageService {
     private final InspectionRepository inspectionRepository;
     private final SupplierRepository supplierRepository;
     private final UserRepository userRepository;
+    private final InventoryService inventoryService;
 
     @Autowired
     public StorageService(StorageRepository storageRepository,
                           PurchaseRepository purchaseRepository,
                           InspectionRepository inspectionRepository,
                           SupplierRepository supplierRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          InventoryService inventoryService) {
         this.storageRepository = storageRepository;
         this.purchaseRepository = purchaseRepository;
         this.inspectionRepository = inspectionRepository;
         this.supplierRepository = supplierRepository;
         this.userRepository = userRepository;
+        this.inventoryService = inventoryService;
     }
 
     public List<StorageResponseDTO> getAllStorage() {
@@ -67,6 +72,12 @@ public class StorageService {
         storage.setStorageReason(dto.getStorageReason());
 
         Storage saved = storageRepository.save(storage);
+
+        //  입고 상태가 COMPLETED일 때 재고 트리거 호출
+        if (dto.getStorageStatus() == StorageStatus.COMPLETED) {
+            inventoryService.notifyStorageCompleted(dto.getPurchaseId());
+        }
+
         return convertToStorageResponseDTO(saved);
     }
 
@@ -84,6 +95,12 @@ public class StorageService {
         storage.setStorageReason(dto.getStorageReason());
 
         Storage updated = storageRepository.save(storage);
+
+        //  입고 상태가 COMPLETED일 때 재고 트리거 호출
+        if (dto.getStorageStatus() == StorageStatus.COMPLETED) {
+            inventoryService.notifyStorageCompleted(dto.getPurchaseId());
+        }
+
         return convertToStorageResponseDTO(updated);
     }
 
@@ -118,7 +135,6 @@ public class StorageService {
         dto.setPurchaseId(purchase.getPurchaseId());
         dto.setUserId(purchase.getUserId());
 
-        // 유저 이름도 함께 조회
         if (purchase.getUserId() != null) {
             userRepository.findById(purchase.getUserId())
                     .ifPresent(user -> dto.setUserName(user.getUserName()));
@@ -146,35 +162,29 @@ public class StorageService {
         StorageResponseDTO dto = new StorageResponseDTO();
         dto.setStorageId(entity.getStorageId());
         dto.setStorageStatus(entity.getStorageStatus());
-        dto.setInspectionStatus(entity.getInspectionStatus()); // 기본 값 (입고 테이블)
-
+        dto.setInspectionStatus(entity.getInspectionStatus());
         dto.setStorageDate(entity.getStorageDate());
         dto.setStorageReason(entity.getStorageReason());
         dto.setStorageCreatedAt(entity.getStorageCreatedAt());
 
         if (entity.getPurchase() != null) {
             Purchase purchase = entity.getPurchase();
-
             dto.setPurchaseId(purchase.getPurchaseId());
             dto.setPurchaseUserId(purchase.getUserId());
             dto.setPurchaseDueDate(purchase.getPurchaseDueDate());
             dto.setPurchaseStatus(purchase.getPurchaseStatus().name());
 
-            // 유저 이름
             if (purchase.getUserId() != null) {
                 userRepository.findById(purchase.getUserId())
                         .ifPresent(user -> dto.setPurchaseUserName(user.getUserName()));
             }
 
-            // 공급업체 이름
             if (purchase.getSupplier() != null) {
                 dto.setSupplierName(purchase.getSupplier().getSupplierName());
             }
 
-            // 품목 수
             dto.setItemCount(purchase.getItems() != null ? purchase.getItems().size() : 0);
 
-            // 👉 검수 상태는 inspection 테이블에서 최신 상태 조회
             inspectionRepository.findByTransactionTypeAndTransactionId(
                     InspectionTransactionType.PURCHASE,
                     Long.valueOf(purchase.getPurchaseId())
