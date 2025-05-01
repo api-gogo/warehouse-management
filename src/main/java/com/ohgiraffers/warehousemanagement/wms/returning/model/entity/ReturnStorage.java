@@ -19,7 +19,7 @@ public class ReturnStorage {
     private Integer storageId; //-> 나중에 입고에서 외래키로 받아줘야됨
 
     @Column(name = "user_id",nullable = false)
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "return_storages_created_at",nullable = false)
     private LocalDateTime returnStorageCreatedAt;
@@ -31,14 +31,14 @@ public class ReturnStorage {
     public ReturnStorage() {
     }
     /*조회 및 수정용 PK값 있음*/
-    public ReturnStorage(Integer returnStorageId, Integer storageId, Integer userId, LocalDateTime returnStorageCreatedAt) {
+    public ReturnStorage(Integer returnStorageId, Integer storageId, Long userId, LocalDateTime returnStorageCreatedAt) {
         this.returnStorageId = returnStorageId;
         this.storageId = storageId;
         this.userId = userId;
         this.returnStorageCreatedAt = returnStorageCreatedAt;
     }
     /* 등록용 - PK값 없음 */
-    public ReturnStorage(Integer storageId, Integer userId, LocalDateTime returnStorageCreatedAt) {
+    public ReturnStorage(Integer storageId, Long userId, LocalDateTime returnStorageCreatedAt) {
         this.storageId = storageId;
         this.userId = userId;
         this.returnStorageCreatedAt = returnStorageCreatedAt;
@@ -70,11 +70,11 @@ public class ReturnStorage {
         this.storageId = storageId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

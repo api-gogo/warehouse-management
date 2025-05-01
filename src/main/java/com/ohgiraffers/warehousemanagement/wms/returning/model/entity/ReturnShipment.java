@@ -26,7 +26,7 @@ public class ReturnShipment {
     private Integer shipmentId; //나중에 외래키로, 출고와 외래키
 
     @Column(name = "user_id",nullable = false)
-    private Integer userId;
+    private Long userId;
     @Column(name = "store_id",nullable = false)
     private Integer storeId;
 
@@ -59,7 +59,7 @@ public class ReturnShipment {
     public ReturnShipment() {
     }
 
-    public ReturnShipment(Integer returnShipmentId, Integer userId, Integer storeId, String lotNumber, int returnShipmentQuantity, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
+    public ReturnShipment(Integer returnShipmentId, Long userId, Integer storeId, String lotNumber, int returnShipmentQuantity, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
         this.returnShipmentId = returnShipmentId;//pk값
         this.userId = userId;
         this.storeId = storeId;
@@ -73,7 +73,7 @@ public class ReturnShipment {
         this.shipmentId = shipmentId;
     }
 
-    public ReturnShipment(Integer storeId,Integer userId,String lotNumber,int returnShipmentQuantity,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
+    public ReturnShipment(Integer storeId,Long userId,String lotNumber,int returnShipmentQuantity,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
     {
         this.storeId = storeId;
         this.userId = userId;
@@ -100,11 +100,11 @@ public class ReturnShipment {
         this.returnShipmentId = returnShipmentId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

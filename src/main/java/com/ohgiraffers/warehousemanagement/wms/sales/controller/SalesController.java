@@ -145,7 +145,7 @@ public class SalesController {
         return searchStoreResults;
     }
 
-    // 상품 검색하기(재고에서 조회하는거라 상품명 입력하면 총 재고 가져옴
+/*    // 상품 검색하기(재고에서 조회하는거라 상품명 입력하면 총 재고 가져옴
     @GetMapping("/search/products")
     @ResponseBody
     public List<InventoryViewDTO> searchProducts(@RequestParam(name = "productSearchName") String productName) {
@@ -159,5 +159,5 @@ public class SalesController {
     public List<UserDTO> searchUsers(@RequestParam(name = "userSearchName") String userName) {
         List<UserDTO> searchUsersResults = salesServiceImpl.searchUsersByName(userName);
         return searchUsersResults;
-    }
+    }*/
 }
