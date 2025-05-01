@@ -9,7 +9,7 @@ public class PurchaseItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "purchase_item_id")
-    private Integer purchaseItemId;
+    private Long purchaseItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_id")
@@ -24,18 +24,18 @@ public class PurchaseItem {
 
     public PurchaseItem() {}
 
-    public PurchaseItem(Integer purchaseItemId, Purchase purchase, Integer productId, Integer productQuantity) {
+    public PurchaseItem(Long purchaseItemId, Purchase purchase, Integer productId, Integer productQuantity) {
         this.purchaseItemId = purchaseItemId;
         this.purchase = purchase;
         this.productId = productId;
         this.productQuantity = productQuantity;
     }
 
-    public Integer getPurchaseItemId() {
+    public Long getPurchaseItemId() {
         return purchaseItemId;
     }
 
-    public void setPurchaseItemId(Integer purchaseItemId) {
+    public void setPurchaseItemId(Long purchaseItemId) {
         this.purchaseItemId = purchaseItemId;
     }
 
