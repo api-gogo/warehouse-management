@@ -37,7 +37,7 @@ class InspectionControllerTest {
 
     @BeforeEach
     void setUp() {
-        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK, LocalDate.now());
+        InspectionRequestDTO dto = new InspectionRequestDTO(1L, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK, LocalDate.now());
         inspection = inspectionService.createInspection(dto);
     }
 
@@ -45,7 +45,7 @@ class InspectionControllerTest {
     @Test
     @DisplayName("등록 테스트")
     void createInspection() {
-        InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK, LocalDate.now());
+        InspectionRequestDTO dto = new InspectionRequestDTO(1L, null, InspectionTransactionType.INSPECTION, 50, 50, 0, InspectionStatus.OK, LocalDate.now());
 
         InspectionResponseDTO inspection = inspectionService.createInspection(dto);
 
@@ -142,7 +142,7 @@ class InspectionControllerTest {
     @DisplayName("다중 등록 테스트")
     void createMultiInspection() {
         for(long i = 1; i <= 43; i++) {
-            InspectionRequestDTO dto = new InspectionRequestDTO(1, null, InspectionTransactionType.INSPECTION, (int)i, (int)i, 0, InspectionStatus.OK, LocalDate.now());
+            InspectionRequestDTO dto = new InspectionRequestDTO(1L, null, InspectionTransactionType.INSPECTION, (int)i, (int)i, 0, InspectionStatus.OK, LocalDate.now());
             if(i % 2 == 0) {
                 dto.setTransactionType(InspectionTransactionType.PURCHASE);
                 dto.setTransactionId(i);
