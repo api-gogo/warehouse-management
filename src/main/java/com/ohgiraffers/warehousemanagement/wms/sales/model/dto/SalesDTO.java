@@ -10,6 +10,8 @@ import java.util.List;
 public class SalesDTO {
     private Integer salesId;
     private Integer storeId;
+    private String storeName;
+    private String storeAddress;
     private Integer userId;
     private String userName;
     private String userPhone;
@@ -27,9 +29,11 @@ public class SalesDTO {
     public SalesDTO() {
     }
 
-    public SalesDTO(Integer salesId, Integer storeId, Integer userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
+    public SalesDTO(Integer salesId, Integer storeId, String storeName, String storeAddress, Integer userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
         this.salesId = salesId;
         this.storeId = storeId;
+        this.storeName = storeName;
+        this.storeAddress = storeAddress;
         this.userId = userId;
         this.userName = userName;
         this.userPhone = userPhone;
@@ -54,6 +58,22 @@ public class SalesDTO {
 
     public void setStoreId(Integer storeId) {
         this.storeId = storeId;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public String getStoreAddress() {
+        return storeAddress;
+    }
+
+    public void setStoreAddress(String storeAddress) {
+        this.storeAddress = storeAddress;
     }
 
     public Integer getUserId() {
@@ -165,8 +185,10 @@ public class SalesDTO {
         return "SalesDTO{" +
                 "salesId=" + salesId +
                 ", storeId=" + storeId +
+                ", storeAddress='" + storeAddress + '\'' +
                 ", userId=" + userId +
                 ", userName='" + userName + '\'' +
+                ", userPhone='" + userPhone + '\'' +
                 ", salesDate=" + salesDate +
                 ", shippingDueDate=" + shippingDueDate +
                 ", salesStatus=" + salesStatus +

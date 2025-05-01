@@ -1,19 +1,16 @@
 package com.ohgiraffers.warehousemanagement.wms.returning.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
-import com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnShipmentDTO;
-import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShipment;
-import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturningService;
+import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturnShipmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +19,14 @@ import java.util.List;
 @RequestMapping("/returns/outbound/list")
 @Validated
 
-public class ReturningController {
+public class ReturnShipmentController {
 
     //의존성 주입
-    private final ReturningService returningService;
+    private final ReturnShipmentService returnShipmentService;
 
     @Autowired
-    public ReturningController(ReturningService returningService) {
-        this.returningService = returningService;
+    public ReturnShipmentController(ReturnShipmentService returnShipmentService) {
+        this.returnShipmentService = returnShipmentService;
     }
 
     //(반품서) 전체 조회
@@ -39,7 +36,7 @@ public class ReturningController {
     public ModelAndView getAllReturns(ModelAndView mv) {
 
         //서비스의 getALLReturning 호출
-        List<ReturnShipmentDTO> returnLists = returningService.getAllReturns();
+        List<ReturnShipmentDTO> returnLists = returnShipmentService.getAllReturns();
 
         if (returnLists != null) {
             mv.addObject("returnLists", returnLists);
@@ -62,7 +59,7 @@ public class ReturningController {
     public String createReturns(@Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO, RedirectAttributes rdtat) {
 
         System.out.println("컨트롤러에서 데이터 넘어오는지: " + returnShipmentDTO);
-        int returnShipmentId = returningService.createReturns(returnShipmentDTO);
+        int returnShipmentId = returnShipmentService.createReturns(returnShipmentDTO);
         String resultUrl = null;
 
         if (returnShipmentId > 0) {
@@ -90,7 +87,7 @@ public class ReturningController {
         @GetMapping("/{returnShipmentId}")
         public ModelAndView getReturnsByID (@PathVariable(name = "returnShipmentId") Integer
         returnShipmentId, ModelAndView mv, RedirectAttributes rdtat){
-            ReturnShipmentDTO returnShipmentDTO = returningService.getReturnsByID(returnShipmentId);
+            ReturnShipmentDTO returnShipmentDTO = returnShipmentService.getReturnsByID(returnShipmentId);
             //returnShipmentDTO.setReturnShipmentId(returnShipmentId); 서비스에서 이미 설정
             if (returnShipmentDTO != null) {
                 mv.addObject("returns", returnShipmentDTO);
@@ -115,7 +112,7 @@ public class ReturningController {
         returnShipmentId, RedirectAttributes redirectAttributes){
 
             /*삭제 상태 변경 - > 논리적 삭제*/
-            boolean isDeleted = returningService.deleteReturns(returnShipmentId);
+            boolean isDeleted = returnShipmentService.deleteReturns(returnShipmentId);
 
             if (isDeleted) {
                 return "redirect:/returns/outbound/list"; //삭제에 성공->홈화면으로
@@ -138,7 +135,7 @@ public class ReturningController {
         public ModelAndView updateReturnsById (@PathVariable("return_shipment_id") Integer
         returnShipmentId, ModelAndView mv, RedirectAttributes rdtat)
         {
-            ReturnShipmentDTO rsDTO = returningService.getReturnsByID(returnShipmentId);
+            ReturnShipmentDTO rsDTO = returnShipmentService.getReturnsByID(returnShipmentId);
 
             if (rsDTO != null) {
                 mv.addObject("ReturnShipmentDTO", rsDTO);
@@ -157,7 +154,7 @@ public class ReturningController {
         public String updateReturns (@PathVariable("return_shipment_id") Integer returnShipmentId,
                 @Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO,
                 RedirectAttributes rdtat){
-            ReturnShipmentDTO updateDTO = returningService.updateReturns(returnShipmentId, returnShipmentDTO);
+            ReturnShipmentDTO updateDTO = returnShipmentService.updateReturns(returnShipmentId, returnShipmentDTO);
             String resultUrl = null;
 
             if (updateDTO != null) {
@@ -174,7 +171,7 @@ public class ReturningController {
         @PostMapping("{return_shipment_id}/update/status/")
         public String updateStatusReturns (@PathVariable Integer returnShipmentId, @RequestParam ReturnShipmentStatus
         returnShipmentStatus, RedirectAttributes rdtat){
-            boolean result = returningService.updateStatusReturns(returnShipmentId, returnShipmentStatus);
+            boolean result = returnShipmentService.updateStatusReturns(returnShipmentId, returnShipmentStatus);
             String resultUrl = null;
 
             if (result) {
