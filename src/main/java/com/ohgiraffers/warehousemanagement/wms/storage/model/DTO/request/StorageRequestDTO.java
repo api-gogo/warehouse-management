@@ -10,34 +10,29 @@ import java.time.LocalDate;
 public class StorageRequestDTO {
 
     @NotNull(message = "발주 ID는 필수입니다!")
-    private Integer purchaseId;  // 발주 ID
+    private Integer purchaseId;
 
     @NotNull(message = "입고 상태를 선택해 주세요!")
-    private StorageStatus storageStatus;  // 입고 상태 (ENUM)
+    private StorageStatus storageStatus;
 
-    private String inspectionStatus;  // 검수 상태 (입고 이상/완료 등)
+    private String inspectionStatus;  // 검수 상태 (검수완료 / 검수이상)
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "입고일은 필수입니다!")
-    private LocalDate storageDate;  // 입고일
+    private LocalDate storageDate;
 
     @NotBlank(message = "입고 사유를 입력해 주세요.")
-    private String storageReason;  // 입고 사유
+    private String storageReason;
 
-    // 등록일은 자동 생성 - 사용자가 입력하지 않음
-    private LocalDate createdAt;
+    public StorageRequestDTO() {}
 
-    public StorageRequestDTO() {
-        this.createdAt = LocalDate.now();  // 객체 생성 시 등록일 자동 설정
-    }
-
-    public StorageRequestDTO(Integer purchaseId, StorageStatus storageStatus, String inspectionStatus, LocalDate storageDate, String storageReason, LocalDate createdAt) {
+    public StorageRequestDTO(Integer purchaseId, StorageStatus storageStatus, String inspectionStatus,
+                             LocalDate storageDate, String storageReason) {
         this.purchaseId = purchaseId;
         this.storageStatus = storageStatus;
         this.inspectionStatus = inspectionStatus;
         this.storageDate = storageDate;
         this.storageReason = storageReason;
-        this.createdAt = createdAt;
     }
 
     public Integer getPurchaseId() {
@@ -80,14 +75,6 @@ public class StorageRequestDTO {
         this.storageReason = storageReason;
     }
 
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
     @Override
     public String toString() {
         return "StorageRequestDTO{" +
@@ -96,7 +83,6 @@ public class StorageRequestDTO {
                 ", inspectionStatus='" + inspectionStatus + '\'' +
                 ", storageDate=" + storageDate +
                 ", storageReason='" + storageReason + '\'' +
-                ", createdAt=" + createdAt +
                 '}';
     }
 }

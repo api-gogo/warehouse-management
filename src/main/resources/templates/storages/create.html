@@ -3,21 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <title>WMS - 신규 입고 등록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/navigation.css?v=1">
     <link rel="stylesheet" href="/common.css?v=1">
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-search {
+            margin-top: 1.9rem;
+        }
+
+        .info-card {
+            background-color: #f7f9fc;
+            border: 1px solid #ccd6e0;
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-row {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .info-row strong {
+            display: inline-block;
+            width: 130px;
+            color: #333;
+        }
+
+        .alert-danger {
+            background-color: #ffe8e8;
+            color: #c00;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .flex {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .justify-end {
+            justify-content: flex-end;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: 2fr 1fr auto;
+        }
+
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        .max-w-4xl {
+            max-width: 900px;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+        }
+
+        .btn-outline {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 <div class="layout">
-    <!-- 사이드바 -->
     <div th:replace="~{navigation :: aside(activeMenu='storage')}"></div>
-
-    <!-- 메인 콘텐츠 -->
     <div class="main-content">
-        <!-- 헤더 -->
         <div th:replace="~{navigation :: header}"></div>
 
-        <!-- 페이지 본문 -->
         <main class="page-content">
             <div class="flex items-center justify-between mb-6">
                 <h1 class="page-title">신규 입고 등록</h1>
@@ -26,23 +168,41 @@
                 </a>
             </div>
 
-            <div class="card max-w-4xl mx-auto">
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">입고 정보</h2>
                     <p class="card-description">신규 입고 정보를 입력해주세요.</p>
                 </div>
 
-                <div class="card-content" style="max-width: 800px; margin: 0 auto;">
-                    <form th:action="@{/storages}" method="post" th:object="${storages}">
-                        <div class="grid grid-cols-2 gap-4">
-
-                            <!-- 발주 ID -->
-                            <div class="form-group">
-                                <label for="purchaseId" class="form-label">발주 ID *</label>
-                                <input type="text" id="purchaseId" th:field="*{purchaseId}" class="form-input" required>
+                <div class="card-content">
+                    <form th:action="@{/storages}" method="post" th:object="${storage}">
+                        <div class="grid grid-cols-3 items-end">
+                            <div class="form-group col-span-2">
+                                <label class="form-label">발주 ID *</label>
+                                <input type="number" id="purchaseId" th:field="*{purchaseId}" class="form-input" required>
                             </div>
+                            <div class="form-group">
+                                <button type="button" id="btnFetchPurchase" class="btn btn-outline btn-search">검색</button>
+                            </div>
+                        </div>
 
-                            <!-- 입고 상태 -->
+                        <div id="purchaseInfo" class="info-card" style="display:none;">
+                            <div class="info-row"><strong>담당자 ID:</strong> <span id="userId"></span></div>
+                            <div class="info-row"><strong>담당자 이름:</strong> <span id="userName"></span></div>
+                            <div class="info-row"><strong>납기일:</strong> <span id="purchaseDueDate"></span></div>
+                            <div class="info-row"><strong>검수 상태:</strong> <span id="inspectionStatusLabel"></span></div>
+                            <div class="info-row"><strong>공급업체:</strong> <span id="supplierName"></span></div>
+                            <div class="info-row"><strong>품목 수:</strong> <span id="itemCount"></span></div>
+                        </div>
+
+                        <input type="hidden" id="inspectionStatus" th:field="*{inspectionStatus}" />
+
+                        <div class="grid grid-cols-2 mt-6">
                             <div class="form-group">
                                 <label for="storageStatus" class="form-label">입고 상태 *</label>
                                 <select id="storageStatus" th:field="*{storageStatus}" class="form-select" required>
@@ -54,20 +214,18 @@
                                 </select>
                             </div>
 
-                            <!-- 입고일 -->
                             <div class="form-group">
                                 <label for="storageDate" class="form-label">입고일 *</label>
                                 <input type="date" id="storageDate" th:field="*{storageDate}" class="form-input" required>
                             </div>
 
-                            <!-- 입고 사유 -->
                             <div class="form-group col-span-2">
                                 <label for="storageReason" class="form-label">입고 사유 *</label>
                                 <input type="text" id="storageReason" th:field="*{storageReason}" class="form-input" required>
                             </div>
                         </div>
 
-                        <div class="flex justify-end mt-6 space-x-2">
+                        <div class="flex justify-end mt-6">
                             <a th:href="@{/storages}" class="btn btn-outline">취소</a>
                             <button type="submit" class="btn btn-primary">등록</button>
                         </div>
@@ -79,5 +237,57 @@
 </div>
 
 <div th:replace="~{navigation :: scripts}"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function () {
+        $('#btnFetchPurchase').click(function () {
+            const purchaseId = $('#purchaseId').val();
+            if (!purchaseId) {
+                alert("발주 ID를 입력해주세요.");
+                return;
+            }
+
+            $.get(`/storages/purchase-info/${purchaseId}`, function (data) {
+                $('#userId').text(data.userId ?? '-');
+                $('#userName').text(data.userName ?? '-');
+                $('#purchaseDueDate').text(data.purchaseDueDate ?? '-');
+                $('#inspectionStatusLabel').text(data.inspectionStatus ?? '-');
+                $('#supplierName').text(data.supplierName ?? '-');
+                $('#itemCount').text(data.itemCount ?? '-');
+
+                $('#inspectionStatus').val(data.inspectionStatus ?? '');
+                $('#purchaseInfo').show();
+            }).fail(() => {
+                alert("해당 발주 ID를 찾을 수 없습니다.");
+                $('#purchaseInfo').hide();
+                $('#inspectionStatus').val('');
+            });
+        });
+
+        $('form').on('submit', function (event) {
+            event.preventDefault();
+
+            const purchaseId = $('#purchaseId').val();
+            const storageStatus = $('#storageStatus').val();
+            const storageDate = $('#storageDate').val();
+            const storageReason = $('#storageReason').val();
+
+            if (!purchaseId || !storageStatus || !storageDate || !storageReason) {
+                alert("모든 필수 항목을 입력해주세요.");
+                return;
+            }
+
+            $.post('/storages/check-duplicate', { purchaseId }, function (isDuplicate) {
+                if (isDuplicate) {
+                    alert("이미 등록된 발주 ID입니다.");
+                } else {
+                    event.target.submit();
+                }
+            }).fail(() => {
+                alert("발주 ID 중복 확인에 실패했습니다.");
+            });
+        });
+    });
+</script>
 </body>
 </html>
