@@ -11,7 +11,7 @@ public class ReturnShipmentDTO {
 
     private Integer returnShipmentId;
     private Integer storeId;
-    private Integer userId;
+    private Long userId;
 
     private ReturnShipmentStatus returnShipmentStatus; //Enum
 
@@ -34,7 +34,7 @@ public class ReturnShipmentDTO {
 
 
     //조회 및 수정용 - PK값 있음
-    public ReturnShipmentDTO(Integer returnShipmentId, Integer storeId, Integer userId, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted , Integer shipmentId) {
+    public ReturnShipmentDTO(Integer returnShipmentId, Integer storeId, Long userId, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted , Integer shipmentId) {
         this.returnShipmentId = returnShipmentId;//PK
         this.storeId = storeId;
         this.userId = userId;
@@ -66,11 +66,11 @@ public class ReturnShipmentDTO {
         this.storeId = storeId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

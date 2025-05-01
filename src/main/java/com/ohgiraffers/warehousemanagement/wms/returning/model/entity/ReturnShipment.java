@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "return_shipments")
-@Where(clause = "is_deleted = true") //삭제 상태가 1인 것만 조회
+//@Where(clause = "is_deleted = true") //활성화 상태인 것만 조회
 
 public class ReturnShipment {
     @Id
@@ -26,7 +26,7 @@ public class ReturnShipment {
     private Integer shipmentId; //나중에 외래키로, 출고와 외래키
 
     @Column(name = "user_id",nullable = false)
-    private Integer userId;
+    private Long userId;
     @Column(name = "store_id",nullable = false)
     private Integer storeId;
 
@@ -51,7 +51,7 @@ public class ReturnShipment {
     private LocalDateTime returnShipmentDeletedAt;
 
     @Column(name = "is_deleted",nullable = false)
-    private boolean isDeleted = true;
+    private boolean isDeleted = true; // true=활성화, false=삭제
 
     @OneToMany(mappedBy = "returnShipmentId",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ReturnShipmentItem> returnShipmentItems = new ArrayList<>(); //출고반품에 대해 리스트로 받아옴
@@ -59,7 +59,7 @@ public class ReturnShipment {
     public ReturnShipment() {
     }
 
-    public ReturnShipment(Integer returnShipmentId, Integer userId, Integer storeId, String lotNumber, int returnShipmentQuantity, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
+    public ReturnShipment(Integer returnShipmentId, Long userId, Integer storeId, String lotNumber, int returnShipmentQuantity, ReturnShipmentStatus returnShipmentStatus, LocalDateTime returnShipmentCreatedAt, LocalDateTime returnShipmentUpdatedAt, LocalDateTime returnShipmentDeletedAt, boolean isDeleted,Integer shipmentId) {
         this.returnShipmentId = returnShipmentId;//pk값
         this.userId = userId;
         this.storeId = storeId;
@@ -73,7 +73,7 @@ public class ReturnShipment {
         this.shipmentId = shipmentId;
     }
 
-    public ReturnShipment(Integer storeId,Integer userId,String lotNumber,int returnShipmentQuantity,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
+    public ReturnShipment(Integer storeId,Long userId,String lotNumber,int returnShipmentQuantity,ReturnShipmentStatus returnShipmentStatus,LocalDateTime returnShipmentCreatedAt,Integer shipmentId)
     {
         this.storeId = storeId;
         this.userId = userId;
@@ -100,11 +100,11 @@ public class ReturnShipment {
         this.returnShipmentId = returnShipmentId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

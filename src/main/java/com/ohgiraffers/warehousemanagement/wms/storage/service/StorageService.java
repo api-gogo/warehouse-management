@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -195,4 +196,13 @@ public class StorageService {
 
         return dto;
     }
+
+/*    public Integer getPurchaseId(int storageId) {
+        Optional<Storage> optionalStorage = storageRepository.findById(storageId);
+        if (optionalStorage.isPresent()) {
+            return optionalStorage.get().getPurchaseId();
+        }
+        return null;
+    }*/
+
 }

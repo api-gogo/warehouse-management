@@ -9,6 +9,9 @@ import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShip
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnShipmentItemRepository;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnShipmentRepository;
 
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
+import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesService;
+import com.ohgiraffers.warehousemanagement.wms.shipment.service.ShipmentService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,17 +30,23 @@ public class ReturnShipmentService {
 
     private final ReturnShipmentRepository returnShipmentRepository;
     private final ReturnShipmentItemRepository returnShipmentItemRepository;
+    private final ShipmentService shipmentService;
+    private final SalesService salesService;
 
     @Autowired
-    public ReturnShipmentService(ReturnShipmentRepository returnShipmentRepository, ReturnShipmentItemRepository returnShipmentItemRepository) { //엔티티를 반환
+    public ReturnShipmentService(ReturnShipmentRepository returnShipmentRepository, ReturnShipmentItemRepository returnShipmentItemRepository, ShipmentService shipmentService, SalesService salesService) {
         this.returnShipmentRepository = returnShipmentRepository;
         this.returnShipmentItemRepository = returnShipmentItemRepository;
+        this.shipmentService = shipmentService;
+        this.salesService = salesService;
     }
+
 
     //전체조회
     public List<ReturnShipmentDTO> getAllReturns() {//엔티티 리스트로 받기
 
-        List<ReturnShipment> findAll = returnShipmentRepository.findAll(); //엔티티로 받기
+        List<ReturnShipment> findAll = returnShipmentRepository.findAllByIsDeleted(true);//활성화된 항목만 조회
+
         List<ReturnShipmentDTO> returnLists = new ArrayList<>();
 
         for (ReturnShipment rsEntity : findAll) {
@@ -74,6 +83,11 @@ public class ReturnShipmentService {
         logger.info("Received DTO: lotNumber={}, returnShipmentContent={}",
                 returnShipmentDTO.getLotNumber(),
                 returnShipmentDTO.getReturnShipmentContent());
+
+        //
+        Integer salesId = shipmentService.getSaleIdByShipmentId(returnShipmentDTO.getShipmentId());
+        SalesItem salesItem = salesService.getSalesItemBySalesId(salesId);
+        System.out.println();
 
         /*유효성 검증*/
         if (returnShipmentDTO.getLotNumber() == null || returnShipmentDTO.getLotNumber().isEmpty()) {
@@ -201,16 +215,42 @@ public class ReturnShipmentService {
             findDTO.setReturnShipmentQuantity(quantities);
             findDTO.setReturnShipmentContent(causes);
 
+
             // 디버깅 로그
             System.out.println("DTO populated with: " +
-                               "LotNumbers=" + lotNumbers.size() +
-                               ", Quantities=" + quantities.size() +
-                               ", Causes=" + causes.size());
+                               "LotNumbers=" + lotNumbers +
+                               ", Quantities=" + quantities +
+                               ", Causes=" + causes);
+            System.out.println(findDTO);
         } else {
             System.out.println("No ReturnShipmentItems found for ReturnShipment ID: " + returnShipmentId);
         }
 
         return findDTO;
+    }
+
+    //논리적 삭제
+    public List<ReturnShipmentDTO> getActiveReturns() {
+        return returnShipmentRepository.findAllByIsDeleted(true)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private ReturnShipmentDTO convertToDTO(ReturnShipment returnShipment) {
+        ReturnShipmentDTO dto = new ReturnShipmentDTO();
+
+        dto.setReturnShipmentId(returnShipment.getReturnShipmentId());
+        dto.setStoreId(returnShipment.getStoreId());
+        dto.setUserId(returnShipment.getUserId());
+        dto.setReturnShipmentStatus(returnShipment.getReturnShipmentStatus());
+        dto.setReturnShipmentCreatedAt(returnShipment.getReturnShipmentCreatedAt());
+        dto.setReturnShipmentUpdatedAt(returnShipment.getReturnShipmentUpdatedAt());
+        dto.setReturnShipmentDeletedAt(returnShipment.getReturnShipmentDeletedAt());
+        dto.setDeleted(returnShipment.isDeleted());
+        dto.setShipmentId(returnShipment.getShipmentId());
+
+        return dto;
     }
 
     //삭제
@@ -220,7 +260,7 @@ public class ReturnShipmentService {
             ReturnShipment returnShipment = returnShipmentRepository.findById(returnShipmentId) //ID를 이용해 조회
                     .orElseThrow(() -> new RuntimeException("삭제할 반품서가 없습니다"));
 
-            returnShipment.setDeleted(false); //삭제 상태 -> 0: 삭제, 1: 활성화 @@@@@byte로? ,returnShipment.setDeleted(0);
+            returnShipment.setDeleted(false); //false=삭제 상태, true=활성화 상태
             returnShipment.setReturnShipmentDeletedAt(LocalDateTime.now());
             returnShipmentRepository.save(returnShipment);
 
@@ -296,5 +336,6 @@ public class ReturnShipmentService {
         return returnShipmentRepository.findById(returnShipmentId).get().getReturnShipmentId();
     }*/
     //비즈니스 로직
+
 }
 
