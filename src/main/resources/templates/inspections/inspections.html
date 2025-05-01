@@ -49,22 +49,21 @@
             <thead>
             <tr>
               <th>검수ID</th>
-              <th>검수자</th>
               <th>검수유형ID</th>
               <th>검수유형</th>
+              <th>검수일자</th>
+              <th>검수자</th>
+              <th>검수상태</th>
               <th>검수수량</th>
               <th>정상수량</th>
               <th>불량수량</th>
-              <th>검수상태</th>
-              <th>검수일자</th>
               <th>액션</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="inspection : ${inspectionList.content}" th:if="${inspectionList.content != null}">
               <td th:text="${inspection.inspectionId}"></td>
-              <td th:text="${inspection.userName}"></td>
-              <td th:text="${inspection.transactionId != null ? inspection.transactionId : '-'}"></td>
+              <td th:text="${inspection.transactionId != null ? inspection.transactionId : '상시'}"></td>
               <td>
                 <span class="status-badge"
                     th:classappend="${inspection.transactionType == '상시' ? 'status-active' :
@@ -74,17 +73,18 @@
                                     (inspection.transactionType == '출고반품' ? 'status-resigned' : ''))))}"
                     th:text="${inspection.transactionType}">상시</span>
               </td>
+              <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>
+              <td th:text="${inspection.userName}"></td>
+              <td>
+                <span class="status-badge"
+                      th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
+                                    (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
+                                    (inspection.inspectionStatus == '보류' ? 'status-pending' : ''))}"
+                      th:text="${inspection.inspectionStatus}">이상 없음</span>
+              </td>
               <td th:text="${inspection.inspectionQuantity}"></td>
               <td th:text="${inspection.acceptedQuantity}"></td>
               <td th:text="${inspection.defectiveQuantity}"></td>
-              <td>
-                <span class="status-badge"
-                    th:classappend="${inspection.inspectionStatus == '이상 없음' ? 'status-active' :
-                                    (inspection.inspectionStatus == '이상 있음' ? 'status-rejected' :
-                                    (inspection.inspectionStatus == '보류' ? 'status-pending' : ''))}"
-                    th:text="${inspection.inspectionStatus}">이상 없음</span>
-              </td>
-              <td th:text="${#temporals.format(inspection.inspectionDate, 'yyyy-MM-dd')}"></td>
               <td class="actions">
                 <a th:href="@{/inspections/{id}(id=${inspection.inspectionId})}" class="action-button" title="상세보기">
                   <i class="fas fa-eye"></i>
