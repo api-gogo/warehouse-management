@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default-layout}">
+<head>
+  <title>재고 상세 정보</title>
+  <!-- 페이지별 CSS -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="/common.css">
+    <style>
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .info-item {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .label {
+        font-weight: bold;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+      }
+      
+      .value {
+        font-size: 1.1rem;
+      }
+      
+      .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+      }
+      
+      /* 이력 테이블 스타일 */
+      .transaction-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-weight: bold;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+      }
+      
+      .transaction-storage {
+        background-color: #d1e7dd;
+        color: #0f5132;
+      }
+      
+      .transaction-shipment {
+        background-color: #f8d7da;
+        color: #842029;
+      }
+      
+      .transaction-return {
+        background-color: #d7e9f8;
+        color: #084298;
+      }
+      
+      .transaction-adjustment {
+        background-color: #fff3cd;
+        color: #664d03;
+      }
+      
+      .quantity-badge {
+        font-weight: bold;
+      }
+      
+      .quantity-positive {
+        color: #0f5132;
+      }
+      
+      .quantity-negative {
+        color: #842029;
+      }
+    </style>
+  </th:block>
+</head>
+<body>
+  <!-- 페이지 콘텐츠 -->
+  <th:block layout:fragment="content" th:with="activeMenu='inventory'">
+    <div class="common-container">
+      <div class="common-header">
+        <h1 class="common-title">재고 상세 정보</h1>
+        <div class="common-actions">
+          <a th:href="@{/inventories/detail/{id}(id=${inventory != null && inventory.productId != null ? inventory.productId.intValue() : 0})}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+          </a>
+        </div>
+      </div>
+      
+      <div class="common-content">
+        <!-- 오류 메시지가 있는 경우 표시 -->
+        <div class="alert alert-danger" th:if="${errorMessage != null}">
+          <i class="fas fa-exclamation-circle"></i>
+          <span th:text="${errorMessage}">오류 메시지</span>
+        </div>
+        
+        <!-- 재고 정보 섹션 -->
+        <div class="detail-section" th:if="${inventory != null}">
+          <h2 class="section-title">재고 기본 정보</h2>
+          
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">재고 ID</span>
+              <span class="value" th:text="${inventory.inventoryId != null ? inventory.inventoryId : '-'}">10001</span>
+            </div>
+            <div class="info-item">
+              <span class="label">상품명</span>
+              <span class="value" th:text="${inventory.productName != null ? inventory.productName : '-'}">상품명</span>
+            </div>
+            <div class="info-item">
+              <span class="label">로트 번호</span>
+              <span class="value" th:text="${inventory.lotNumber != null ? inventory.lotNumber : '-'}">LOT123456</span>
+            </div>
+            <div class="info-item">
+              <span class="label">위치 코드</span>
+              <span class="value" th:text="${inventory.locationCode != null ? inventory.locationCode : '-'}">A-01-02</span>
+            </div>
+            <div class="info-item">
+              <span class="label">가용 재고</span>
+              <span class="value" th:text="${inventory.availableStock != null ? inventory.availableStock : '-'}">100</span>
+            </div>
+            <div class="info-item">
+              <span class="label">할당 재고</span>
+              <span class="value" th:text="${inventory.allocatedStock != null ? inventory.allocatedStock : '-'}">20</span>
+            </div>
+            <div class="info-item">
+              <span class="label">폐기 재고</span>
+              <span class="value" th:text="${inventory.disposedStock != null ? inventory.disposedStock : '-'}">5</span>
+            </div>
+            <div class="info-item">
+              <span class="label">유통기한</span>
+              <span class="value" th:text="${inventory.inventoryExpiryDate != null ? #temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd') : '-'}">2023-12-31</span>
+            </div>
+            <div class="info-item">
+              <span class="label">생성일</span>
+              <span class="value" th:text="${inventory.inventoryCreatedAt != null ? #temporals.format(inventory.inventoryCreatedAt, 'yyyy-MM-dd HH:mm') : '-'}">2023-01-01 12:00</span>
+            </div>
+            <div class="info-item">
+              <span class="label">수정일</span>
+              <span class="value" th:text="${inventory.inventoryUpdatedAt != null ? #temporals.format(inventory.inventoryUpdatedAt, 'yyyy-MM-dd HH:mm') : '-'}">2023-01-10 15:30</span>
+            </div>
+          </div>
+          
+          <!-- 액션 버튼 -->
+          <div class="action-buttons">
+            <a th:href="@{/inventories/edit/{id}(id=${inventory.inventoryId != null ? inventory.inventoryId : 0})}" class="btn btn-primary">
+              <i class="fas fa-edit"></i> 정보 수정
+            </a>
+            <a th:href="@{/inventories/delete/{id}(id=${inventory.inventoryId != null ? inventory.inventoryId : 0})}"
+               onclick="return confirm('정말로 이 재고를 삭제하시겠습니까?');" 
+               class="btn btn-danger">
+              <i class="fas fa-trash"></i> 삭제
+            </a>
+          </div>
+        </div>
+        
+        <!-- 재고 정보가 없을 경우 표시 -->
+        <div class="alert alert-warning" th:if="${inventory == null}">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>재고 정보를 찾을 수 없습니다.</span>
+        </div>
+        
+        <!-- 재고 이력 섹션 -->
+        <div class="detail-section">
+          <h2 class="section-title">재고 이력</h2>
+          
+          <!-- 데이터 테이블 -->
+          <div class="table-responsive" th:if="${logs != null and not #lists.isEmpty(logs)}">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>일시</th>
+                  <th>구분</th>
+                  <th>수량</th>
+                  <th>내용</th>
+                  <th>처리자</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="log : ${logs}">
+                  <td th:text="${log.inventoryLogCreated != null ? #temporals.format(log.inventoryLogCreated, 'yyyy-MM-dd HH:mm') : '-'}">2023-01-01 12:00</td>
+                  <td>
+                    <span class="transaction-badge" 
+                          th:if="${log.transactionType != null}"
+                          th:classappend="${'transaction-' + log.transactionType.name().toLowerCase()}"
+                          th:text="${log.transactionType.getTransactionType()}">구분</span>
+                    <span th:unless="${log.transactionType != null}">-</span>
+                  </td>
+                  <td>
+                    <!-- 입고/반품: + 표시, 출고: - 표시, 재고수정: 내용에서 추출 -->
+                    <!-- ADJUSTMENT 타입일 경우 -->
+                    <span th:if="${log.transactionType != null && log.transactionType.name() == 'ADJUSTMENT'}">
+                      <!-- 로그 내용이 null이 아니고 '증가'를 포함할 경우 -->
+                      <span th:if="${log.inventoryLogContent != null && log.inventoryLogContent.contains('증가')}" 
+                            class="quantity-badge quantity-positive" 
+                            th:text="${'+' + log.quantityChanged}">+00</span>
+                      
+                      <!-- 로그 내용이 null이 아니고 '증가'를 포함하지 않을 경우 -->
+                      <span th:if="${log.inventoryLogContent != null && !log.inventoryLogContent.contains('증가')}" 
+                            class="quantity-badge quantity-negative" 
+                            th:text="${'-' + log.quantityChanged}">-00</span>
+                      
+                      <!-- 로그 내용이 null일 경우 -->
+                      <span th:if="${log.inventoryLogContent == null}" 
+                            class="quantity-badge">±00</span>
+                    </span>
+                    
+                    <!-- STORAGE 타입일 경우 -->
+                    <span th:if="${log.transactionType != null && log.transactionType.name() == 'STORAGE'}" 
+                          class="quantity-badge quantity-positive" 
+                          th:text="${'+' + log.quantityChanged}">+00</span>
+                    
+                    <!-- SHIPMENT 타입일 경우 -->
+                    <span th:if="${log.transactionType != null && log.transactionType.name() == 'SHIPMENT'}" 
+                          class="quantity-badge quantity-negative" 
+                          th:text="${'-' + log.quantityChanged}">-00</span>
+                    
+                    <!-- RETURN 타입일 경우 -->
+                    <span th:if="${log.transactionType != null && log.transactionType.name() == 'RETURN'}" 
+                          class="quantity-badge quantity-positive" 
+                          th:text="${'+' + log.quantityChanged}">+00</span>
+                    
+                    <!-- transactionType이 null일 경우 -->
+                    <span th:unless="${log.transactionType != null}">-</span>
+                  </td>
+                  <td th:text="${log.inventoryLogContent != null ? log.inventoryLogContent : '-'}">내용</td>
+                  <td th:text="${log.user_id != null ? log.user_id : '-'}">사용자</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- 데이터가 없을 경우 -->
+          <div class="empty-state" th:if="${logs == null or #lists.isEmpty(logs)}">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <span>해당 재고의 변동 이력이 존재하지 않습니다.</span>
+            </div>
+          </div>
+        </div>
+      </div> <!-- .common-content 닫는 태그 -->
+    </div> <!-- .common-container 닫는 태그 -->
+  </th:block>
+  
+  <!-- 페이지별 스크립트 -->
+  <th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log("재고 상세 정보 페이지 스크립트 로딩 완료");
+      });
+      /*]]>*/
+    </script>
+  </th:block>
+</body>
+</html>

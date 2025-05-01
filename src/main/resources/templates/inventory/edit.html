@@ -42,7 +42,7 @@
               </div>
               
               <div class="form-group">
-                <label for="storageId" class="form-label">창고 ID</label>
+                <label for="storageId" class="form-label">입고 ID</label>
                 <input type="text" id="storageId" name="storageId" th:value="${inventory.storageId}" class="form-control" required>
               </div>
               
@@ -71,6 +71,20 @@
                 <input type="date" id="inventoryExpiryDate" name="inventoryExpiryDate" 
                      th:value="${#temporals.format(inventory.inventoryExpiryDate, 'yyyy-MM-dd')}" class="form-control" required>
               </div>
+            </div>
+            
+            <!-- 재고 변경 사유 필드 추가 -->
+            <div class="form-group">
+              <label for="reason" class="form-label">재고 변경 사유</label>
+              <select class="form-control mb-2" id="reasonSelect" onchange="document.getElementById('reason').value = this.value !== '기타' ? this.value : ''">
+                <option value="">사유 선택...</option>
+                <option value="재고실사">재고실사</option>
+                <option value="손상/폐기">손상/폐기</option>
+                <option value="시스템 오류">시스템 오류</option>
+                <option value="내부사용">내부사용</option>
+                <option value="기타">기타</option>
+              </select>
+              <input type="text" class="form-control" id="reason" name="reason" placeholder="재고 변경 사유를 입력하세요">
             </div>
             
             <div class="form-actions">
