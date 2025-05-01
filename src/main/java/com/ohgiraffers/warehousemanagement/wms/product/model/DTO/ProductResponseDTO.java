@@ -14,7 +14,7 @@ public class ProductResponseDTO {
     private Category category;
     private Integer supplierId;
     private String supplierName;
-    private Integer userId;
+    private Long userId;
     private String userName;
     private String productName;
     private Integer expirationDate;
@@ -29,7 +29,7 @@ public class ProductResponseDTO {
 
     public ProductResponseDTO() {}
 
-    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, String supplierName, Integer userId, String userName,
+    public ProductResponseDTO(Integer productId, Category category, Integer supplierId, String supplierName, Long userId, String userName,
                               String productName, Integer expirationDate, String storageMethod,
                               Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt,
                               LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted,
@@ -95,11 +95,11 @@ public class ProductResponseDTO {
         this.supplierName = supplierName;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

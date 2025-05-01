@@ -36,7 +36,7 @@ public class Product {
 
     // 상품의 담당자 ID (User 엔티티와 외래 키 관계 없음)
     @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     // 상품 이름
     @Column(name = "product_name", length = 50, nullable = false)
@@ -92,7 +92,7 @@ public class Product {
 
     public Product() {}
 
-    public Product(Integer productId, Category category, Supplier supplier, Integer userId, String productName, Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt, LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted, ProductStatus status) {
+    public Product(Integer productId, Category category, Supplier supplier, Long userId, String productName, Integer expirationDate, String storageMethod, Integer pricePerBox, Integer quantityPerBox, LocalDateTime productCreatedAt, LocalDateTime productUpdatedAt, LocalDateTime productDeletedAt, Boolean isDeleted, ProductStatus status) {
         this.productId = productId;
         this.category = category;
         this.supplier = supplier;
@@ -133,11 +133,11 @@ public class Product {
         this.supplier = supplier;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

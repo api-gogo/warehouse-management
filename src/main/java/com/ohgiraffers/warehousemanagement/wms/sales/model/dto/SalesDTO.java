@@ -4,7 +4,6 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SalesDTO {
@@ -12,7 +11,7 @@ public class SalesDTO {
     private Integer storeId;
     private String storeName;
     private String storeAddress;
-    private Integer userId;
+    private Long userId;
     private String userName;
     private String userPhone;
     private LocalDate salesDate;
@@ -29,7 +28,7 @@ public class SalesDTO {
     public SalesDTO() {
     }
 
-    public SalesDTO(Integer salesId, Integer storeId, String storeName, String storeAddress, Integer userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
+    public SalesDTO(Integer salesId, Integer storeId, String storeName, String storeAddress, Long userId, String userName, String userPhone, LocalDate salesDate, LocalDate shippingDueDate, SalesStatus salesStatus, LocalDateTime salesCreatedAt, LocalDateTime salesUpdatedAt) {
         this.salesId = salesId;
         this.storeId = storeId;
         this.storeName = storeName;
@@ -76,11 +75,11 @@ public class SalesDTO {
         this.storeAddress = storeAddress;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
