@@ -39,13 +39,9 @@ public class AuthDetails implements UserDetails {
 
         // 기본 권한 추가
         authorities.add(new SimpleGrantedAuthority(status));
-        authorities.add(new SimpleGrantedAuthority(role));
-        authorities.add(new SimpleGrantedAuthority(part));
 
         // 재직중 상태인 경우에만 추가 권한 부여
         if (UserStatus.재직중.getStatus().equals(status)) {
-            // 모든 재직중인 사용자에게 조회 권한 부여
-            authorities.add(new SimpleGrantedAuthority("READ_ALL"));
 
             // 통합 부서는 관리자 직책만 가질 수 있음
             // 통합 부서 + 관리자인 경우 모든 도메인 접근 권한 부여
