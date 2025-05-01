@@ -71,8 +71,12 @@ public class InventoryServicelmpl implements InventoryService {
 
     public Inventory findTopByProductIdOrderByInventoryExpiryDateAsc(Integer productId){
         Optional<Inventory> findInventory = inventoryRepository.findTopByProductProductIdOrderByInventoryExpiryDateAsc(productId);
-
-        return findInventory.get();
+        if (findInventory.isPresent()){
+            return findInventory.get();
+        } else {
+            throw new IllegalArgumentException("해당 재고 아이디의 재고가 없습니다. \n" +
+                    "재고 ID : " + productId);
+        }
     };
 
     // 제품 ID에 해당하는 전체 재고 조회 (유통기한 내림차순)
@@ -177,7 +181,7 @@ public class InventoryServicelmpl implements InventoryService {
             // 현재 시간 설정
             LocalDateTime now = LocalDateTime.now();
 
-            // ID를 제외하고 엔티티 생성 (setter 사용)
+            // ID를 제외하고 엔티티 생성
             Inventory inventory = new Inventory();
             inventory.setStorageId(inventoryDTO.getStorageId());
 
@@ -229,18 +233,18 @@ public class InventoryServicelmpl implements InventoryService {
     public int getNextSequenceForProductToday(Integer productId) {
         // 당일 날짜 접두사 생성
         LocalDate today = LocalDate.now();
-        String datePrefix = String.format("C%%__%02d%02d%%", today.getYear() % 100, today.getMonthValue()); // 예: "C%__2504%"
+        String datePrefix = String.format("C%%__%02d%02d%%", today.getYear() % 100, today.getMonthValue());
 
         // 최대 lot_number 조회
         String maxLotNumber = inventoryRepository.findMaxLotNumberByProductAndDate(productId, datePrefix);
 
         if (maxLotNumber == null) {
-            return 1; // 첫 번째 일련번호
+            return 1;
         }
 
         // lot_number에서 일련번호 추출 (마지막 3자리)
         String sequencePart = maxLotNumber.substring(maxLotNumber.length() - 3);
-        return Integer.parseInt(sequencePart) + 1; // 다음 일련번호
+        return Integer.parseInt(sequencePart) + 1;
     }
 
 

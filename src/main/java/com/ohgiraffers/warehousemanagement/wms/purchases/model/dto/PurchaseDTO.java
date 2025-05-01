@@ -3,6 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.purchases.model.dto;
 
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
+import com.ohgiraffers.warehousemanagement.wms.supplier.model.entity.Supplier;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.List;
 public class PurchaseDTO {
     private Integer purchaseId;
     private Long userId;
+//    private Integer userId;
+    private Integer supplierId;    // 추가: 거래처 ID 필드
     private LocalDate purchaseDate;
     private LocalDate purchaseDueDate;
     private String purchaseStatus;
@@ -18,6 +21,7 @@ public class PurchaseDTO {
     private LocalDate purchaseCreatedAt;
     private String purchaseNotes;
     private Product product;
+    private Supplier supplier;
 
 
     private List<PurchaseItemDTO> items = new ArrayList<>();
@@ -47,6 +51,33 @@ public class PurchaseDTO {
 //        this.storages = storages;
     }
 
+    // 거래처 ID를 포함하는 생성자 추가
+    public PurchaseDTO(Integer purchaseId, Long userId, Integer supplierId, LocalDate purchaseCreatedAt,
+                    LocalDate purchaseDate, LocalDate purchaseDueDate, String purchaseStatus,
+                    LocalDate purchaseUpdatedAt, String purchaseNotes) {
+        this.purchaseId = purchaseId;
+        this.userId = userId;
+        this.supplierId = supplierId;
+        this.purchaseDate = purchaseDate;
+        this.purchaseDueDate = purchaseDueDate;
+        this.purchaseStatus = purchaseStatus;
+        this.purchaseUpdatedAt = purchaseUpdatedAt;
+        this.purchaseCreatedAt = purchaseCreatedAt;
+        this.purchaseNotes = purchaseNotes;
+    }
+
+    public  PurchaseDTO(Supplier Supplier){
+        this.supplier = Supplier;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
+
     public Integer getPurchaseId() {
         return purchaseId;
     }
@@ -61,6 +92,14 @@ public class PurchaseDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
     }
 
     public LocalDate getPurchaseDate() {
@@ -124,13 +163,14 @@ public class PurchaseDTO {
         return "PurchaseDTO{" +
                 "purchaseId=" + purchaseId +
                 ", userId=" + userId +
+                ", supplierId=" + supplierId +
                 ", purchaseDate=" + purchaseDate +
                 ", purchaseDueDate=" + purchaseDueDate +
                 ", purchaseStatus='" + purchaseStatus + '\'' +
                 ", purchase_updated_at=" + purchaseUpdatedAt +
                 ", purchase_created_at=" + purchaseCreatedAt +
                 ", purchase_notes='" + purchaseNotes + '\'' +
-//                ", supplier=" + supplier +
+                ", supplier=" + supplier +
                 ", items=" + items +
 //                ", storages=" + storages +
                 '}';
