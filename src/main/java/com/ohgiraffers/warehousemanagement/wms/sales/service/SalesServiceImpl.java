@@ -9,6 +9,8 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesItemsRepository;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
+import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
+import com.ohgiraffers.warehousemanagement.wms.store.service.StoreService;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.service.UserService;
 import jakarta.transaction.Transactional;
@@ -29,14 +31,16 @@ public class SalesServiceImpl implements SalesService {
     private final ProductService productService;
     private final UserService userService;
     private final InventoryService inventoryService;
+    private final StoreService storeService;
 
     @Autowired
-    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService) {
+    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService, StoreService storeService) {
         this.salesRepository = salesRepository;
         this.salesItemsRepository = salesItemsRepository;
         this.productService = productService;
         this.userService = userService;
         this.inventoryService = inventoryService;
+        this.storeService = storeService;
     }
 
     public List<SalesDTO> getAllSales() {
@@ -46,13 +50,17 @@ public class SalesServiceImpl implements SalesService {
 
         // 수주 상품 목록 Sales 엔티티에서 꺼냄
         for (Sales salesEntity : findAll) {
+            System.out.println(salesEntity);
             LogUserDTO user = userService.getUserInfoForLogging(salesEntity.getUserId());
+            StoreDTO store = storeService.findById(salesEntity.getStoreId());
             SalesDTO salesDTO = new SalesDTO(
                     salesEntity.getSalesId(),
                     salesEntity.getStoreId(),
+                    store.getStoreName(),
+                    store.getStoreAddress(),
                     salesEntity.getUserId(),
                     user.getUserName(),
-                    null,
+                    user.getUserPhone(),
                     salesEntity.getSalesDate(),
                     salesEntity.getShippingDueDate(),
                     salesEntity.getSalesStatus(),
@@ -122,13 +130,16 @@ public class SalesServiceImpl implements SalesService {
 
         List<Integer> quantity = findSales.getSalesItems().stream().map(SalesItem::getSalesItemsQuantity).collect(Collectors.toList());
         LogUserDTO user = userService.getUserInfoForLogging(findSales.getUserId());
+        StoreDTO store = storeService.findById(findSales.getStoreId());
 
         SalesDTO findDTO = new SalesDTO(
                 findSales.getSalesId(),
                 findSales.getStoreId(),
+                store.getStoreName(),
+                store.getStoreAddress(),
                 findSales.getUserId(),
                 user.getUserName(),
-                null,
+                user.getUserPhone(),
                 findSales.getSalesDate(),
                 findSales.getShippingDueDate(),
                 findSales.getSalesStatus(),
