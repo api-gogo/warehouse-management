@@ -3,8 +3,7 @@ package com.ohgiraffers.warehousemanagement.wms.returning.controller;
 import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
 import com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnShipmentDTO;
-import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShipmentItem;
-import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturningService;
+import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturnShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,17 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/returns")
 public class ReturnHomeController {
 
-    private final ReturningService returningService;
+    private final ReturnShipmentService returnShipmentService;
 
     @Autowired
-    public ReturnHomeController(ReturningService returningService) {
-        this.returningService = returningService;
+    public ReturnHomeController(ReturnShipmentService returnShipmentService) {
+        this.returnShipmentService = returnShipmentService;
     }
 
     @GetMapping
@@ -30,7 +28,7 @@ public class ReturnHomeController {
         ModelAndView mv = new ModelAndView("returns/home");
         
         // 모든 반품 데이터 가져오기
-        List<ReturnShipmentDTO> allReturns = returningService.getAllReturns();
+        List<ReturnShipmentDTO> allReturns = returnShipmentService.getAllReturns();
         
         // 현재 시스템에는 출고 반품만 있음
         // 모든 반품을 출고 반품으로 처리

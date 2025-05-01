@@ -23,13 +23,13 @@ import java.util.Objects;
 
 
 @Service
-public class ReturningService {
+public class ReturnShipmentService {
 
     private final ReturnShipmentRepository returnShipmentRepository;
     private final ReturnShipmentItemRepository returnShipmentItemRepository;
 
     @Autowired
-    public ReturningService(ReturnShipmentRepository returnShipmentRepository, ReturnShipmentItemRepository returnShipmentItemRepository) { //엔티티를 반환
+    public ReturnShipmentService(ReturnShipmentRepository returnShipmentRepository, ReturnShipmentItemRepository returnShipmentItemRepository) { //엔티티를 반환
         this.returnShipmentRepository = returnShipmentRepository;
         this.returnShipmentItemRepository = returnShipmentItemRepository;
     }
@@ -70,7 +70,7 @@ public class ReturningService {
     public int createReturns(ReturnShipmentDTO returnShipmentDTO) {
 
         /*예외처리*/
-        Logger logger = LoggerFactory.getLogger(ReturningService.class);
+        Logger logger = LoggerFactory.getLogger(ReturnShipmentService.class);
         logger.info("Received DTO: lotNumber={}, returnShipmentContent={}",
                 returnShipmentDTO.getLotNumber(),
                 returnShipmentDTO.getReturnShipmentContent());

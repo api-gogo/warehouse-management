@@ -6,27 +6,33 @@ import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnStor
 import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnStorageItem;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnStorageItemRepository;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnStorageRepository;
+
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 public class ReturnStorageService {
 
+
     private final ReturnStorageRepository returnStorageRepository;
     private final ReturnStorageItemRepository returnStorageItemRepository;
+
 
     @Autowired
     public ReturnStorageService(ReturnStorageRepository returnStorageRepository, ReturnStorageItemRepository returnStorageItemRepository) {
         this.returnStorageRepository = returnStorageRepository;
         this.returnStorageItemRepository = returnStorageItemRepository;
+
     }
 
     /*전체 조회*/
@@ -41,18 +47,23 @@ public class ReturnStorageService {
                     storageEntity.getUserId(),
                     storageEntity.getReturnStoragesCreatedAt(),
                     storageEntity.getStorageId()
+
             );
             returnLists.add(storageDTO);
         }
         return returnLists;
+
     }
 
     /*등록*/
     @Transactional
     public int createReturns(ReturnStorageDTO returnStorageDTO) {
 
+
+
+
         /*예외처리*/
-        Logger logger = LoggerFactory.getLogger(ReturnStorageService.class);
+        Logger logger = LoggerFactory.getLogger(ReturnShipmentService.class);
         logger.info("Recived DTO : returnShipmentContent={}, returnShipmentQuantity={}",
                 returnStorageDTO.getReturnStorageContent(),
                 returnStorageDTO.getReturnStorageQuantity());
@@ -62,16 +73,23 @@ public class ReturnStorageService {
             throw new IllegalArgumentException("수량은 필수입니다.");
         }
 
+
+
         List<ReturningStorageCause> causes = returnStorageDTO.getReturnStorageContent();
         if (causes == null || causes.isEmpty()) {
             throw new IllegalArgumentException("반품 사유는 최소 하나 이상 선택해야 합니다.");
         }
 
+
         ReturnStorage storageEntity = new ReturnStorage();
+
 
         storageEntity.setUserId(returnStorageDTO.getUserId());
         storageEntity.setReturnStorageId(returnStorageDTO.getReturnStorageId());
         storageEntity.setReturnStoragesCreatedAt(LocalDateTime.now());
+
+
+
 
         ReturnStorage savedStorage = returnStorageRepository.save(storageEntity);
         //로트넘버 없이 멀로 리스트를 만들까..
@@ -127,6 +145,8 @@ public class ReturnStorageService {
 //            returnStorage.set
 //        }
 //    }
+
+
 
 
 }
