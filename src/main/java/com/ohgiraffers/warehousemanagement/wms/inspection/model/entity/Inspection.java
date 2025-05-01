@@ -22,7 +22,7 @@ public class Inspection {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
-    @Comment("검수자")
+    @Comment("검수자 정보")
     private User user;
 
     @Column(name = "transaction_id")

@@ -45,15 +45,15 @@
                         </tr>
                         <tr>
                             <th>점포명</th>
-                            <td th:text="${sales.storeId}">서울점</td>
+                            <td th:text="${sales.storeName}">점포명</td>
                             <th>점포 주소</th>
-                            <td></td> <!-- 점포주소 -->
+                            <td th:text="${sales.storeAddress}">점포주소</td>
                         </tr>
                         <tr>
                             <th>수주담당자</th>
-                            <td th:text="${sales.userName}">홍길동</td>
+                            <td th:text="${sales.userName}">담당자</td>
                             <th>담당자 전화번호</th>
-                            <td></td> <!-- 전화번호 -->
+                            <td th:text="${sales.userPhone}">담당자 전화번호</td>
                         </tr>
                         <tr>
                             <th>수주일</th>

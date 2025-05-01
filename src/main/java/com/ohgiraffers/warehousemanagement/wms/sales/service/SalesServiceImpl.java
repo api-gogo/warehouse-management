@@ -183,9 +183,12 @@ public class SalesServiceImpl implements SalesService {
         findSales.setSalesUpdatedAt(LocalDateTime.now());
         Sales savedEntity = salesRepository.save(findSales);
 
+        System.out.println("salesItems 조회 : " + salesItemsRepository.findBySalesId(findSales));
+
         // 이 sales Id를 가진 수주 물품 목록 삭제하고
         salesItemsRepository.deleteBySalesId(findSales);
-
+        System.out.println("삭제됐는지");
+        
         // 새로등록할거. 어차피 수주 등록상태에서만 수정 가능하기 때문에 출고로 아예 넘어가지 않은 상태라 수정하지 않은 상품들도 로트넘버를 새로 갱신해줘도 상관없음
         List<SalesItem> newItems = new ArrayList<>();
         for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
