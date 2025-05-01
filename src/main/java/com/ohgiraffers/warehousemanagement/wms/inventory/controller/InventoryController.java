@@ -34,9 +34,9 @@ public class InventoryController {
 
     // 재고 전체 조회
     @GetMapping
-    public String getInventoryList(@RequestParam(name = "productName", required = false) String productName,
+    public ModelAndView getInventoryList(@RequestParam(name = "productName", required = false) String productName,
                                    @RequestParam(defaultValue = "0") int page,
-                                   @RequestParam(defaultValue = "10") int size, Model model) {
+                                   @RequestParam(defaultValue = "10") int size, ModelAndView mv) {
         try {
             Page<InventoryViewDTO> inventoriesPage;
 
@@ -46,18 +46,19 @@ public class InventoryController {
                 inventoriesPage = inventoryServicelmpl.getInventoryViewListWithPaging(page, size);
             }
 
-            model.addAttribute("inventories", inventoriesPage.getContent());
-            model.addAttribute("currentPage", inventoriesPage.getNumber());
-            model.addAttribute("totalPages", inventoriesPage.getTotalPages());
-            model.addAttribute("productName", productName);
-            model.addAttribute("size", size);
-            model.addAttribute("activeMenu", "inventory");
-            model.addAttribute("today", LocalDate.now());
+            mv.addObject("inventories", inventoriesPage.getContent());
+            mv.addObject("currentPage", inventoriesPage.getNumber());
+            mv.addObject("totalPages", inventoriesPage.getTotalPages());
+            mv.addObject("productName", productName);
+            mv.addObject("size", size);
+            mv.addObject("activeMenu", "inventory");
+            mv.addObject("today", LocalDate.now());
+            mv.setViewName("inventory/list");
+            return mv;
 
-            return "/inventory/list";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "/inventory/list";
+            mv.addObject("errorMessage", e.getMessage());
+            return mv;
         }
     }
 
@@ -69,7 +70,6 @@ public class InventoryController {
                                         @RequestParam(defaultValue = "8") int size, ModelAndView mv) {
 
         Page<InventoryDTO> inventoriesPage = inventoryServicelmpl.findByProductProductIdOrderByInventoryExpiryDateAsc(productId, page, size);
-
 
         mv.addObject("inventory", inventoriesPage.getContent());
         mv.addObject("currentPage", inventoriesPage.getNumber());
@@ -110,12 +110,10 @@ public class InventoryController {
     public String updateInventory(@PathVariable("inventoryId") Long inventoryId,
                                   @ModelAttribute InventoryDTO inventoryDTO,
                                   @RequestParam String reason,
-                                  HttpSession session,
                                   RedirectAttributes redirectAttributes) {
 
         AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = authDetails.getUsername().toString();
-
 
         inventoryServicelmpl.updateInventory(inventoryId, inventoryDTO, reason, userId);
         redirectAttributes.addFlashAttribute("inventories", inventoryDTO);
