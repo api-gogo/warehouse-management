@@ -8,9 +8,6 @@ import java.util.List;
 
 public interface InventoryService {
 
-    // 전체 재고 조회
-    List<InventoryDTO> findAllInventories();
-
     // 재고 수정, 삭제 메소드에 필요한 재고 ID에 해당하는 재고 정보 불러오기
     InventoryDTO findInventoryById(Long inventoryId);
 

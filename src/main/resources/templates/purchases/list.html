@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>전체 발주 목록</title>
+</head>
+<body>
+<h1>전체 발주 목록</h1>
+
+<div th:if="${message}">
+  <p th:text="${message}"></p>
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th>발주 ID</th>
+    <th>상태</th>
+    <th>주문자</th>
+    <th>날짜</th>
+    <th>상세보기</th>
+    <th>수정</th>
+    <th>삭제</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="purchases : ${purchases}">
+    <td th:text="${purchase.id}"></td>
+    <td th:text="${purchase.status}"></td>
+    <td th:text="${purchase.customerName}"></td>
+    <td th:text="${purchase.date}"></td>
+    <td><a th:href="@{/templates/purchases/{id}(id=${purchase.id})}">상세보기</a></td>
+    <td><a th:href="@{/templates/purchases/update/{id}(id=${purchase.id})}">수정</a></td>
+    <td>
+      <form th:action="@{/templates/purchases/delete/{id}(id=${purchase.id})}" method="post">
+        <button type="submit">삭제</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<a href="/purchase/create">발주 생성</a>
+</body>
+</html>
