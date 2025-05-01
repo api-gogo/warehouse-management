@@ -119,4 +119,20 @@ public class Store {
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
     }
+
+    @Override
+    public String toString() {
+        return "Store{" +
+                "storeId=" + storeId +
+                ", storeName='" + storeName + '\'' +
+                ", storeAddress='" + storeAddress + '\'' +
+                ", storeManagerName='" + storeManagerName + '\'' +
+                ", storeManagerPhone='" + storeManagerPhone + '\'' +
+                ", storeManagerEmail='" + storeManagerEmail + '\'' +
+                ", storeCreatedAt=" + storeCreatedAt +
+                ", storeUpdatedAt=" + storeUpdatedAt +
+                ", storeDeletedAt=" + storeDeletedAt +
+                ", isDeleted=" + isDeleted +
+                '}';
+    }
 }

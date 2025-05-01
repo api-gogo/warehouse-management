@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StoreServiceImpl implements StoreService {
@@ -154,5 +156,25 @@ public class StoreServiceImpl implements StoreService {
         store.setStoreDeletedAt(null);
         storeRepository.save(store);
         return true;
+    }
+
+    @Override
+    public List<StoreDTO> searchByNameContainingAndIsDeletedTrue(String storeName) {
+        List<Store> stores = storeRepository.findByStoreNameContainingAndIsDeletedTrue(storeName);
+        System.out.println("stores: " + stores);
+        return stores.stream()
+                .map(s -> new StoreDTO(
+                        s.getStoreId(),
+                        s.getStoreName(),
+                        s.getStoreAddress(),
+                        s.getStoreManagerName(),
+                        s.getStoreManagerPhone(),
+                        s.getStoreManagerEmail(),
+                        s.getStoreCreatedAt(),
+                        s.getStoreUpdatedAt(),
+                        s.getStoreDeletedAt(),
+                        s.getDeleted()
+                ))
+                .collect(Collectors.toList());
     }
 }
