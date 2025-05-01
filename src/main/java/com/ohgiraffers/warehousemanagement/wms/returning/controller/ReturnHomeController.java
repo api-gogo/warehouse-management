@@ -45,17 +45,26 @@ public class ReturnHomeController {
         // 입고, 출고 반품 개수
         int inboundReturnsCount = inboundReturns.size();
         int outboundReturnsCount = outboundReturns.size();
-        
+
         // 완료된 반품 개수 (RETURN_COMPLETED 상태인 반품)
         long completedReturnsCount = allReturns.stream()
             .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
             .count();
-        
+
+//        int outboundReturnsCount = (int) outboundReturns.stream()
+//                .filter(r -> r.getReturnShipmentStatus() != ReturnShipmentStatus.RETURN_COMPLETED)
+//                .count();
+//
+//        // 완료된 반품 개수 (RETURN_COMPLETED 상태인 반품)
+//        long completedReturnsCount = allReturns.stream()
+//                .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
+//                .count();
+
         // 상태별 개수 계산
         long inboundWaitingCount = inboundReturns.stream()
             .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_WAITING)
             .count();
-        
+
         long inboundApprovedCount = inboundReturns.stream()
             .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_APPROVED)
             .count();
