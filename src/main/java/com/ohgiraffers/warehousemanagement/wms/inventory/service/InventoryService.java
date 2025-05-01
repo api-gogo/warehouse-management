@@ -21,5 +21,5 @@ public interface InventoryService {
     int getNextSequenceForProductToday(Integer productId);
 
 
-
-    }
+    void notifyStorageCompleted(Integer purchaseId);
+}

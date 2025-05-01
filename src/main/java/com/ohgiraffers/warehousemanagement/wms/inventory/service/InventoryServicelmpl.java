@@ -247,6 +247,19 @@ public class InventoryServicelmpl implements InventoryService {
         return Integer.parseInt(sequencePart) + 1;
     }
 
+    @Override
+    @Transactional
+    public void notifyStorageCompleted(Integer purchaseId) {
+        // TODO: 재고 등록 로직 구현 예정
+        System.out.println("입고 완료된 발주 ID: " + purchaseId + " 에 대한 재고 등록 작업을 수행합니다.");
+
+        // 예시 - 추후 PurchaseItemRepository, ProductRepository 등과 함께 구현해야 할 부분
+        // 1. 해당 발주 ID에 대한 발주 아이템(PurchaseItem) 리스트 가져오기
+        // 2. 각 PurchaseItem에 대해 Inventory 생성
+        // 3. Inventory 생성 후 InventoryLog 자동 기록
+    }
+
+
 
 
 }
