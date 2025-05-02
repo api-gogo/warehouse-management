@@ -83,6 +83,7 @@
                                 <th>입고 ID</th>
                                 <th>발주 ID</th>
                                 <th>입고 상태</th>
+                                <th>검수 상태</th> <!-- ✅ 추가 -->
                                 <th>입고일</th>
                                 <th>관리</th>
                             </tr>
@@ -91,6 +92,8 @@
                             <tr th:each="storage : ${storages}">
                                 <td th:text="${storage.storageId}">1</td>
                                 <td th:text="${storage.purchaseId}">101</td>
+
+                                <!-- 입고 상태 배지 -->
                                 <td>
                                     <span th:class="${(storage.storageStatus.name() == 'COMPLETED') ? 'badge badge-success' :
                                                      (storage.storageStatus.name() == 'WAITING') ? 'badge badge-warning' :
@@ -101,7 +104,16 @@
                                           th:text="${storage.storageStatusDescription}">
                                     </span>
                                 </td>
+
+                                <!-- ✅ 검수 상태 출력 -->
+                                <td>
+                                    <span th:if="${storage.inspectionStatus != null}" th:text="${storage.inspectionStatus}"></span>
+                                    <span th:if="${storage.inspectionStatus == null}">-</span>
+                                </td>
+
                                 <td th:text="${storage.storageDate}">2025-05-01</td>
+
+                                <!-- 관리 버튼 -->
                                 <td>
                                     <a th:href="@{'/storages/' + ${storage.storageId}}" class="btn btn-outline btn-sm">상세</a>
                                     <a th:href="@{'/storages/update/' + ${storage.storageId}}" class="btn btn-outline btn-sm">수정</a>
@@ -114,7 +126,7 @@
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(storages)}">
-                                <td colspan="5" style="text-align: center; padding: 2rem;">등록된 입고 내역이 없습니다.</td>
+                                <td colspan="6" style="text-align: center; padding: 2rem;">등록된 입고 내역이 없습니다.</td>
                             </tr>
                             </tbody>
                         </table>
