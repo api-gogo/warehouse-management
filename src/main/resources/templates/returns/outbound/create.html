@@ -119,17 +119,21 @@
                 </div>
                 
                 <form th:action="@{/returns/outbound/create}" method="post">
+                    <div class="form-group">
+                        <label for="shipmentId" class="form-label required">출고 ID</label>
+                        <div class="input-group">
+                            <input type="number" id="shipmentId" name="shipmentId" class="form-control" 
+                                   placeholder="출고 ID를 입력하세요" required>
+                            <button type="button" id="fetchShipmentInfo" class="btn btn-primary">정보 조회</button>
+                        </div>
+                        <small class="text-muted">출고 ID를 입력하고 정보 조회 버튼을 클릭하세요.</small>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="storeId" class="form-label required">매장 선택</label>
-                            <select id="storeId" name="storeId" class="form-select" required>
-                                <option value="">매장을 선택하세요</option>
-                                <option th:each="store : ${stores}" 
-                                        th:value="${store.storeId}" 
-                                        th:text="${store.storeName + ' (' + store.storeId + ')'}">
-                                    더현대 서울점 (100)
-                                </option>
-                            </select>
+                            <label for="storeId" class="form-label required">매장 정보</label>
+                            <input type="hidden" id="storeId" name="storeId">
+                            <input type="text" id="storeName" class="form-control" readonly placeholder="출고 ID 조회 시 자동으로 설정됩니다">
                         </div>
                         
                         <div class="form-group">
@@ -145,45 +149,19 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="shipmentId" class="form-label required">출고 ID</label>
-                        <input type="number" id="shipmentId" name="shipmentId" class="form-control" 
-                               placeholder="출고 ID를 입력하세요" required>
-                    </div>
-                    
                     <!-- 반품 항목 입력 섹션 -->
                     <div class="items-container">
                         <h3>반품 항목</h3>
-                        <p class="text-muted">반품할 항목의 정보를 입력하세요. 항목 추가 버튼을 클릭하여 여러 항목을 등록할 수 있습니다.</p>
+                        <p class="text-muted">출고 ID를 조회하면 로트 번호와 수량이 자동으로 설정됩니다. 반품 사유만 선택하세요.</p>
                         
                         <div id="items-wrapper">
-                            <!-- 항목 행 템플릿 -->
-                            <div class="item-row">
-                                <div class="form-group">
-                                    <label class="form-label required">로트 번호</label>
-                                    <input type="text" name="lotNumber" class="form-control" placeholder="로트 번호 입력" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label required">수량</label>
-                                    <input type="number" name="returnShipmentQuantity" class="form-control" min="1" value="1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label required">반품 사유</label>
-                                    <select name="returnShipmentContent" class="form-select" required>
-                                        <option value="EXPIRED">유통기한 만료</option>
-                                        <option value="DAMAGED_OR_DEFECTIVE">손상 또는 결함</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="button" class="btn-remove-item" onclick="removeItem(this)" disabled>삭제</button>
-                                </div>
-                            </div>
+                            <!-- 동적으로 생성될 항목 행들이 여기에 추가됩니다 -->
                         </div>
                         
-                        <button type="button" class="btn-add-item" onclick="addItem()">
-                            <i class="fas fa-plus"></i> 항목 추가
-                        </button>
+                        <!-- 항목 추가 버튼은 사용자가 직접 추가할 수 없도록 숨김 -->
+                        <div id="noItemsMessage" class="text-center p-3">
+                            출고 ID를 입력하고 정보 조회 버튼을 클릭하면 항목이 자동으로 표시됩니다.
+                        </div>
                     </div>
                     
                     <div class="form-submit">
@@ -197,53 +175,92 @@
     
     <th:block layout:fragment="scripts">
         <script>
-            // 항목 추가 함수
-            function addItem() {
-                const wrapper = document.getElementById('items-wrapper');
-                const rows = wrapper.querySelectorAll('.item-row');
+            // 페이지 로드 시 실행
+            document.addEventListener('DOMContentLoaded', function() {
+                // 출고 정보 조회 버튼 이벤트 등록
+                document.getElementById('fetchShipmentInfo').addEventListener('click', fetchShipmentInfo);
+            });
+            
+            // 출고 정보 조회 함수
+            function fetchShipmentInfo() {
+                const shipmentId = document.getElementById('shipmentId').value;
                 
-                // 첫 번째 항목 행 복제
-                const newRow = rows[0].cloneNode(true);
-                
-                // 입력 필드 초기화
-                const inputs = newRow.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    if (input.type === 'number' && input.name === 'returnShipmentQuantity') {
-                        input.value = 1;
-                    } else if (input.type === 'text') {
-                        input.value = '';
-                    }
-                });
-                
-                // 삭제 버튼 활성화
-                const removeBtn = newRow.querySelector('.btn-remove-item');
-                removeBtn.disabled = false;
-                
-                // 항목 행 추가
-                wrapper.appendChild(newRow);
-                
-                // 첫 번째 행의 삭제 버튼도 활성화 (2개 이상일 경우)
-                if (rows.length === 1) {
-                    rows[0].querySelector('.btn-remove-item').disabled = false;
+                // 값이 없으면 경고
+                if (!shipmentId) {
+                    alert('출고 ID를 입력해주세요.');
+                    return;
                 }
+                
+                // 서버에 정보 요청
+                fetch(`/shipments/api/shipment-info/${shipmentId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // 매장 정보 설정
+                            document.getElementById('storeId').value = data.storeId;
+                            document.getElementById('storeName').value = data.storeName;
+                            
+                            // 항목 정보 설정
+                            setItemsFromData(data.lotNumbers, data.quantities);
+                        } else {
+                            alert(data.message || '출고 정보를 가져오는데 실패했습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching shipment info:', error);
+                        alert('출고 정보를 가져오는데 실패했습니다. 네트워크 연결을 확인해주세요.');
+                    });
             }
             
-            // 항목 삭제 함수
-            function removeItem(button) {
+            // 항목 데이터 설정 함수
+            function setItemsFromData(lotNumbers, quantities) {
                 const wrapper = document.getElementById('items-wrapper');
-                const rows = wrapper.querySelectorAll('.item-row');
+                const noItemsMessage = document.getElementById('noItemsMessage');
                 
-                // 최소한 하나의 항목은 유지
-                if (rows.length > 1) {
-                    const row = button.closest('.item-row');
-                    row.remove();
-                    
-                    // 만약 항목이 하나만 남았다면 삭제 버튼 비활성화
-                    const remainingRows = wrapper.querySelectorAll('.item-row');
-                    if (remainingRows.length === 1) {
-                        remainingRows[0].querySelector('.btn-remove-item').disabled = true;
-                    }
+                // 기존 항목 모두 제거
+                wrapper.innerHTML = '';
+                
+                // 항목이 없으면 메시지 표시
+                if (!lotNumbers || lotNumbers.length === 0) {
+                    noItemsMessage.style.display = 'block';
+                    return;
                 }
+                
+                // 메시지 숨김
+                noItemsMessage.style.display = 'none';
+                
+                // 각 로트번호와 수량에 대해 항목 행 추가
+                lotNumbers.forEach((lotNumber, index) => {
+                    const quantity = quantities[index] || 1;
+                    
+                    // 항목 행 생성
+                    const row = document.createElement('div');
+                    row.className = 'item-row';
+                    row.innerHTML = `
+                        <div class="form-group">
+                            <label class="form-label required">로트 번호</label>
+                            <input type="text" name="lotNumber" class="form-control" value="${lotNumber}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">수량</label>
+                            <input type="number" name="returnShipmentQuantity" class="form-control" value="${quantity}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">반품 사유</label>
+                            <select name="returnShipmentContent" class="form-select" required>
+                                <option value="EXPIRED">유통기한 만료</option>
+                                <option value="DAMAGED_OR_DEFECTIVE">손상 또는 결함</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="text-muted" style="padding: 10px;">자동 등록 항목</div>
+                        </div>
+                    `;
+                    
+                    // 항목 행 추가
+                    wrapper.appendChild(row);
+                });
             }
         </script>
     </th:block>

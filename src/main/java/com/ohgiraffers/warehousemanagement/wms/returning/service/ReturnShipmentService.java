@@ -281,54 +281,54 @@ public class ReturnShipmentService {
         // 로깅 설정
         Logger logger = LoggerFactory.getLogger(ReturnShipmentService.class);
         logger.info("updateReturns 시작 - ID: {}, DTO 상태: {}", returnShipmentId, returnShipmentDTO.getReturnShipmentStatus());
-        
+
         // 1. 기존 엔티티 조회
         ReturnShipment returnShipment = returnShipmentRepository.findById(returnShipmentId)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 반품 데이터가 없습니다. ID: " + returnShipmentId));
-        
+
         // 2. 기본 정보 업데이트
         // 매장 ID 설정
         returnShipment.setStoreId(returnShipmentDTO.getStoreId());
-        
+
         // 담당자 ID 설정
         returnShipment.setUserId(returnShipmentDTO.getUserId());
-        
+
         // 출고 ID 설정
         returnShipment.setShipmentId(returnShipmentDTO.getShipmentId());
-        
+
         // 3. 상태 업데이트 - 명시적으로 처리 (중요)
         logger.info("상태 변경 전: {}", returnShipment.getReturnShipmentStatus());
         returnShipment.setReturnShipmentStatus(returnShipmentDTO.getReturnShipmentStatus());
         logger.info("상태 변경 후: {}", returnShipment.getReturnShipmentStatus());
-        
+
         // 4. 수정일시 업데이트
         returnShipment.setReturnShipmentUpdatedAt(LocalDateTime.now());
-        
+
         // 5. 기본 정보 저장
         ReturnShipment savedEntity = returnShipmentRepository.save(returnShipment);
         logger.info("기본 정보 저장 완료 - 상태: {}", savedEntity.getReturnShipmentStatus());
-        
+
         // 6. 기존 아이템 모두 삭제
-        returnShipmentItemRepository.deleteByReturnShipmentId(savedEntity);
-        
+        returnShipmentItemRepository.deleteByReturnShipmentId(savedEntity.getReturnShipmentId());
+
         // 7. 로트 번호와 반품 사유 유효성 검사
         if (returnShipmentDTO.getLotNumber() == null || returnShipmentDTO.getLotNumber().isEmpty()) {
             throw new IllegalArgumentException("로트 번호는 최소 하나 이상 필요합니다.");
         }
-        
+
         if (returnShipmentDTO.getReturnShipmentContent() == null || returnShipmentDTO.getReturnShipmentContent().isEmpty()) {
             throw new IllegalArgumentException("반품 사유는 최소 하나 이상 필요합니다.");
         }
-        
+
         // 8. 새 아이템 생성 및 추가
         List<ReturnShipmentItem> newItems = new ArrayList<>();
         for (int i = 0; i < returnShipmentDTO.getLotNumber().size(); i++) {
             ReturnShipmentItem item = new ReturnShipmentItem();
             item.setReturnShipmentId(savedEntity);
-            
+
             // 로트 번호 설정
             item.setLotNumber(returnShipmentDTO.getLotNumber().get(i));
-            
+
             // 반품 사유 설정
             if (i < returnShipmentDTO.getReturnShipmentContent().size()) {
                 item.setReturnShipmentContent(returnShipmentDTO.getReturnShipmentContent().get(i));
@@ -336,31 +336,31 @@ public class ReturnShipmentService {
                 // 인덱스 범위를 벗어나면 첫 번째 사유 사용
                 item.setReturnShipmentContent(returnShipmentDTO.getReturnShipmentContent().get(0));
             }
-            
+
             // 수량 설정
-            if (returnShipmentDTO.getReturnShipmentQuantity() != null && 
+            if (returnShipmentDTO.getReturnShipmentQuantity() != null &&
                 i < returnShipmentDTO.getReturnShipmentQuantity().size()) {
                 item.setReturnShipmentQuantity(returnShipmentDTO.getReturnShipmentQuantity().get(i));
             } else {
                 // 기본값 설정
                 item.setReturnShipmentQuantity(1);
             }
-            
+
             newItems.add(item);
-            logger.info("아이템 생성 - 로트번호: {}, 수량: {}, 사유: {}", 
+            logger.info("아이템 생성 - 로트번호: {}, 수량: {}, 사유: {}",
                     item.getLotNumber(), item.getReturnShipmentQuantity(), item.getReturnShipmentContent());
         }
-        
+
         // 9. 아이템 저장
         returnShipmentItemRepository.saveAll(newItems);
         logger.info("반품 항목 저장 완료 - 항목 수: {}", newItems.size());
-        
+
         // 10. 저장된 엔티티를 DTO로 변환하여 반환
         // 직접 DB에서 새로 조회하여 최신 상태 반환
         ReturnShipmentDTO updatedDTO = getReturnsByID(returnShipmentId);
-        logger.info("updateReturns 완료 - ID: {}, 반환 DTO 상태: {}", 
+        logger.info("updateReturns 완료 - ID: {}, 반환 DTO 상태: {}",
                 updatedDTO.getReturnShipmentId(), updatedDTO.getReturnShipmentStatus());
-        
+
         return updatedDTO;
     }
 

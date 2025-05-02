@@ -262,4 +262,11 @@ public class SalesServiceImpl implements SalesService {
     public SalesItem getSalesItemBySalesId(Integer salesId) {
         return salesItemsRepository.findById(salesId).get();
     }
+    
+    @Override
+    public Integer getStoreIdBySalesId(Integer salesId) {
+        Sales sales = salesRepository.findById(salesId)
+                .orElseThrow(() -> new RuntimeException("해당 수주 정보가 존재하지 않습니다. ID: " + salesId));
+        return sales.getStoreId();
+    }
 }

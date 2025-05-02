@@ -154,44 +154,40 @@
                 </div>
                 
                 <form th:action="@{/returns/outbound/update/{id}(id=${ReturnShipmentDTO.returnShipmentId})}" method="post">
-                    <!-- 히든 필드 - 기존 ID 유지 -->
+                    <!-- 히든 필드 - 기존 정보 유지 -->
                     <input type="hidden" name="returnShipmentId" th:value="${ReturnShipmentDTO.returnShipmentId}">
+                    <input type="hidden" name="shipmentId" th:value="${ReturnShipmentDTO.shipmentId}">
+                    <input type="hidden" name="storeId" th:value="${ReturnShipmentDTO.storeId}">
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="storeId" class="form-label required">매장 선택</label>
-                            <select id="storeId" name="storeId" class="form-select" required>
-                                <option value="">매장을 선택하세요</option>
-                                <option th:each="store : ${stores}" 
-                                        th:value="${store.storeId}" 
-                                        th:text="${store.storeName + ' (' + store.storeId + ')'}"
-                                        th:selected="${store.storeId == ReturnShipmentDTO.storeId}">
-                                    더현대 서울점 (100)
-                                </option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="userId" class="form-label required">담당자 선택</label>
-                            <select id="userId" name="userId" class="form-select" required>
-                                <option value="">담당자를 선택하세요</option>
-                                <option th:each="user : ${users}" 
-                                        th:value="${user.userId}" 
-                                        th:text="${user.userName + ' (' + user.userPart + ')'}"
-                                        th:selected="${user.userId == ReturnShipmentDTO.userId}">
-                                    홍길동 (영업부)
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    
+                    <!-- 출고 ID (읽기 전용) -->
                     <div class="form-group">
-                        <label for="shipmentId" class="form-label required">출고 ID</label>
-                        <input type="number" id="shipmentId" name="shipmentId" class="form-control" 
-                               th:value="${ReturnShipmentDTO.shipmentId}" required>
+                        <label class="form-label">출고 ID</label>
+                        <input type="text" class="form-control readonly-field" 
+                               th:value="${ReturnShipmentDTO.shipmentId}" readonly>
+                    </div>
+
+                    <!-- 매장 정보 (읽기 전용) -->
+                    <div class="form-group">
+                        <label class="form-label">매장 정보</label>
+                        <input type="text" class="form-control readonly-field"
+                               th:value="${storeDisplayInfo}" readonly>
                     </div>
                     
-                    <!-- 반품 상태 필드 -->
+                    <!-- 담당자 선택 (수정 가능) -->
+                    <div class="form-group">
+                        <label for="userId" class="form-label required">담당자 선택</label>
+                        <select id="userId" name="userId" class="form-select" required>
+                            <option value="">담당자를 선택하세요</option>
+                            <option th:each="user : ${users}" 
+                                    th:value="${user.userId}" 
+                                    th:text="${user.userName + ' (' + user.userPart + ')'}"
+                                    th:selected="${user.userId == ReturnShipmentDTO.userId}">
+                                홍길동 (영업부)
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- 반품 상태 (수정 가능) -->
                     <div class="form-group">
                         <label for="returnShipmentStatus" class="form-label required">반품 상태</label>
                         <select id="returnShipmentStatus" name="returnShipmentStatus" class="form-select" required>
@@ -210,72 +206,51 @@
                                readonly>
                     </div>
                     
-                    <!-- 반품 항목 입력 섹션 -->
+                    <!-- 반품 항목 표시 섹션 (읽기 전용) -->
                     <div class="items-container">
-                        <h3>반품 항목</h3>
-                        <p class="text-muted">반품할 항목의 정보를 수정하세요. 항목 추가 버튼을 클릭하여 여러 항목을 등록할 수 있습니다.</p>
+                        <h3>반품 항목 정보</h3>
+                        <p class="text-muted">반품 항목 정보는 수정할 수 없습니다.</p>
                         
                         <div id="items-wrapper">
-                            <!-- 기존 항목들 표시 -->
+                            <!-- 기존 항목들 읽기전용으로 표시 -->
                             <div th:if="${ReturnShipmentDTO.lotNumber != null and !ReturnShipmentDTO.lotNumber.empty}"
                                  th:each="lot, idx : ${ReturnShipmentDTO.lotNumber}" class="item-row">
+                                <!-- 히든 필드로 데이터 유지 -->
+                                <input type="hidden" name="lotNumber" th:value="${lot}">
+                                <input type="hidden" name="returnShipmentQuantity" 
+                                       th:value="${ReturnShipmentDTO.returnShipmentQuantity != null and ReturnShipmentDTO.returnShipmentQuantity.size() > idx.index ? ReturnShipmentDTO.returnShipmentQuantity[idx.index] : 1}">
+                                <input type="hidden" name="returnShipmentContent" 
+                                       th:value="${ReturnShipmentDTO.returnShipmentContent != null and ReturnShipmentDTO.returnShipmentContent.size() > idx.index ? ReturnShipmentDTO.returnShipmentContent[idx.index].name() : 'DAMAGED_OR_DEFECTIVE'}">
+                                
                                 <div class="form-group">
-                                    <label class="form-label required">로트 번호</label>
-                                    <input type="text" name="lotNumber" class="form-control" 
-                                           th:value="${lot}" required>
+                                    <label class="form-label">로트 번호</label>
+                                    <input type="text" class="form-control readonly-field" 
+                                           th:value="${lot}" readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label required">수량</label>
-                                    <input type="number" name="returnShipmentQuantity" class="form-control" min="1" 
-                                           th:value="${ReturnShipmentDTO.returnShipmentQuantity != null and ReturnShipmentDTO.returnShipmentQuantity.size() > idx.index ? ReturnShipmentDTO.returnShipmentQuantity[idx.index] : 1}" required>
+                                    <label class="form-label">수량</label>
+                                    <input type="text" class="form-control readonly-field" 
+                                           th:value="${ReturnShipmentDTO.returnShipmentQuantity != null and ReturnShipmentDTO.returnShipmentQuantity.size() > idx.index ? ReturnShipmentDTO.returnShipmentQuantity[idx.index] : 1}" 
+                                           readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label required">반품 사유</label>
-                                    <select name="returnShipmentContent" class="form-select" required>
-                                        <option value="EXPIRED" 
-                                                th:selected="${ReturnShipmentDTO.returnShipmentContent != null and ReturnShipmentDTO.returnShipmentContent.size() > idx.index and ReturnShipmentDTO.returnShipmentContent[idx.index].name() == 'EXPIRED'}">
-                                            유통기한 만료
-                                        </option>
-                                        <option value="DAMAGED_OR_DEFECTIVE" 
-                                                th:selected="${ReturnShipmentDTO.returnShipmentContent != null and ReturnShipmentDTO.returnShipmentContent.size() > idx.index and ReturnShipmentDTO.returnShipmentContent[idx.index].name() == 'DAMAGED_OR_DEFECTIVE'}">
-                                            손상 또는 결함
-                                        </option>
-                                    </select>
+                                    <label class="form-label">반품 사유</label>
+                                    <input type="text" class="form-control readonly-field"
+                                           th:value="${ReturnShipmentDTO.returnShipmentContent != null and ReturnShipmentDTO.returnShipmentContent.size() > idx.index ? 
+                                                    (ReturnShipmentDTO.returnShipmentContent[idx.index].name() == 'EXPIRED' ? '유통기한 만료' : '손상 또는 결함') : '손상 또는 결함'}"
+                                           readonly>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">&nbsp;</label>
-                                    <button type="button" class="btn-remove-item" onclick="removeItem(this)" 
-                                            th:disabled="${ReturnShipmentDTO.lotNumber.size() <= 1}">삭제</button>
+                                    <div class="text-muted" style="padding: 10px;">자동 등록 항목</div>
                                 </div>
                             </div>
                             
-                            <!-- 기존 항목이 없는 경우 기본 템플릿 -->
-                            <div th:if="${ReturnShipmentDTO.lotNumber == null or ReturnShipmentDTO.lotNumber.empty}" class="item-row">
-                                <div class="form-group">
-                                    <label class="form-label required">로트 번호</label>
-                                    <input type="text" name="lotNumber" class="form-control" placeholder="로트 번호 입력" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label required">수량</label>
-                                    <input type="number" name="returnShipmentQuantity" class="form-control" min="1" value="1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label required">반품 사유</label>
-                                    <select name="returnShipmentContent" class="form-select" required>
-                                        <option value="EXPIRED">유통기한 만료</option>
-                                        <option value="DAMAGED_OR_DEFECTIVE">손상 또는 결함</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="button" class="btn-remove-item" onclick="removeItem(this)" disabled>삭제</button>
-                                </div>
+                            <!-- 항목이 없는 경우 메시지 표시 -->
+                            <div th:if="${ReturnShipmentDTO.lotNumber == null or ReturnShipmentDTO.lotNumber.empty}" class="text-center p-3">
+                                등록된 반품 항목이 없습니다.
                             </div>
                         </div>
-                        
-                        <button type="button" class="btn-add-item" onclick="addItem()">
-                            <i class="fas fa-plus"></i> 항목 추가
-                        </button>
                     </div>
                     
                     <div class="form-submit">
@@ -289,54 +264,11 @@
     
     <th:block layout:fragment="scripts">
         <script>
-            // 항목 추가 함수
-            function addItem() {
-                const wrapper = document.getElementById('items-wrapper');
-                const rows = wrapper.querySelectorAll('.item-row');
-                
-                // 첫 번째 항목 행 복제
-                const newRow = rows[0].cloneNode(true);
-                
-                // 입력 필드 초기화
-                const inputs = newRow.querySelectorAll('input, select');
-                inputs.forEach(input => {
-                    if (input.type === 'number' && input.name === 'returnShipmentQuantity') {
-                        input.value = 1;
-                    } else if (input.type === 'text') {
-                        input.value = '';
-                    }
-                });
-                
-                // 삭제 버튼 활성화
-                const removeBtn = newRow.querySelector('.btn-remove-item');
-                removeBtn.disabled = false;
-                
-                // 항목 행 추가
-                wrapper.appendChild(newRow);
-                
-                // 첫 번째 행의 삭제 버튼도 활성화 (2개 이상일 경우)
-                if (rows.length === 1) {
-                    rows[0].querySelector('.btn-remove-item').disabled = false;
-                }
-            }
-            
-            // 항목 삭제 함수
-            function removeItem(button) {
-                const wrapper = document.getElementById('items-wrapper');
-                const rows = wrapper.querySelectorAll('.item-row');
-                
-                // 최소한 하나의 항목은 유지
-                if (rows.length > 1) {
-                    const row = button.closest('.item-row');
-                    row.remove();
-                    
-                    // 만약 항목이 하나만 남았다면 삭제 버튼 비활성화
-                    const remainingRows = wrapper.querySelectorAll('.item-row');
-                    if (remainingRows.length === 1) {
-                        remainingRows[0].querySelector('.btn-remove-item').disabled = true;
-                    }
-                }
-            }
+            // 페이지 로드 시 실행
+            document.addEventListener('DOMContentLoaded', function() {
+                // 필요한 초기화 로직
+                console.log('반품 수정 페이지 로드됨');
+            });
         </script>
     </th:block>
 </body>

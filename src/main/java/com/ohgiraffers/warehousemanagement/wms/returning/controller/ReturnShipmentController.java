@@ -3,6 +3,9 @@ package com.ohgiraffers.warehousemanagement.wms.returning.controller;
 import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnShipmentDTO;
 import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturnShipmentService;
+import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesService;
+import com.ohgiraffers.warehousemanagement.wms.shipment.model.dto.ShipmentResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.shipment.service.ShipmentService;
 import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
 import com.ohgiraffers.warehousemanagement.wms.store.model.entity.Store;
 import com.ohgiraffers.warehousemanagement.wms.store.repository.StoreRepository;
@@ -19,7 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /*출고반품*/
@@ -30,6 +35,8 @@ public class ReturnShipmentController {
 
     //의존성 주입
     private final ReturnShipmentService returnShipmentService;
+    private final ShipmentService shipmentService;
+    private final SalesService salesService;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
 
@@ -37,10 +44,14 @@ public class ReturnShipmentController {
     public ReturnShipmentController(
             ReturnShipmentService returnShipmentService,
             StoreRepository storeRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            SalesService salesService,
+            ShipmentService shipmentService) {
         this.returnShipmentService = returnShipmentService;
         this.storeRepository = storeRepository;
         this.userRepository = userRepository;
+        this.salesService = salesService;
+        this.shipmentService = shipmentService;
     }
 
     @GetMapping("/list")
@@ -205,57 +216,63 @@ public class ReturnShipmentController {
     }
 
     @GetMapping("/update/{returnShipmentId}")
-    public ModelAndView updateReturnsById (@PathVariable("returnShipmentId") Integer
-                                                   returnShipmentId, ModelAndView mv, RedirectAttributes rdtat)
+    public ModelAndView updateReturnsById(@PathVariable("returnShipmentId") Integer returnShipmentId,
+                                          ModelAndView mv, RedirectAttributes rdtat)
     {
         ReturnShipmentDTO rsDTO = returnShipmentService.getReturnsByID(returnShipmentId);
 
         if (rsDTO != null) {
-            // 활성 상태인 매장 목록 가져오기
+            // 활성 상태인 매장 목록 가져오기 (기존 코드)
             List<Store> activeStores = storeRepository.findAll().stream()
                     .filter(store -> !store.getDeleted())
                     .collect(Collectors.toList());
 
-            // 활성 상태인 사용자 목록 가져오기
+            // 활성 상태인 사용자 목록 가져오기 (기존 코드)
             List<User> activeUsers = userRepository.findAll().stream()
                     .filter(user -> user.getUserStatus() == UserStatus.재직중)
                     .collect(Collectors.toList());
 
-            // Entity를 DTO로 변환
+            // Entity를 DTO로 변환 (기존 코드)
             List<StoreDTO> storeDTOs = activeStores.stream()
                     .map(store -> new StoreDTO(
-                            store.getStoreId(),
-                            store.getStoreName(),
-                            store.getStoreAddress(),
-                            store.getStoreManagerName(),
-                            store.getStoreManagerPhone(),
-                            store.getStoreManagerEmail(),
-                            store.getStoreCreatedAt(),
-                            store.getStoreUpdatedAt(),
-                            store.getStoreDeletedAt(),
+                            store.getStoreId(), store.getStoreName(), store.getStoreAddress(),
+                            store.getStoreManagerName(), store.getStoreManagerPhone(), store.getStoreManagerEmail(),
+                            store.getStoreCreatedAt(), store.getStoreUpdatedAt(), store.getStoreDeletedAt(),
                             store.getDeleted()
                     ))
                     .collect(Collectors.toList());
 
             List<UserDTO> userDTOs = activeUsers.stream()
                     .map(user -> new UserDTO(
-                            user.getUserId(),
-                            user.getUserCode(),
-                            user.getUserName(),
-                            user.getUserEmail(),
-                            user.getUserPhone(),
-                            user.getUserPart().name(),
-                            user.getUserRole().name(),
-                            user.getUserStatus().name(),
-                            user.getUserCreatedAt(),
-                            user.getUserUpdatedAt(),
+                            user.getUserId(), user.getUserCode(), user.getUserName(), user.getUserEmail(),
+                            user.getUserPhone(), user.getUserPart().name(), user.getUserRole().name(),
+                            user.getUserStatus().name(), user.getUserCreatedAt(), user.getUserUpdatedAt(),
                             user.getUserDeletedAt()
                     ))
                     .collect(Collectors.toList());
 
-            mv.addObject("stores", storeDTOs);
-            mv.addObject("users", userDTOs);
-            mv.addObject("ReturnShipmentDTO", rsDTO);
+            // ----- 매장 정보 표시 문자열 생성 로직 추가 -----
+            String storeDisplayInfo = "매장 정보 없음"; // 기본값
+            if (rsDTO.getStoreId() != null && storeDTOs != null) {
+                // 모델에 추가된 storeDTOs 리스트에서 해당 매장 찾기
+                StoreDTO matchingStore = storeDTOs.stream()
+                        .filter(s -> rsDTO.getStoreId().equals(s.getStoreId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (matchingStore != null) {
+                    storeDisplayInfo = matchingStore.getStoreName() + " (" + rsDTO.getStoreId() + ")";
+                } else {
+                    // 리스트에 없는 경우 (예외적 상황)
+                    storeDisplayInfo = "매장 ID " + rsDTO.getStoreId() + " 없음";
+                }
+            }
+            // ----- 로직 추가 끝 -----
+
+            mv.addObject("stores", storeDTOs); // 기존 매장 리스트 (다른 용도로 필요할 수 있음)
+            mv.addObject("users", userDTOs);    // 기존 사용자 리스트
+            mv.addObject("ReturnShipmentDTO", rsDTO); // 기존 반품 DTO
+            mv.addObject("storeDisplayInfo", storeDisplayInfo); // ---> 생성된 문자열 추가
             mv.setViewName("returns/outbound/update");
         } else {
             rdtat.addFlashAttribute("message", "반품 데이터를 찾을 수 없습니다.");
