@@ -1,8 +1,11 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.common.exception.ProductNotFoundException;
+import com.ohgiraffers.warehousemanagement.wms.common.exception.StoreNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.service.InventoryService;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
+import com.ohgiraffers.warehousemanagement.wms.product.model.repository.ProductRepository;
 import com.ohgiraffers.warehousemanagement.wms.product.service.ProductService;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
@@ -11,6 +14,8 @@ import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesItemsRepository;
 import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
 import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
+import com.ohgiraffers.warehousemanagement.wms.store.model.entity.Store;
+import com.ohgiraffers.warehousemanagement.wms.store.repository.StoreRepository;
 import com.ohgiraffers.warehousemanagement.wms.store.service.StoreService;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.LogUserDTO;
 import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
@@ -34,15 +39,19 @@ public class SalesServiceImpl implements SalesService {
     private final UserService userService;
     private final InventoryService inventoryService;
     private final StoreService storeService;
+    private final ProductRepository productRepository;
+    private final StoreRepository storeRepository;
 
     @Autowired
-    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService, StoreService storeService) {
+    public SalesServiceImpl(SalesRepository salesRepository, SalesItemsRepository salesItemsRepository, ProductService productService, UserService userService, InventoryService inventoryService, StoreService storeService, ProductRepository productRepository, StoreRepository storeRepository) {
         this.salesRepository = salesRepository;
         this.salesItemsRepository = salesItemsRepository;
         this.productService = productService;
         this.userService = userService;
         this.inventoryService = inventoryService;
         this.storeService = storeService;
+        this.productRepository = productRepository;
+        this.storeRepository = storeRepository;
     }
 
     public List<SalesDTO> getAllSales() {
@@ -77,6 +86,10 @@ public class SalesServiceImpl implements SalesService {
 
     @Transactional
     public int createSales(SalesDTO salesDTO, Long userId) {
+        Store store = storeRepository.findById(salesDTO.getStoreId()).orElseThrow(() -> new StoreNotFoundException("존재하지 않는 점포입니다."));
+        for (Integer productId : salesDTO.getProductIds()) {
+            Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException(productId +"번 상품은 존재하지 않는 상품입니다."));
+        }
 
         // 수주 정보 저장
         Sales salesEntity = new Sales.Builder()

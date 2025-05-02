@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
+import com.ohgiraffers.warehousemanagement.wms.common.exception.ProductNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
@@ -48,7 +49,7 @@ public class SalesController {
     
     @GetMapping("/create")
     public String createSales() {
-        return "sales/create"; // view 부분 만들고 수정필요
+        return "sales/create";
     }
 
     // 새로고침 시 중복 등록 방지 및 이동 시 URL을 맞춰주기 위해 forward 말고 redirect 사용했음!
@@ -56,17 +57,16 @@ public class SalesController {
     public String createSales(@Valid @ModelAttribute SalesDTO salesDTO, RedirectAttributes rdtat) {
         AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = authDetails.getUserId();
-
-        int salesId = salesServiceImpl.createSales(salesDTO, userId);
         String resultUrl = null;
 
-        if (salesId > 0) {
+        try {
+            int salesId = salesServiceImpl.createSales(salesDTO, userId);
             rdtat.addFlashAttribute("salesDTO", salesId);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
             resultUrl = "redirect:/sales/" + salesId;
-        } else {
-            rdtat.addFlashAttribute("message","수주서 등록에 실패하였습니다. 다시 시도해주세요.");
-            resultUrl = "redirect:/sales";
+        } catch (ProductNotFoundException e) {
+            rdtat.addFlashAttribute("error",e.getMessage());
+            resultUrl = "redirect:/sales/create";
         }
 
         return resultUrl;
