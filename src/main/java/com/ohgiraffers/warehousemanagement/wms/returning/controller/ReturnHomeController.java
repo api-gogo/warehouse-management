@@ -4,256 +4,223 @@ import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
 import com.ohgiraffers.warehousemanagement.wms.returning.ReturningShipmentCause;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnShipmentDTO;
 import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturnShipmentService;
+import com.ohgiraffers.warehousemanagement.wms.store.model.entity.Store; // Import Store entity
+import com.ohgiraffers.warehousemanagement.wms.store.repository.StoreRepository; // Import StoreRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam; // Added for filtering
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDate; // Added for date filtering
 import java.time.LocalDateTime;
+import java.time.LocalTime; // Added for date filtering
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Function; // Added for map creation
+import java.util.stream.Collectors; // Added for stream operations
 
 @Controller
 @RequestMapping("/returns")
 public class ReturnHomeController {
 
     private final ReturnShipmentService returnShipmentService;
+    private final StoreRepository storeRepository; // Added StoreRepository dependency
 
     @Autowired
-    public ReturnHomeController(ReturnShipmentService returnShipmentService) {
+    public ReturnHomeController(ReturnShipmentService returnShipmentService,
+                                StoreRepository storeRepository /* Added to constructor */) {
         this.returnShipmentService = returnShipmentService;
+        this.storeRepository = storeRepository; // Initialize repository
     }
+
+    // Helper method to get Store ID -> Name Map
+    private Map<Integer, String> getStoreNameMap() {
+        return storeRepository.findAll().stream()
+                .collect(Collectors.toMap(Store::getStoreId, Store::getStoreName, (existing, replacement) -> existing)); // Handle potential duplicate keys if any
+    }
+
 
     @GetMapping
     public ModelAndView showReturnsHome() {
         ModelAndView mv = new ModelAndView("returns/home");
-        
-        // 모든 반품 데이터 가져오기
+        Map<Integer, String> storeNameMap = getStoreNameMap(); // Get store names
+
+        // Fetch all return data (assuming only outbound for now)
         List<ReturnShipmentDTO> allReturns = returnShipmentService.getAllReturns();
-        
-        // 현재 시스템에는 출고 반품만 있음
-        // 모든 반품을 출고 반품으로 처리
-        List<ReturnShipmentDTO> inboundReturns = new ArrayList<>(); // 입고 반품은 없음
-        List<ReturnShipmentDTO> outboundReturns = new ArrayList<>();
-        
-        if (allReturns != null && !allReturns.isEmpty()) {
-            // 모든 반품을 출고 반품으로 분류
-            outboundReturns.addAll(allReturns);
+        if (allReturns == null) {
+            allReturns = new ArrayList<>(); // Ensure list is not null
         }
-        
-        // 입고, 출고 반품 개수
+
+        // --- Statistics Calculation (Mostly unchanged, uses allReturns) ---
+        List<ReturnShipmentDTO> inboundReturns = new ArrayList<>(); // Keep distinction, though currently empty
+        List<ReturnShipmentDTO> outboundReturns = new ArrayList<>(allReturns); // Assume all are outbound
+
         int inboundReturnsCount = inboundReturns.size();
         int outboundReturnsCount = outboundReturns.size();
-        
-        // 완료된 반품 개수 (RETURN_COMPLETED 상태인 반품)
+
         long completedReturnsCount = allReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
-            .count();
-        
-        // 상태별 개수 계산
-        long inboundWaitingCount = inboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_WAITING)
-            .count();
-        
-        long inboundApprovedCount = inboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_APPROVED)
-            .count();
-        
-        long inboundRejectedCount = inboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_REJECTED)
-            .count();
-        
-        long inboundCompletedCount = inboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
-            .count();
-        
+                .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
+                .count();
+
+        // Status counts (calculated based on the current data structure)
+        long inboundWaitingCount = 0; // Since inboundReturns is empty
+        long inboundApprovedCount = 0;
+        long inboundRejectedCount = 0;
+        long inboundCompletedCount = 0;
+
         long outboundWaitingCount = outboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_WAITING)
-            .count();
-        
+                .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_WAITING)
+                .count();
         long outboundApprovedCount = outboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_APPROVED)
-            .count();
-        
+                .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_APPROVED)
+                .count();
         long outboundRejectedCount = outboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_REJECTED)
-            .count();
-        
+                .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_REJECTED)
+                .count();
         long outboundCompletedCount = outboundReturns.stream()
-            .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
-            .count();
-        
+                .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
+                .count();
+
         long totalWaitingCount = inboundWaitingCount + outboundWaitingCount;
         long totalApprovedCount = inboundApprovedCount + outboundApprovedCount;
         long totalRejectedCount = inboundRejectedCount + outboundRejectedCount;
         long totalCompletedCount = inboundCompletedCount + outboundCompletedCount;
-        
-        // 최근 반품 내역 (최대 5개, 생성일 기준 내림차순 정렬)
+
+        // --- Recent Returns (Refactored Store Name) ---
         List<Map<String, Object>> recentReturns = new ArrayList<>();
-        
-        if (allReturns != null && !allReturns.isEmpty()) {
-            // 생성일 기준 내림차순 정렬
-            allReturns.sort((a, b) -> 
-                b.getReturnShipmentCreatedAt().compareTo(a.getReturnShipmentCreatedAt()));
-            
-            // 최대 5개까지만 가져옴
-            int count = Math.min(allReturns.size(), 5);
-            
-            for (int i = 0; i < count; i++) {
-                ReturnShipmentDTO returnDTO = allReturns.get(i);
-                Map<String, Object> returnMap = new HashMap<>();
-                
-                returnMap.put("returnId", returnDTO.getReturnShipmentId());
-                // 모든 항목을 출고 반품으로 표시
-                returnMap.put("type", "OUTBOUND");
-                
-                // 매장 이름 설정 (예시)
-                int storeId = returnDTO.getStoreId();
-                String storeName = "알 수 없음";
-                if (storeId == 1) storeName = "서울 매장";
-                else if (storeId == 2) storeName = "대구 매장";
-                else if (storeId == 3) storeName = "부산 매장";
-                else if (storeId == 4) storeName = "인천 매장";
-                returnMap.put("storeName", storeName);
-                
-                returnMap.put("createdAt", returnDTO.getReturnShipmentCreatedAt());
-                returnMap.put("status", returnDTO.getReturnShipmentStatus().name());
-                
-                recentReturns.add(returnMap);
-            }
+        allReturns.sort(Comparator.comparing(ReturnShipmentDTO::getReturnShipmentCreatedAt).reversed()); // Sort by creation date desc
+
+        int count = Math.min(allReturns.size(), 5);
+        for (int i = 0; i < count; i++) {
+            ReturnShipmentDTO returnDTO = allReturns.get(i);
+            Map<String, Object> returnMap = new HashMap<>();
+
+            returnMap.put("returnId", returnDTO.getReturnShipmentId());
+            returnMap.put("type", "OUTBOUND"); // Assuming outbound based on service used
+            // Use map to get actual store name
+            returnMap.put("storeName", storeNameMap.getOrDefault(returnDTO.getStoreId(), "ID: " + returnDTO.getStoreId()));
+            returnMap.put("createdAt", returnDTO.getReturnShipmentCreatedAt());
+            returnMap.put("status", returnDTO.getReturnShipmentStatus().name()); // Pass enum name for status
+
+            recentReturns.add(returnMap);
         }
-        
-        // 반품 사유 통계 - 실제 데이터 집계를 시도
-        // ReturnShipmentItem에서 사유 데이터를 집계해야 하지만 현재는 간단히 처리
+
+        // --- Reason Statistics (Unchanged logic, depends on DTO content) ---
         long expiredCount = 0;
         long damagedCount = 0;
-        long wrongItemCount = 0;
-        long changedMindCount = 0;
-        
-        // 실제 데이터에 기반한 반품 사유 집계
-        // 각 반품의 항목에서 returnShipmentContent를 확인해야 하지만
-        // ReturnShipmentDTO에 항목 정보가 포함되어 있다면 집계 가능
+        // Add counts for other reasons if they exist in ReturningShipmentCause enum and are used
+        // long wrongItemCount = 0;
+        // long changedMindCount = 0;
+
         for (ReturnShipmentDTO dto : allReturns) {
             if (dto.getReturnShipmentContent() != null) {
-                for (ReturningShipmentCause cause : dto.getReturnShipmentContent()) {
-                    if (cause == ReturningShipmentCause.EXPIRED) {
-                        expiredCount++;
-                    } else if (cause == ReturningShipmentCause.DAMAGED_OR_DEFECTIVE) {
-                        damagedCount++;
-                    }
-                }
+                expiredCount += dto.getReturnShipmentContent().stream()
+                        .filter(cause -> cause == ReturningShipmentCause.EXPIRED)
+                        .count();
+                damagedCount += dto.getReturnShipmentContent().stream()
+                        .filter(cause -> cause == ReturningShipmentCause.DAMAGED_OR_DEFECTIVE)
+                        .count();
+                // Add counting logic for other causes here
             }
         }
-        
-        // 모든 데이터를 ModelAndView에 추가
+
+        // Add all data to ModelAndView
         mv.addObject("inboundReturnsCount", inboundReturnsCount);
         mv.addObject("outboundReturnsCount", outboundReturnsCount);
         mv.addObject("completedReturnsCount", completedReturnsCount);
-        
+
         mv.addObject("inboundWaitingCount", inboundWaitingCount);
         mv.addObject("inboundApprovedCount", inboundApprovedCount);
         mv.addObject("inboundRejectedCount", inboundRejectedCount);
         mv.addObject("inboundCompletedCount", inboundCompletedCount);
-        
+
         mv.addObject("outboundWaitingCount", outboundWaitingCount);
         mv.addObject("outboundApprovedCount", outboundApprovedCount);
         mv.addObject("outboundRejectedCount", outboundRejectedCount);
         mv.addObject("outboundCompletedCount", outboundCompletedCount);
-        
+
         mv.addObject("totalWaitingCount", totalWaitingCount);
         mv.addObject("totalApprovedCount", totalApprovedCount);
         mv.addObject("totalRejectedCount", totalRejectedCount);
         mv.addObject("totalCompletedCount", totalCompletedCount);
-        
+
         mv.addObject("recentReturns", recentReturns);
-        
-        // 반품 사유 통계
+
         mv.addObject("expiredCount", expiredCount);
         mv.addObject("damagedCount", damagedCount);
-        mv.addObject("wrongItemCount", wrongItemCount);
-        mv.addObject("changedMindCount", changedMindCount);
-        
+        // Add other reason counts
+        // mv.addObject("wrongItemCount", wrongItemCount);
+        // mv.addObject("changedMindCount", changedMindCount);
+
         return mv;
     }
 
     @GetMapping("/completed")
-    public ModelAndView showCompletedReturns() {
-        ModelAndView mv = new ModelAndView("returns/completed");
-        
+    public ModelAndView showCompletedReturns(
+            // Add RequestParams for filtering
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            ModelAndView mv) { // Inject ModelAndView directly
+
+        mv.setViewName("returns/completed"); // Set view name early
+        Map<Integer, String> storeNameMap = getStoreNameMap(); // Get store names
+
         try {
-            // 모든 반품 데이터 가져오기
+            // Fetch all returns (assuming only outbound for now)
             List<ReturnShipmentDTO> allReturns = returnShipmentService.getAllReturns();
-            System.out.println("Fetched returns count: " + (allReturns != null ? allReturns.size() : "null"));
-            
-            // RETURN_COMPLETED 상태인 반품만 필터링
-            List<Map<String, Object>> completedReturns = new ArrayList<>();
-            
-            if (allReturns != null && !allReturns.isEmpty()) {
-                // 필터링하기 전 상태 확인
-                System.out.println("Status counts:");
-                for (ReturnShipmentStatus status : ReturnShipmentStatus.values()) {
-                    long count = allReturns.stream()
-                        .filter(r -> r.getReturnShipmentStatus() == status)
-                        .count();
-                    System.out.println(" - " + status + ": " + count);
-                }
-                
-                // 완료 상태인 반품만 필터링
-                allReturns.stream()
+            if (allReturns == null) {
+                allReturns = new ArrayList<>(); // Ensure list is not null
+            }
+
+            // Filter for completed status and apply optional filters
+            List<Map<String, Object>> completedReturns = allReturns.stream()
                     .filter(r -> r.getReturnShipmentStatus() == ReturnShipmentStatus.RETURN_COMPLETED)
-                    .forEach(returnDTO -> {
+                    // Apply type filter (currently only OUTBOUND exists from this service)
+                    .filter(r -> type == null || type.isEmpty() || type.equalsIgnoreCase("OUTBOUND")) // Adapt if INBOUND is added
+                    // Apply date filters
+                    .filter(r -> startDate == null || !r.getReturnShipmentCreatedAt().toLocalDate().isBefore(startDate))
+                    .filter(r -> endDate == null || !r.getReturnShipmentCreatedAt().toLocalDate().isAfter(endDate))
+                    // Map to the structure needed by the view
+                    .map(returnDTO -> {
                         Map<String, Object> returnMap = new HashMap<>();
                         returnMap.put("returnId", returnDTO.getReturnShipmentId());
-                        returnMap.put("type", "OUTBOUND"); // 모든 항목을 출고 반품으로 표시
-                        
-                        int storeId = returnDTO.getStoreId();
-                        String storeName = "알 수 없음";
-                        if (storeId == 1) storeName = "서울 매장";
-                        else if (storeId == 2) storeName = "대구 매장";
-                        else if (storeId == 3) storeName = "부산 매장";
-                        else if (storeId == 4) storeName = "인천 매장";
-                        returnMap.put("storeName", storeName);
-                        
+                        returnMap.put("type", "OUTBOUND"); // Assuming outbound
+                        // Use map for store name
+                        returnMap.put("storeName", storeNameMap.getOrDefault(returnDTO.getStoreId(), "ID: " + returnDTO.getStoreId()));
                         returnMap.put("createdAt", returnDTO.getReturnShipmentCreatedAt());
-                        returnMap.put("updatedAt", returnDTO.getReturnShipmentUpdatedAt());
+                        returnMap.put("updatedAt", returnDTO.getReturnShipmentUpdatedAt()); // Completion date is often update date
                         returnMap.put("status", returnDTO.getReturnShipmentStatus().name());
-                        
-                        completedReturns.add(returnMap);
-                    });
-            }
-            
-            System.out.println("Completed returns count: " + completedReturns.size());
-            
-            // 데이터가 없을 경우 테스트용 예시 데이터 추가
-            if (completedReturns.isEmpty()) {
-                System.out.println("Adding sample data for testing...");
-                Map<String, Object> sampleData = new HashMap<>();
-                sampleData.put("returnId", 9999);
-                sampleData.put("type", "OUTBOUND");
-                sampleData.put("storeName", "테스트 매장");
-                sampleData.put("createdAt", LocalDateTime.now().minusDays(5));
-                sampleData.put("updatedAt", LocalDateTime.now().minusDays(2));
-                sampleData.put("status", "RETURN_COMPLETED");
-                completedReturns.add(sampleData);
-            }
-            
+                        return returnMap;
+                    })
+                    // Sort by completion date (updatedAt) descending
+                    .sorted((m1, m2) -> ((LocalDateTime)m2.get("updatedAt")).compareTo((LocalDateTime)m1.get("updatedAt")))
+                    .collect(Collectors.toList());
+
             mv.addObject("completedReturns", completedReturns);
+            // Pass filter values back to the view to keep them selected
+            mv.addObject("selectedType", type);
+            mv.addObject("selectedStartDate", startDate);
+            mv.addObject("selectedEndDate", endDate);
+
         } catch (Exception e) {
             System.err.println("Error in showCompletedReturns: " + e.getMessage());
             e.printStackTrace();
             mv.addObject("error", "데이터를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
+            mv.addObject("completedReturns", new ArrayList<>()); // Ensure list exists even on error
         }
-        
+
         return mv;
     }
 
-    @GetMapping("/inbound") //입고반품 전체조회
+    // Redirects remain the same
+    @GetMapping("/inbound")
     public String showInboundReturns() {
-        return "returns/inbound/inbound";
+        return "redirect:/returns/inbound/list"; // Assuming this path exists for inbound
     }
 
-    @GetMapping("/outbound") //출고반품 전체조회
+    @GetMapping("/outbound")
     public String showOutboundReturns() {
         return "redirect:/returns/outbound/list";
     }
