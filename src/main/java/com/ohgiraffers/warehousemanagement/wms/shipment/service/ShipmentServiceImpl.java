@@ -202,7 +202,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             inventory.setAvailableStock(availableStock - quantity);
             inventory.setAllocatedStock(inventory.getAllocatedStock() + quantity);
             inventoryRepository.save(inventory);
-            log.info("재고 업데이트 성공 - 상품 ID: {}, 로트 번호: {}, 가용재고: {}, 할당재고: {}",
+            log.info("재고 업데이트 성공 - 상품 ID: {}, 로트 번호: {}, 가용재고: {}, 할  당재고: {}",
                     productId, lotNumber, inventory.getAvailableStock(), inventory.getAllocatedStock());
         }
     }
