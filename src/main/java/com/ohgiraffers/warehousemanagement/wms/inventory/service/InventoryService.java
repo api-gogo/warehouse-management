@@ -4,7 +4,7 @@ import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryDTO;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.Inventory;
 import com.ohgiraffers.warehousemanagement.wms.product.model.entity.Product;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface InventoryService {
 
@@ -21,5 +21,7 @@ public interface InventoryService {
     int getNextSequenceForProductToday(Integer productId);
 
 
-    void notifyStorageCompleted(Integer purchaseId);
+    void notifyStorageCompleted(Integer purchaseId, Integer userId);
+
+    void notifyShipmentCompleted(Inventory inventory, Integer purchaseId, Long difference);
 }

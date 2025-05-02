@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.service;
 
+import com.ohgiraffers.warehousemanagement.wms.common.exception.InventoryNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.common.exception.ProductNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.common.exception.StoreNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
@@ -105,11 +106,20 @@ public class SalesServiceImpl implements SalesService {
         // 수주 리스트 저장
         List<SalesItem> salesItemList = new ArrayList<>();
         for (int i = 0; i < salesDTO.getProductIds().size(); i++) {
-            String lotNumber = inventoryService.findTopByProductIdOrderByInventoryExpiryDateAsc(salesDTO.getProductIds().get(i)).getLotNumber();
+            Integer productId = salesDTO.getProductIds().get(i);
+            Integer quantity = salesDTO.getQuantity().get(i);
+
+            String lotNumber;
+            try {
+                lotNumber = inventoryService.findTopByProductIdOrderByInventoryExpiryDateAsc(productId).getLotNumber();
+            } catch (IllegalArgumentException e) {
+                throw new InventoryNotFoundException(productId + "번 상품에 재고가 없습니다. 수주 등록을 다시 시도해주세요.");
+            }
+
             SalesItem salesItem = new SalesItem.Builder()
                     .salesId(savedSales)
-                    .productId(salesDTO.getProductIds().get(i))
-                    .salesItemsQuantity(salesDTO.getQuantity().get(i))
+                    .productId(productId)
+                    .salesItemsQuantity(quantity)
                     .lotNumber(lotNumber)
                     .build();
             salesItemList.add(salesItem);
@@ -132,9 +142,12 @@ public class SalesServiceImpl implements SalesService {
         List<Integer> pricePerBoxList = new ArrayList<>();
         List<Integer> quantityList = new ArrayList<>();
         List<Integer> totalPriceList = new ArrayList<>();
+        System.out.println("findSalesById : "+findSales);
 
         for (SalesItem item : findSales.getSalesItems()) {
+            System.out.println("반복문호출 " + item);
             Product product = productService.findProductById(item.getProductId());
+            System.out.println("item리스트 : "+item);
 
             productIds.add(product.getProductId());
             productNames.add(product.getProductName());

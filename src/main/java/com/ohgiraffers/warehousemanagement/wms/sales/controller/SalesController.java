@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.sales.controller;
 
 import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
+import com.ohgiraffers.warehousemanagement.wms.common.exception.InventoryNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.common.exception.ProductNotFoundException;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.DTO.InventoryViewDTO;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.dto.SalesDTO;
@@ -64,7 +65,7 @@ public class SalesController {
             rdtat.addFlashAttribute("salesDTO", salesId);
             rdtat.addFlashAttribute("message", "수주서가 등록되었습니다.");
             resultUrl = "redirect:/sales/" + salesId;
-        } catch (ProductNotFoundException e) {
+        } catch (ProductNotFoundException | InventoryNotFoundException | IllegalArgumentException e) {
             rdtat.addFlashAttribute("error",e.getMessage());
             resultUrl = "redirect:/sales/create";
         }
@@ -75,9 +76,10 @@ public class SalesController {
     @GetMapping("/{salesId}")
     public ModelAndView getSalesById(@PathVariable(name = "salesId") Integer salesId, ModelAndView mv, RedirectAttributes rdtat) {
         SalesDTO findDTO = salesServiceImpl.getSalesById(salesId);
+        System.out.println("findDTO"+findDTO);
         if (findDTO != null) {
             mv.addObject("sales", findDTO);
-            mv.setViewName("/sales/detail"); // view 수정필요 상세페이지로 가야됨
+            mv.setViewName("sales/detail"); // view 수정필요 상세페이지로 가야됨
         } else {
             rdtat.addFlashAttribute("message","수주 데이터를 찾을 수 없습니다.");
             mv.setViewName("redirect:/sales"); // 없으면 목록으로 돌아감

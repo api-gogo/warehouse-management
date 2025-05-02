@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PurchaseService {
@@ -39,13 +40,20 @@ public class PurchaseService {
     private final SupplierRepository supplierRepository;
 
 
+
     @Autowired
     public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository, SupplierService supplierService, SupplierRepository supplierRepository) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseItemRepository = purchaseItemRepository;
         this.supplierService = supplierService;
         this.supplierRepository = supplierRepository;
+
+
     }
+
+
+
+    // 상품 가져오는 메서드
     public PurchaseItemDTO getProductInfo(Integer productId) {
         // Native Query를 사용한 기존 메서드
         return purchaseRepository.findProductInfo(productId);
@@ -201,15 +209,15 @@ public class PurchaseService {
     // 발주 생성
     @Transactional
     public PurchaseDTO createPurchase(PurchaseDTO purchaseDTO) {
-        // userId가 설정되었는지 확인
+        // 사용자 ID가 설정되지 않으면 예외 처리
         if (purchaseDTO.getUserId() == null) {
             throw new IllegalArgumentException("사용자 ID가 설정되지 않았습니다.");
         }
-        
-        // Purchase 엔티티 생성
+
+        // 발주 엔티티 생성
         Purchase purchase = new Purchase(
                 null, // ID는 자동 생성
-                purchaseDTO.getUserId(), // 컨트롤러에서 설정한 사용자 ID 사용
+                purchaseDTO.getUserId(),
                 purchaseDTO.getPurchaseDate() != null ? purchaseDTO.getPurchaseDate() : LocalDate.now(),
                 purchaseDTO.getPurchaseDueDate() != null ? purchaseDTO.getPurchaseDueDate() : LocalDate.now().plusDays(7),
                 PurchaseStatus.대기,
@@ -217,29 +225,35 @@ public class PurchaseService {
                 null,
                 purchaseDTO.getPurchaseNotes()
         );
-        
-        // 거래처 정보 설정 (supplierId가 있는 경우)
+
+        // 거래처 정보 설정
         if (purchaseDTO.getSupplierId() != null) {
             try {
-                // SupplierRepository를 통해 직접 Supplier 엔티티 가져오기
-                supplierRepository.findById(purchaseDTO.getSupplierId())
-                    .ifPresent(supplier -> {
-                        purchase.setSupplier(supplier);
-                        System.out.println("Setting supplier: " + supplier.getSupplierId() + " - " + supplier.getSupplierName());
-                    });
+                // 거래처 조회
+                Supplier supplier = supplierRepository.findBysupplierIdAndIsDeletedFalse(purchaseDTO.getSupplierId())
+                        .orElseThrow(() -> new IllegalArgumentException("삭제된 거래처이거나 존재하지 않는 거래처입니다. Supplier ID: " + purchaseDTO.getSupplierId()));
+
+                // 거래처 설정
+                purchase.setSupplier(supplier);
+                System.out.println("Setting supplier: " + supplier.getSupplierId());
+            } catch (IllegalArgumentException e) {
+                System.err.println("거래처 조회 실패: " + e.getMessage());
+                throw e; // 예외를 던져 트랜잭션 롤백 처리
             } catch (Exception e) {
                 System.err.println("거래처 정보 설정 중 오류 발생: " + e.getMessage());
                 e.printStackTrace();
+                throw new RuntimeException("거래처 설정 중 오류가 발생했습니다.", e);
             }
         }
 
+        // 발주 저장
         Purchase savedPurchase = purchaseRepository.save(purchase);
-        
-        // 저장된 결과 확인 로그
-        System.out.println("Saved Purchase: " + savedPurchase);
-        System.out.println("Saved Supplier: " + (savedPurchase.getSupplier() != null ? 
-                            savedPurchase.getSupplier().getSupplierId() : "null"));
 
+        // 저장된 발주 정보 확인
+        System.out.println("Saved Purchase: " + savedPurchase);
+        System.out.println("Saved Supplier: " + (savedPurchase.getSupplier() != null ? savedPurchase.getSupplier().getSupplierId() : "null"));
+
+        // 저장된 Purchase를 DTO로 변환하여 반환
         PurchaseDTO savedPurchaseDTO = new PurchaseDTO(
                 savedPurchase.getPurchaseId(),
                 savedPurchase.getUserId(),
@@ -250,16 +264,14 @@ public class PurchaseService {
                 savedPurchase.getPurchaseUpdatedAt(),
                 savedPurchase.getNotes()
         );
-        
+
         // 거래처 ID 설정
         if (savedPurchase.getSupplier() != null) {
             savedPurchaseDTO.setSupplierId(savedPurchase.getSupplier().getSupplierId());
         }
-        
+
         return savedPurchaseDTO;
     }
-
-
 
     // 발주 수정
     @Transactional
@@ -279,7 +291,7 @@ public class PurchaseService {
                 // 기본값으로 '대기' 상태 설정
                 status = PurchaseStatus.대기;
             }
-            
+
             // 사용자가 수정한 정보로 엔티티 업데이트
             purchase.setPurchaseStatus(status);
             purchase.setUserId(purchaseDTO.getUserId()); // userId 업데이트 추가
@@ -288,7 +300,7 @@ public class PurchaseService {
             purchase.setPurchaseCreatedAt(purchaseDTO.getPurchaseCreatedAt());
             purchase.setPurchaseUpdatedAt(LocalDate.now());
             purchase.setNotes(purchaseDTO.getPurchaseNotes()); // notes 업데이트 추가
-            
+
             Purchase updatepurchase = purchaseRepository.save(purchase);
 
             return new PurchaseDTO(
@@ -306,7 +318,7 @@ public class PurchaseService {
             // 발주대기 상태가 아니라면 수정 못한다는 것을 표시
         }
     }
-    
+
     // 문자열 상태를 PurchaseStatus Enum으로 변환하는 헬퍼 메서드
     private PurchaseStatus getStatusFromString(String statusStr) {
         // 직접 Enum 이름으로 매칭 시도
@@ -323,7 +335,7 @@ public class PurchaseService {
             throw new IllegalArgumentException("Invalid status: " + statusStr);
         }
     }
-    
+
 
 
     /*
@@ -413,13 +425,12 @@ public class PurchaseService {
 
     }
 
-    public Integer getSupplierid(Integer supplierId) {
-        SupplierDTO supplierDTO = supplierService.findById(supplierId);
-        if (supplierDTO == null) {
-            throw new IllegalArgumentException("해당 거래처가 없습니다.");
-        } else {
-            return supplierDTO.getSupplierId();
-        }
+    public Integer getSupplierId(Integer supplierId) {
+        // Supplier 엔티티를 직접 조회
+        Supplier supplier = supplierRepository.findBysupplierIdAndIsDeletedFalse(supplierId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 거래처가 존재하지 않거나 삭제된 거래처입니다. Supplier ID: " + supplierId));
+
+        return supplier.getSupplierId();
     }
 
 

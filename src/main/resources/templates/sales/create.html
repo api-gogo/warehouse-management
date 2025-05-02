@@ -87,6 +87,11 @@
                 </div>
             </div>
 
+            <script th:if="${error != null}" th:inline="javascript">
+                alert([[${error}]]);
+            </script>
+
+
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const addItemBtn = document.getElementById('add-item');
