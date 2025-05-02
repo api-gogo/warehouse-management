@@ -16,8 +16,6 @@ import java.util.Optional;
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     Optional<Inventory> findTopByProductProductIdOrderByInventoryExpiryDateAsc(Integer productId);
 
-    Optional<Inventory> findInventoryByProductProductId(Integer productId);
-
     // 재고 조회 리스트에서 '상세 정보' 를 눌렀을 때, 해당 제품 이름의 재고 목록을 보여준다. (유통기한이 빠른 순)
     Page<Inventory> findByProductProductIdOrderByInventoryExpiryDateAsc(Long productId, Pageable pageable);
 
@@ -42,7 +40,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT MAX(i.lotNumber) FROM Inventory i WHERE i.product.productId = :productId AND i.lotNumber LIKE :datePrefix")
     String findMaxLotNumberByProductAndDate(Integer productId, String datePrefix);
 
-    //상품 ID와 로트 번호로 재고 조회.
+    //상품 ID와 로트 번호로 재고 조회
     Optional<Inventory> findByProductProductIdAndLotNumber(Integer productId, String lotNumber);
 
 }

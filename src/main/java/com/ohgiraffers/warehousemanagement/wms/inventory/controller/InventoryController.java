@@ -72,7 +72,7 @@ public class InventoryController {
         mv.addObject("totalItems", inventoriesPage.getTotalElements());
         mv.addObject("size", size);
         mv.addObject("activeMenu", "inventory");
-        mv.setViewName("/inventory/detail");
+        mv.setViewName("inventory/detail");
         return mv;
 
     }
@@ -85,7 +85,7 @@ public class InventoryController {
         mv.addObject("inventory", inventory);
         mv.addObject("logs", log);
         mv.addObject("activeMenu", "inventory");
-        mv.setViewName("/inventory/inventory-detail");
+        mv.setViewName("inventory/inventory-detail");
         return mv;
     }
 
@@ -96,7 +96,7 @@ public class InventoryController {
         InventoryDTO inventory = inventoryServicelmpl.findInventoryById(inventoryId);
         mv.addObject("inventory", inventory);
         mv.addObject("activeMenu", "inventory");
-        mv.setViewName("/inventory/edit");
+        mv.setViewName("inventory/edit");
         return mv;
     }
     
@@ -126,7 +126,7 @@ public class InventoryController {
     @GetMapping("/add")
     public String inventoryAddForm(Model model) {
         model.addAttribute("activeMenu", "inventory");
-        return "/inventory/add";
+        return "inventory/add";
     }
 
     // 재고 등록 처리

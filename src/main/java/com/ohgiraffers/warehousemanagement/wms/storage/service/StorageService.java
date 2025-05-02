@@ -76,13 +76,13 @@ public class StorageService {
 
         //  입고 상태가 COMPLETED일 때 재고 트리거 호출
         if (dto.getStorageStatus() == StorageStatus.COMPLETED) {
-            inventoryService.notifyStorageCompleted(dto.getPurchaseId());
+            inventoryService.notifyStorageCompleted(dto.getPurchaseId(), storage.getUserId());
         }
 
         return convertToStorageResponseDTO(saved);
     }
 
-    public StorageResponseDTO updateStorage(int id, StorageRequestDTO dto) {
+    public StorageResponseDTO updateStorage(int id, StorageRequestDTO dto, String userId) {
         Storage storage = storageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("입고 ID를 찾을 수 없습니다: " + id));
 
@@ -99,7 +99,7 @@ public class StorageService {
 
         //  입고 상태가 COMPLETED일 때 재고 트리거 호출
         if (dto.getStorageStatus() == StorageStatus.COMPLETED) {
-            inventoryService.notifyStorageCompleted(dto.getPurchaseId());
+            inventoryService.notifyStorageCompleted(dto.getPurchaseId(), Integer.valueOf(userId.toString()));
         }
 
         return convertToStorageResponseDTO(updated);
