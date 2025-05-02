@@ -85,9 +85,6 @@ public class ReturnShipmentService {
                 returnShipmentDTO.getReturnShipmentContent());
 
         //
-        Integer salesId = shipmentService.getSaleIdByShipmentId(returnShipmentDTO.getShipmentId());
-        SalesItem salesItem = salesService.getSalesItemBySalesId(salesId);
-        System.out.println();
 
         /*유효성 검증*/
         if (returnShipmentDTO.getLotNumber() == null || returnShipmentDTO.getLotNumber().isEmpty()) {
