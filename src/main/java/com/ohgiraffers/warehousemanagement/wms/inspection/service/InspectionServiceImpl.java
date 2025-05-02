@@ -10,9 +10,16 @@ import com.ohgiraffers.warehousemanagement.wms.inspection.repository.InspectionR
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.Purchase;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.entity.PurchaseItem;
 import com.ohgiraffers.warehousemanagement.wms.purchases.model.repository.PurchaseItemRepository;
+import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShipment;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnShipmentItem;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnShipmentItemRepository;
+import com.ohgiraffers.warehousemanagement.wms.returning.model.repository.ReturnShipmentRepository;
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
+import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesStatus;
+import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesItemsRepository;
+import com.ohgiraffers.warehousemanagement.wms.sales.repository.SalesRepository;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.entity.Storage;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.repository.StorageRepository;
 import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
@@ -33,20 +40,31 @@ public class InspectionServiceImpl implements InspectionService {
     private final InspectionRepository inspectionRepository;
     private final UserRepository userRepository;
 
+    // 입고 관련 repository
     private final PurchaseItemRepository purchaseItemRepository;
     private final StorageRepository storageRepository;
 
+    // 출고반품 관련 repository
     private final ReturnShipmentItemRepository returnShipmentItemRepository;
+    private final ReturnShipmentRepository returnShipmentRepository;
+
+    // 수주 관련 repository
+    private final SalesItemsRepository salesItemsRepository;
+    private final SalesRepository salesRepository;
 
     @Autowired
     public InspectionServiceImpl(InspectionRepository inspectionRepository, UserRepository userRepository,
                                  PurchaseItemRepository purchaseItemRepository, StorageRepository storageRepository
-    , ReturnShipmentItemRepository returnShipmentItemRepository) {
+    , ReturnShipmentItemRepository returnShipmentItemRepository, ReturnShipmentRepository returnShipmentRepository
+    , SalesItemsRepository salesItemsRepository, SalesRepository salesRepository) {
         this.inspectionRepository = inspectionRepository;
         this.userRepository = userRepository;
         this.purchaseItemRepository = purchaseItemRepository;
         this.storageRepository = storageRepository;
         this.returnShipmentItemRepository = returnShipmentItemRepository;
+        this.returnShipmentRepository = returnShipmentRepository;
+        this.salesItemsRepository = salesItemsRepository;
+        this.salesRepository = salesRepository;
     }
 
     @Override
@@ -79,13 +97,14 @@ public class InspectionServiceImpl implements InspectionService {
                 return changeStorageStatus(saveInspection);
             }
             case SALES -> {
-
+                return changeShipments(saveInspection);
             }
             case SHIPMENT -> {
-                return changeShipments(saveInspection);
+                return changeReturnShipments(saveInspection);
             }
         }
 
+        return new InspectionResponseDTO(saveInspection);
     }
 
     public Page<InspectionResponseDTO> getAllInspection(SearchResponseDTO dto, int page, int size) {
@@ -184,12 +203,14 @@ public class InspectionServiceImpl implements InspectionService {
                 return changeStorageStatus(saveInspection);
             }
             case SALES -> {
-
-            }
-            case SHIPMENT -> {
                 return changeShipments(saveInspection);
             }
+            case SHIPMENT -> {
+                return changeReturnShipments(saveInspection);
+            }
         }
+
+        return new InspectionResponseDTO(saveInspection);
     }
 
     public void deleteInspection(Long inspectionId) {
@@ -205,13 +226,20 @@ public class InspectionServiceImpl implements InspectionService {
 
     private InspectionResponseDTO changeStorageStatus(Inspection saveInspection) {
         // 발주의 경우 발주 목록에 개수만큼 채워지면 입고에 이상없음으로 변경해주기
-        PurchaseItem purchaseItem = purchaseItemRepository.findById(saveInspection.getTransactionId()).get();
-        Purchase purchase = purchaseItem.getPurchase();
+        Optional<PurchaseItem> purchaseItemOptional = purchaseItemRepository.findById(saveInspection.getTransactionId());
+        if(purchaseItemOptional.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 발주 목록 ID입니다.\n" +
+                    "요청 발주 ID : " + saveInspection.getTransactionId());
+        }
+        Purchase purchase = purchaseItemOptional.get().getPurchase();
         List<Storage> byPurchaseId = storageRepository.findByPurchase_PurchaseId(purchase.getPurchaseId());
         if (saveInspection.getInspectionStatus().equals(InspectionStatus.DEFECTIVE)) {
+            // 검수 도중 이상을 발견했으므로 검수 이상으로 리턴하기
             for (Storage storage : byPurchaseId) {
                 storage.setInspectionStatus("검수 이상");
                 storageRepository.save(storage);
+
+                return new InspectionResponseDTO(saveInspection);
             }
         }
         int count = 0;
@@ -235,14 +263,73 @@ public class InspectionServiceImpl implements InspectionService {
         return new InspectionResponseDTO(saveInspection);
     }
 
-    private InspectionResponseDTO changeShipments(Inspection saveInspection) {
+    private InspectionResponseDTO changeReturnShipments(Inspection saveInspection) {
         // 출고반품 경우 출고반품 목록에 개수만큼 채워지면 입고에 이상없음으로 변경해주기
-        ReturnShipmentItem shipmentItem = returnShipmentItemRepository.findById(saveInspection.getInspectionId());
-        ReturnShipment shipment = shipmentItem.getReturnShipmentId();
+        Optional<ReturnShipmentItem> shipmentItemOptional = returnShipmentItemRepository.findById(saveInspection.getTransactionId().intValue()); // 강제형변환 한거라 좋지 않음, 나중에 Id를 Long 타입으로 변경 필요
+        if(shipmentItemOptional.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 출고반품 목록 ID입니다.\n" +
+                    "요청 출고반품 목록 ID : " + saveInspection.getTransactionId());
+        }
+        ReturnShipment shipment = shipmentItemOptional.get().getReturnShipmentId();
+        if (saveInspection.getInspectionStatus().equals(InspectionStatus.DEFECTIVE)) {
+            // 검수 도중에 이상을 발견했으므로 반품 거절로 변경하기
+            shipment.setReturnShipmentStatus(ReturnShipmentStatus.RETURN_REJECTED); // 반품 거절
+            returnShipmentRepository.save(shipment);
+
+            return new InspectionResponseDTO(saveInspection);
+        }
 
         List<ReturnShipmentItem> returnShipmentItems = shipment.getReturnShipmentItems();
-        if (saveInspection.getInspectionStatus().equals(InspectionStatus.DEFECTIVE)) {
-
+        int count = 0;
+        for (ReturnShipmentItem item : returnShipmentItems) {
+            Optional<Inspection> inspectionOptional = inspectionRepository.findByTransactionTypeAndTransactionId(InspectionTransactionType.SHIPMENT, item.getReturnShipmentItemId());
+            if (inspectionOptional.isPresent()) {
+                count++;
+            } else {
+                break;
+            }
         }
+
+        if (count == returnShipmentItems.size()) {
+            shipment.setReturnShipmentStatus(ReturnShipmentStatus.RETURN_COMPLETED); // 반품 완료
+            returnShipmentRepository.save(shipment);
+        }
+
+        return new InspectionResponseDTO(saveInspection);
+    }
+
+    private InspectionResponseDTO changeShipments(Inspection saveInspection) {
+        // 수주반품의 경우 수주상품 목록에 개수만큼 채워지면 출고에 이상없음으로 변경하기
+        Optional<SalesItem> salesItemOptional = salesItemsRepository.findById(saveInspection.getTransactionId().intValue()); // 강제형변환 한거라 좋지 않음, 나중에 Id를 Long 타입으로 변경 필요
+        if(salesItemOptional.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 수주상품 ID 입니다.\n" +
+                    "요청 수주상품 목록 ID : " + saveInspection.getTransactionId());
+        }
+        Sales sales = salesItemOptional.get().getSalesId();
+        // 검수 도중에 이상을 발견했으므로 출고 지연으로 변경하기
+        if (saveInspection.getInspectionStatus().equals(InspectionStatus.DEFECTIVE)) {
+            sales.setSalesStatus(SalesStatus.PENDING); // 보류중? 으로 변경
+            salesRepository.save(sales);
+
+            return new InspectionResponseDTO(saveInspection);
+        }
+
+        List<SalesItem> salesItems = sales.getSalesItems();
+        int count = 0;
+        for (SalesItem item : salesItems) {
+            Optional<Inspection> inspectionOptional = inspectionRepository.findByTransactionTypeAndTransactionId(InspectionTransactionType.SHIPMENT, item.getSalesItemsId());
+            if (inspectionOptional.isPresent()) {
+                count++;
+            } else {
+                break;
+            }
+        }
+
+        if (count == salesItems.size()) {
+            sales.setSalesStatus(SalesStatus.APPROVED); // 승인됨? 으로 변경
+            salesRepository.save(sales);
+        }
+
+        return new InspectionResponseDTO(saveInspection);
     }
 }
