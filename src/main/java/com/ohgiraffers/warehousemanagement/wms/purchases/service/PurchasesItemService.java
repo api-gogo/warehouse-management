@@ -45,7 +45,7 @@ public class PurchasesItemService {
 
 
     // 단일 조회
-    public PurchaseItemDTO getPurchaseItemById(Integer purchaseItemId) {
+    public PurchaseItemDTO getPurchaseItemById(Long purchaseItemId) {
         PurchaseItem purchaseItem = purchaseItemRepository.findById(purchaseItemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 발주 항목이 없습니다. ID: " + purchaseItemId));
 

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Integer> {
@@ -37,5 +38,7 @@ public interface StoreRepository extends JpaRepository<Store, Integer> {
     Page<Store> findByStatusAndSearch(@Param("status") boolean status,
                                          @Param("search") String search,
                                          Pageable pageable);
+
+    List<Store> findByStoreNameContainingAndIsDeletedFalse(String storeName); // 점포이름으로 검색함
 
 }

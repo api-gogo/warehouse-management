@@ -37,29 +37,24 @@ public class InventoryController {
     public ModelAndView getInventoryList(@RequestParam(name = "productName", required = false) String productName,
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size, ModelAndView mv) {
-        try {
-            Page<InventoryViewDTO> inventoriesPage;
 
-            if (productName != null && !productName.isEmpty()) {
-                inventoriesPage = inventoryServicelmpl.findInventoryViewDTOByProductName(productName, page, size);
-            } else {
-                inventoriesPage = inventoryServicelmpl.getInventoryViewListWithPaging(page, size);
-            }
+        Page<InventoryViewDTO> inventoriesPage;
 
-            mv.addObject("inventories", inventoriesPage.getContent());
-            mv.addObject("currentPage", inventoriesPage.getNumber());
-            mv.addObject("totalPages", inventoriesPage.getTotalPages());
-            mv.addObject("productName", productName);
-            mv.addObject("size", size);
-            mv.addObject("activeMenu", "inventory");
-            mv.addObject("today", LocalDate.now());
-            mv.setViewName("inventory/list");
-            return mv;
-
-        } catch (Exception e) {
-            mv.addObject("errorMessage", e.getMessage());
-            return mv;
+        if (productName != null && !productName.isEmpty()) {
+            inventoriesPage = inventoryServicelmpl.findInventoryViewDTOByProductName(productName, page, size);
+        } else {
+            inventoriesPage = inventoryServicelmpl.getInventoryViewListWithPaging(page, size);
         }
+
+        mv.addObject("inventories", inventoriesPage.getContent());
+        mv.addObject("currentPage", inventoriesPage.getNumber());
+        mv.addObject("totalPages", inventoriesPage.getTotalPages());
+        mv.addObject("productName", productName);
+        mv.addObject("size", size);
+        mv.addObject("activeMenu", "inventory");
+        mv.addObject("today", LocalDate.now());
+        mv.setViewName("inventory/list");
+        return mv;
     }
 
 
@@ -140,4 +135,11 @@ public class InventoryController {
         inventoryServicelmpl.createInventory(inventoryDTO);
         return "redirect:/inventories";
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String illegalArgumentException(Model model, IllegalArgumentException e) {
+        model.addAttribute("message", e.getMessage());
+        return "inspections/error";
+    }
+
 }

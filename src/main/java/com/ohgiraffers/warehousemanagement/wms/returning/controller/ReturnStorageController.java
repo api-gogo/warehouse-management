@@ -2,9 +2,7 @@ package com.ohgiraffers.warehousemanagement.wms.returning.controller;
 
 
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnStorageDTO;
-import com.ohgiraffers.warehousemanagement.wms.returning.model.entity.ReturnStorage;
 import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturnStorageService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,8 +40,6 @@ public class ReturnStorageController {
         return mv;
     }
 
-
-
     //등록화면
     @GetMapping("/create")
     public String registView(){
@@ -52,6 +48,7 @@ public class ReturnStorageController {
 
     @PostMapping("/create")
     public String createReturns(@Valid @ModelAttribute ReturnStorageDTO returnStorageDTO, RedirectAttributes rdtat) {
+        System.out.println("returnStorageDTO : "+returnStorageDTO);
         int returnId = returnStorageService.createReturns(returnStorageDTO);
         String resultUrl = null;
 
@@ -75,23 +72,9 @@ public class ReturnStorageController {
             mv.setViewName("returns/inbound/detail"); //입고에 관한 상세 수정
         }else {
             rdtat.addFlashAttribute("message","반품 데이터를 찾을 수 없습니다.");
-            mv.setViewName("redirect:/returns/inboud/list");
+            mv.setViewName("redirect:/returns/inbound/list");
         }
         return mv;
     }
-
-//    /*삭제*/
-//    @GetMapping("/{returnStorageId}/delete")
-//    public String deleteReturns(@PathVariable(name = "returnStorageId")Integer returnStorageId,RedirectAttributes rdtat)
-//    {
-//        boolean isDeleted = returnStorageService.deleteReturns(returnStorageId);
-//
-//        if(isDeleted){
-//            return "redirect:/returns/inbound/list"; //삭제에 성공 -> 홈화면으로
-//        }else{
-//            rdtat.addFlashAttribute("errorMessage","삭제에 실패했습니다. 다시 시도해주세요.");
-//            return "redirect:/returns/inbound/"+returnStorageId;
-//        }
-//    }
 
 }

@@ -8,18 +8,14 @@ import java.util.List;
 public class ReturnStorageDTO {
 
     private Integer returnStorageId;
-    private Integer userId;
-
+    private Integer storageId; //외래키는 타입만
+    private Long userId;
 
     private LocalDateTime returnStorageCreatedAt;
-    private LocalDateTime returnStorageUpdatedAt;
-    private LocalDateTime returnStorageDeletedAt;
-
-    private Integer storageId; //외래키는 타입만
-
-    private List<ReturningStorageCause> returnStorageContent; //사유, 게터세터만
 
     private List<Integer> returnStorageQuantity; //수량
+    private List<ReturningStorageCause> returnStorageContent; //사유, 게터세터만
+
 
 
     public ReturnStorageDTO() {
@@ -27,20 +23,22 @@ public class ReturnStorageDTO {
 
     //매개변수가 있는 생성자
     //조회 및 수정용 - PK값이 있는 생성자
-    public ReturnStorageDTO(Integer returnStorageId, Integer userId, LocalDateTime returnStorageCreatedAt, Integer storageId) {
+    public ReturnStorageDTO(Integer returnStorageId, Long userId, LocalDateTime returnStorageCreatedAt, Integer storageId) {
         this.returnStorageId = returnStorageId;
         this.userId = userId;
         this.returnStorageCreatedAt = returnStorageCreatedAt;
         this.storageId = storageId;
     }
     //등록용 - PK값이 없는 생성자
-    public ReturnStorageDTO(Integer userId, LocalDateTime returnStorageCreatedAt, Integer storageId) {
+    public ReturnStorageDTO(Long userId, LocalDateTime returnStorageCreatedAt, Integer storageId) {
         this.userId = userId;
         this.returnStorageCreatedAt = returnStorageCreatedAt;
         this.storageId = storageId;
     }
 
     //게터세터
+
+
     public Integer getReturnStorageId() {
         return returnStorageId;
     }
@@ -49,11 +47,11 @@ public class ReturnStorageDTO {
         this.returnStorageId = returnStorageId;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

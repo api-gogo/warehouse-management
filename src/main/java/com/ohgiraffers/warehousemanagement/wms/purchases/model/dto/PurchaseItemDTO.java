@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PurchaseItemDTO {
 
-    private Integer purchaseItemId;
+    private Long purchaseItemId;
     private Integer purchaseId;
     private Integer productId;
     private Integer productQuantity;
@@ -26,7 +26,7 @@ public class PurchaseItemDTO {
         this.pricePerBox = pricePerBox;
         this.quantityPerBox = quantityPerBox;
     }
-    public PurchaseItemDTO(Integer purchaseItemId, Integer purchaseId, Integer productId, Integer productQuantity,
+    public PurchaseItemDTO(Long purchaseItemId, Integer purchaseId, Integer productId, Integer productQuantity,
                            Product product, String productName, Integer pricePerBox, Integer quantityPerBox) {
         this.purchaseItemId = purchaseItemId;
         this.purchaseId = purchaseId;
@@ -58,11 +58,11 @@ public class PurchaseItemDTO {
     }
 
 
-    public Integer getPurchaseItemId() {
+    public Long getPurchaseItemId() {
         return purchaseItemId;
     }
 
-    public void setPurchaseItemId(Integer purchaseItemId) {
+    public void setPurchaseItemId(Long purchaseItemId) {
         this.purchaseItemId = purchaseItemId;
     }
 
