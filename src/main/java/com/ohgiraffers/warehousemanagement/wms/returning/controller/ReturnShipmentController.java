@@ -3,6 +3,16 @@ package com.ohgiraffers.warehousemanagement.wms.returning.controller;
 import com.ohgiraffers.warehousemanagement.wms.returning.ReturnShipmentStatus;
 import com.ohgiraffers.warehousemanagement.wms.returning.model.DTO.ReturnShipmentDTO;
 import com.ohgiraffers.warehousemanagement.wms.returning.service.ReturnShipmentService;
+import com.ohgiraffers.warehousemanagement.wms.sales.service.SalesService;
+import com.ohgiraffers.warehousemanagement.wms.shipment.model.dto.ShipmentResponseDTO;
+import com.ohgiraffers.warehousemanagement.wms.shipment.service.ShipmentService;
+import com.ohgiraffers.warehousemanagement.wms.store.model.dto.StoreDTO;
+import com.ohgiraffers.warehousemanagement.wms.store.model.entity.Store;
+import com.ohgiraffers.warehousemanagement.wms.store.repository.StoreRepository;
+import com.ohgiraffers.warehousemanagement.wms.user.model.common.UserStatus;
+import com.ohgiraffers.warehousemanagement.wms.user.model.dto.UserDTO;
+import com.ohgiraffers.warehousemanagement.wms.user.model.entity.User;
+import com.ohgiraffers.warehousemanagement.wms.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,53 +22,156 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /*출고반품*/
 @Controller
-@RequestMapping("/returns/outbound/list")
+@RequestMapping("/returns/outbound")
 @Validated
-
 public class ReturnShipmentController {
 
     //의존성 주입
     private final ReturnShipmentService returnShipmentService;
+    private final ShipmentService shipmentService;
+    private final SalesService salesService;
+    private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ReturnShipmentController(ReturnShipmentService returnShipmentService) {
+    public ReturnShipmentController(
+            ReturnShipmentService returnShipmentService,
+            StoreRepository storeRepository,
+            UserRepository userRepository,
+            SalesService salesService,
+            ShipmentService shipmentService) {
         this.returnShipmentService = returnShipmentService;
+        this.storeRepository = storeRepository;
+        this.userRepository = userRepository;
+        this.salesService = salesService;
+        this.shipmentService = shipmentService;
     }
 
-    //(반품서) 전체 조회
-    //getALlReturning메서드 호출해서 데이터들(List) 받아오기
-
-
-    @GetMapping
+    @GetMapping("/list")
     public ModelAndView getAllReturns(ModelAndView mv) {
-
         //서비스의 getALLReturning 호출 - 활성화된 항목만 조회
         List<ReturnShipmentDTO> returnLists = returnShipmentService.getAllReturns();
 
         if (returnLists != null) {
             mv.addObject("returnLists", returnLists);
-            mv.setViewName("returns/outbound/outbound");
+            mv.setViewName("returns/outbound/list");
         } else {
             mv.addObject("returnLists", new ArrayList<>());
+            mv.setViewName("returns/outbound/list");
         }
 
         return mv;
     }
 
+    // 출고 ID로 로트 번호, 수량, 매장 정보 조회 API
+    @GetMapping("/api/shipment-info/{shipmentId}")
+    @ResponseBody
+    public Map<String, Object> getShipmentInfo(@PathVariable Integer shipmentId) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // 출고 정보 조회
+            ShipmentResponseDTO shipment = shipmentService.getShipmentById(shipmentId);
+            
+            if (shipment != null) {
+                // 수주 ID를 통해 매장 정보 조회
+                Integer salesId = shipmentService.getSaleIdByShipmentId(shipmentId);
+                Integer storeId = salesService.getStoreIdBySalesId(salesId);
+                
+                // 매장 정보 조회
+                Store store = storeRepository.findById(storeId)
+                        .orElseThrow(() -> new IllegalArgumentException("매장 정보를 찾을 수 없습니다."));
+                
+                // 로트 번호와 수량 정보 추출
+                List<String> lotNumbers = new ArrayList<>();
+                List<Integer> quantities = new ArrayList<>();
+                
+                // shipment에서 로트번호와 수량 추출 (실제 구현에 맞게 수정 필요)
+                shipment.getItems().forEach(item -> {
+                    lotNumbers.add(item.getLotNumber());
+                    quantities.add(item.getQuantity());
+                });
+                
+                // 결과 저장
+                result.put("status", "success");
+                result.put("storeId", storeId);
+                result.put("storeName", store.getStoreName());
+                result.put("lotNumbers", lotNumbers);
+                result.put("quantities", quantities);
+            } else {
+                result.put("status", "error");
+                result.put("message", "출고 정보를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+        }
+        
+        return result;
+    }
+
     //등록 화면 - 신규반품(뷰 화면 필요 - html필요)
     @GetMapping("/create")
-    public String registView() {
-        return "returns/outbound/create";
-    } //returning/regist_return.html에 등록할 정보들 담기
+    public ModelAndView registView() {
+        ModelAndView mv = new ModelAndView("returns/outbound/create");
 
-    //등록 --> 등록일 달아주기, 리다이렉트로 다시 돌아가기..
+        // 활성 상태인 매장 목록 가져오기
+        List<Store> activeStores = storeRepository.findAll().stream()
+                .filter(store -> !store.getDeleted())
+                .collect(Collectors.toList());
+
+        // 활성 상태인 사용자 목록 가져오기
+        List<User> activeUsers = userRepository.findAll().stream()
+                .filter(user -> user.getUserStatus() == UserStatus.재직중)
+                .collect(Collectors.toList());
+
+        // Entity를 DTO로 변환
+        List<StoreDTO> storeDTOs = activeStores.stream()
+                .map(store -> new StoreDTO(
+                        store.getStoreId(),
+                        store.getStoreName(),
+                        store.getStoreAddress(),
+                        store.getStoreManagerName(),
+                        store.getStoreManagerPhone(),
+                        store.getStoreManagerEmail(),
+                        store.getStoreCreatedAt(),
+                        store.getStoreUpdatedAt(),
+                        store.getStoreDeletedAt(),
+                        store.getDeleted()
+                ))
+                .collect(Collectors.toList());
+
+        List<UserDTO> userDTOs = activeUsers.stream()
+                .map(user -> new UserDTO(
+                        user.getUserId(),
+                        user.getUserCode(),
+                        user.getUserName(),
+                        user.getUserEmail(),
+                        user.getUserPhone(),
+                        user.getUserPart().name(),
+                        user.getUserRole().name(),
+                        user.getUserStatus().name(),
+                        user.getUserCreatedAt(),
+                        user.getUserUpdatedAt(),
+                        user.getUserDeletedAt()
+                ))
+                .collect(Collectors.toList());
+
+        mv.addObject("stores", storeDTOs);
+        mv.addObject("users", userDTOs);
+
+        return mv;
+    }
+
     @PostMapping("/create")
     public String createReturns(@Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO, RedirectAttributes rdtat) {
-
         System.out.println("컨트롤러에서 데이터 넘어오는지: " + returnShipmentDTO);
         int returnShipmentId = returnShipmentService.createReturns(returnShipmentDTO);
         String resultUrl = null;
@@ -66,127 +179,141 @@ public class ReturnShipmentController {
         if (returnShipmentId > 0) {
             rdtat.addFlashAttribute("returnshipmentDTO", returnShipmentId);
             rdtat.addFlashAttribute("message", "반품서가 등록되었습니다.");
-            resultUrl = "redirect:/returns/outbound/list"; //성공시 홈화면
+            resultUrl = "redirect:/returns/outbound/list";
         } else {
             rdtat.addFlashAttribute("message", "반품서 등록에 실패하였습니다.");
-            resultUrl = "redirect:/returns/outbound/create"; //+ returnShipmentId; 다시 등록화면?
-
-
+            resultUrl = "redirect:/returns/outbound/create";
         }
         return resultUrl;
     }
-        // 출고기록ID(출고번호) 일치 확인 --> 외래키 : 출고기록ID
-        // (반품서 상태 : [반품대기])
-        //ㅁ 일치한다면 서비스로 출고기록ID 넘김
-        //ㅁ 불일치 시 “다시 확인해달라” 예외처리
-        //CreateReturning메서드
 
-
-        //상세 조회
-        //getReturningById메서드 호출 -> returnShipmentId를 대입해서 값 받아오기
-        //반품번호를 기준으로 조회 -> 전체조회 중에 아이디가 일치하는 값으로 조회하기 ->id 값은 url에서 가져옴
-        @GetMapping("/{returnShipmentId}")
-        public ModelAndView getReturnsByID (@PathVariable(name = "returnShipmentId") Integer
-        returnShipmentId, ModelAndView mv, RedirectAttributes rdtat){
-            ReturnShipmentDTO returnShipmentDTO = returnShipmentService.getReturnsByID(returnShipmentId);
-            //returnShipmentDTO.setReturnShipmentId(returnShipmentId); 서비스에서 이미 설정
-            if (returnShipmentDTO != null) {
-                mv.addObject("detail", returnShipmentDTO);
-                mv.setViewName("returns/detail"); //상세 페이지로 이동
-            } else {
-                rdtat.addFlashAttribute("message", "반품 데이터를 찾을 수 없습니다.");
-                mv.setViewName("redirect:/returns/outbound/list");//전체조회 페이지로 이동
-            }
-            //뷰네임 : detail, 경로 : returning/detail
-
-            return mv;
+    @GetMapping("/detail/{returnShipmentId}")
+    public ModelAndView getReturnsByID(@PathVariable(name = "returnShipmentId") Integer returnShipmentId,
+                                       ModelAndView mv, RedirectAttributes rdtat) {
+        ReturnShipmentDTO returnShipmentDTO = returnShipmentService.getReturnsByID(returnShipmentId);
+        if (returnShipmentDTO != null) {
+            mv.addObject("detail", returnShipmentDTO);
+            mv.setViewName("returns/outbound/detail");
+        } else {
+            rdtat.addFlashAttribute("message", "반품 데이터를 찾을 수 없습니다.");
+            mv.setViewName("redirect:/returns/outbound/list");
         }
-
-
-        //삭제 -> 삭제일 달아주기
-        //반품번호(returnShipmentId)를 기준으로 삭제 deletebyid (논리적 삭제 사용 - isdelete의 상태값 변경 - 만약 isdelete가 0이라면 사라지는 상태)
-        //삭제의 성공 여부 보여주고 다시 전체조회 페이지로 넘어가기 -> 리다이렉트
-        //단순 페이지 이동이므로 모델의 이름과 속성을 담아줄 필요가 없을듯? -> ModelAndView 사용x
-        //deleteReturning메서드
-        @GetMapping("/{returnShipmentId}/delete")
-        public String deleteReturns (@PathVariable(name = "returnShipmentId") Integer
-        returnShipmentId, RedirectAttributes redirectAttributes){
-
-            /*삭제 상태 변경 - > 논리적 삭제*/
-            boolean isDeleted = returnShipmentService.deleteReturns(returnShipmentId);
-
-            if (isDeleted) {
-                return "redirect:/returns/outbound/list"; //삭제에 성공->홈화면으로
-            } else {
-                redirectAttributes.addFlashAttribute("errorMessage", "삭제에 실패했습니다. 다시 시도해주세요.");
-                return "redirect:/returns/outbound/" + returnShipmentId;// 실패시 상세조회
-            }
-        }
-        //실패해서 상세페이지로 돌아간다면 -> 예외처리를 해줘야됨
-        //트라이 캐치 써서 성공하면 전체조회 , 실패하면 오류를 띄워주고 원래폼으로 리다이렉트
-
-        //수정 -> 수정일 달아주기
-        //상세 조회 페이지에서 수정 버튼을 누르면 수정할 수 있게
-        //
-        //조회 -> 받은 값 save로 덮어씌우기
-        //updateReturning메서드
-
-        //수정 화면 - html필요
-        @GetMapping("/{returnShipmentId}/update")
-        public ModelAndView updateReturnsById (@PathVariable("returnShipmentId") Integer
-        returnShipmentId, ModelAndView mv, RedirectAttributes rdtat)
-        {
-            ReturnShipmentDTO rsDTO = returnShipmentService.getReturnsByID(returnShipmentId);
-
-            if (rsDTO != null) {
-                mv.addObject("ReturnShipmentDTO", rsDTO);
-                mv.setViewName("returns/outbound/update_view");
-            } else {
-                rdtat.addFlashAttribute("message", "반품 데이터를 찾을 수 없습니다.");
-                mv.setViewName("redirect:/returns/{return_shipment_id}/update");
-            }
-
-            return mv;
-        }
-        //수정 - 데이터를 받고 DTO로 저장 (서비스 클래스에서 DTO를 엔티티로 바꿔서 DB에 저장할 예정)
-        //html 작성이후 @RequestParam 삭제하기..@@@@@@
-
-        @PostMapping("/{returnShipmentId}/update")
-        public String updateReturns (@PathVariable("returnShipmentId") Integer returnShipmentId,
-                @Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO,
-                RedirectAttributes rdtat){
-            ReturnShipmentDTO updateDTO = returnShipmentService.updateReturns(returnShipmentId, returnShipmentDTO);
-            String resultUrl = null;
-
-            if (updateDTO != null) {
-                rdtat.addFlashAttribute("returnShipmentDTO", updateDTO);
-                rdtat.addFlashAttribute("message", "반품서를 수정했습니다.");
-                resultUrl = "redirect:/returns/outbound/list";
-            } else {
-                rdtat.addFlashAttribute("message", "반품서 수정에 실패했습니다. 다시 시도해주세요");
-                resultUrl = "redirect:/returns/outbound/list/" + returnShipmentId;
-            }
-            return resultUrl;
-        }
-
-        @PostMapping("/{returnShipmentId}/update/status/")
-        public String updateStatusReturns (@PathVariable("returnShipmentId") Integer returnShipmentId, @RequestParam ReturnShipmentStatus
-        returnShipmentStatus, RedirectAttributes rdtat){
-            boolean result = returnShipmentService.updateStatusReturns(returnShipmentId, returnShipmentStatus);
-            String resultUrl = null;
-
-            if (result) {
-                rdtat.addFlashAttribute("message", "반품 상태가 변경되었습니다.");
-                resultUrl = "redirect:/returns/outbound/list" ;
-            } else {
-                rdtat.addFlashAttribute("message", "상태변경에 실패했습니다. 다시 시도해주세요");
-                resultUrl = "redirect:/returns/outbound/list/"+returnShipmentId;
-            }
-            return resultUrl;
-        }
-        //홈화면
-
-        //비즈니스 로직 나중에 추가
-
+        return mv;
     }
 
+    @GetMapping("/delete/{returnShipmentId}")
+    public String deleteReturns(@PathVariable(name = "returnShipmentId") Integer returnShipmentId,
+                                RedirectAttributes redirectAttributes) {
+        boolean isDeleted = returnShipmentService.deleteReturns(returnShipmentId);
+
+        if (isDeleted) {
+            redirectAttributes.addFlashAttribute("message", "반품이 성공적으로 삭제되었습니다.");
+            return "redirect:/returns/outbound/list";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "삭제에 실패했습니다. 다시 시도해주세요.");
+            return "redirect:/returns/outbound/detail/" + returnShipmentId;
+        }
+    }
+
+    @GetMapping("/update/{returnShipmentId}")
+    public ModelAndView updateReturnsById(@PathVariable("returnShipmentId") Integer returnShipmentId,
+                                          ModelAndView mv, RedirectAttributes rdtat)
+    {
+        ReturnShipmentDTO rsDTO = returnShipmentService.getReturnsByID(returnShipmentId);
+
+        if (rsDTO != null) {
+            // 활성 상태인 매장 목록 가져오기 (기존 코드)
+            List<Store> activeStores = storeRepository.findAll().stream()
+                    .filter(store -> !store.getDeleted())
+                    .collect(Collectors.toList());
+
+            // 활성 상태인 사용자 목록 가져오기 (기존 코드)
+            List<User> activeUsers = userRepository.findAll().stream()
+                    .filter(user -> user.getUserStatus() == UserStatus.재직중)
+                    .collect(Collectors.toList());
+
+            // Entity를 DTO로 변환 (기존 코드)
+            List<StoreDTO> storeDTOs = activeStores.stream()
+                    .map(store -> new StoreDTO(
+                            store.getStoreId(), store.getStoreName(), store.getStoreAddress(),
+                            store.getStoreManagerName(), store.getStoreManagerPhone(), store.getStoreManagerEmail(),
+                            store.getStoreCreatedAt(), store.getStoreUpdatedAt(), store.getStoreDeletedAt(),
+                            store.getDeleted()
+                    ))
+                    .collect(Collectors.toList());
+
+            List<UserDTO> userDTOs = activeUsers.stream()
+                    .map(user -> new UserDTO(
+                            user.getUserId(), user.getUserCode(), user.getUserName(), user.getUserEmail(),
+                            user.getUserPhone(), user.getUserPart().name(), user.getUserRole().name(),
+                            user.getUserStatus().name(), user.getUserCreatedAt(), user.getUserUpdatedAt(),
+                            user.getUserDeletedAt()
+                    ))
+                    .collect(Collectors.toList());
+
+            // ----- 매장 정보 표시 문자열 생성 로직 추가 -----
+            String storeDisplayInfo = "매장 정보 없음"; // 기본값
+            if (rsDTO.getStoreId() != null && storeDTOs != null) {
+                // 모델에 추가된 storeDTOs 리스트에서 해당 매장 찾기
+                StoreDTO matchingStore = storeDTOs.stream()
+                        .filter(s -> rsDTO.getStoreId().equals(s.getStoreId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (matchingStore != null) {
+                    storeDisplayInfo = matchingStore.getStoreName() + " (" + rsDTO.getStoreId() + ")";
+                } else {
+                    // 리스트에 없는 경우 (예외적 상황)
+                    storeDisplayInfo = "매장 ID " + rsDTO.getStoreId() + " 없음";
+                }
+            }
+            // ----- 로직 추가 끝 -----
+
+            mv.addObject("stores", storeDTOs); // 기존 매장 리스트 (다른 용도로 필요할 수 있음)
+            mv.addObject("users", userDTOs);    // 기존 사용자 리스트
+            mv.addObject("ReturnShipmentDTO", rsDTO); // 기존 반품 DTO
+            mv.addObject("storeDisplayInfo", storeDisplayInfo); // ---> 생성된 문자열 추가
+            mv.setViewName("returns/outbound/update");
+        } else {
+            rdtat.addFlashAttribute("message", "반품 데이터를 찾을 수 없습니다.");
+            mv.setViewName("redirect:/returns/outbound/list");
+        }
+
+        return mv;
+    }
+
+    @PostMapping("/update/{returnShipmentId}")
+    public String updateReturns(@PathVariable("returnShipmentId") Integer returnShipmentId,
+                                @Valid @ModelAttribute ReturnShipmentDTO returnShipmentDTO,
+                                RedirectAttributes rdtat) {
+        ReturnShipmentDTO updateDTO = returnShipmentService.updateReturns(returnShipmentId, returnShipmentDTO);
+        String resultUrl = null;
+
+        if (updateDTO != null) {
+            rdtat.addFlashAttribute("returnShipmentDTO", updateDTO);
+            rdtat.addFlashAttribute("message", "반품서를 수정했습니다.");
+            resultUrl = "redirect:/returns/outbound/list";
+        } else {
+            rdtat.addFlashAttribute("message", "반품서 수정에 실패했습니다. 다시 시도해주세요");
+            resultUrl = "redirect:/returns/outbound/detail/" + returnShipmentId;
+        }
+        return resultUrl;
+    }
+
+    @PostMapping("/update/{returnShipmentId}/status")
+    public String updateStatusReturns(@PathVariable("returnShipmentId") Integer returnShipmentId,
+                                      @RequestParam ReturnShipmentStatus returnShipmentStatus,
+                                      RedirectAttributes rdtat) {
+        boolean result = returnShipmentService.updateStatusReturns(returnShipmentId, returnShipmentStatus);
+        String resultUrl = null;
+
+        if (result) {
+            rdtat.addFlashAttribute("message", "반품 상태가 변경되었습니다.");
+            resultUrl = "redirect:/returns/outbound/list";
+        } else {
+            rdtat.addFlashAttribute("message", "상태변경에 실패했습니다. 다시 시도해주세요");
+            resultUrl = "redirect:/returns/outbound/detail/" + returnShipmentId;
+        }
+        return resultUrl;
+    }
+}

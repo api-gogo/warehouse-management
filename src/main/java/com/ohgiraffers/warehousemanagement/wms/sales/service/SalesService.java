@@ -9,6 +9,7 @@ import java.util.List;
 public interface SalesService {
     Sales getSalesBySalesId(Integer id); // 수주ID로 수주서 정보 가져올 수 있게
     SalesItem getSalesItemBySalesId(Integer id); // 수주ID로 수주상품목록 정보 가져올 수 있게
+    Integer getStoreIdBySalesId(Integer salesId); // 수주ID로 매장ID 가져오기
 
     List<SalesDTO> getAllSales();
 }

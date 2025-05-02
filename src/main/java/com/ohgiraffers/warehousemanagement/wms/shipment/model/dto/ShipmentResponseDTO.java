@@ -1,6 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.shipment.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ShipmentResponseDTO {
 
@@ -12,6 +13,9 @@ public class ShipmentResponseDTO {
     private String shipmentReason;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
+    
+    // 출고 항목 정보 (로트 번호, 수량 등)
+    private List<ShipmentItemDTO> items;
 
     public ShipmentResponseDTO() {}
 
@@ -91,6 +95,14 @@ public class ShipmentResponseDTO {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    
+    public List<ShipmentItemDTO> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ShipmentItemDTO> items) {
+        this.items = items;
+    }
 
     @Override
     public String toString() {
@@ -103,6 +115,7 @@ public class ShipmentResponseDTO {
                 ", shipmentReason='" + shipmentReason + '\'' +
                 ", updatedAt=" + updatedAt +
                 ", createdAt=" + createdAt +
+                ", items=" + items +
                 '}';
     }
 }

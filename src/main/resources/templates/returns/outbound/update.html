@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+    <title>반품 정보 수정</title>
+    <th:block layout:fragment="css">
+        <style>
+            .update-container {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+            .form-header {
+                border-bottom: 1px solid #eee;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .form-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin: 0;
+            }
+            .form-status {
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+            .status-waiting {
+                background-color: #ffc107;
+                color: #212529;
+            }
+            .status-approved {
+                background-color: #28a745;
+                color: white;
+            }
+            .status-rejected {
+                background-color: #dc3545;
+                color: white;
+            }
+            .status-completed {
+                background-color: #17a2b8;
+                color: white;
+            }
+            .form-row {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+                margin-bottom: 15px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-label {
+                font-weight: 600;
+                display: block;
+                margin-bottom: 5px;
+                color: #555;
+            }
+            .form-control {
+                width: 100%;
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #ced4da;
+            }
+            .form-select {
+                width: 100%;
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #ced4da;
+            }
+            .form-submit {
+                margin-top: 20px;
+                text-align: center;
+            }
+            .btn {
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-weight: 500;
+                cursor: pointer;
+                border: none;
+            }
+            .btn-primary {
+                background-color: #007bff;
+                color: white;
+            }
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+                text-decoration: none;
+                display: inline-block;
+                margin-left: 10px;
+            }
+            .items-container {
+                border: 1px solid #ddd;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 20px;
+            }
+            .item-row {
+                display: grid;
+                grid-template-columns: 2fr 1fr 2fr 1fr;
+                gap: 10px;
+                margin-bottom: 10px;
+                align-items: center;
+            }
+            .btn-add-item {
+                background-color: #28a745;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+            .btn-remove-item {
+                background-color: #dc3545;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+            .required:after {
+                content: " *";
+                color: red;
+            }
+            .readonly-field {
+                background-color: #f8f9fa;
+                cursor: not-allowed;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <div class="update-container">
+                <div class="form-header">
+                    <h2 class="form-title">반품 정보 수정</h2>
+                    <span th:class="${'form-status ' + 
+                                (ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_WAITING' ? 'status-waiting' : 
+                                (ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_APPROVED' ? 'status-approved' : 
+                                (ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_REJECTED' ? 'status-rejected' : 'status-completed')))}"
+                          th:text="${ReturnShipmentDTO.returnShipmentStatus.returnShipmentStatus}">
+                        상태
+                    </span>
+                </div>
+                
+                <form th:action="@{/returns/outbound/update/{id}(id=${ReturnShipmentDTO.returnShipmentId})}" method="post">
+                    <!-- 히든 필드 - 기존 정보 유지 -->
+                    <input type="hidden" name="returnShipmentId" th:value="${ReturnShipmentDTO.returnShipmentId}">
+                    <input type="hidden" name="shipmentId" th:value="${ReturnShipmentDTO.shipmentId}">
+                    <input type="hidden" name="storeId" th:value="${ReturnShipmentDTO.storeId}">
+                    
+                    <!-- 출고 ID (읽기 전용) -->
+                    <div class="form-group">
+                        <label class="form-label">출고 ID</label>
+                        <input type="text" class="form-control readonly-field" 
+                               th:value="${ReturnShipmentDTO.shipmentId}" readonly>
+                    </div>
+
+                    <!-- 매장 정보 (읽기 전용) -->
+                    <div class="form-group">
+                        <label class="form-label">매장 정보</label>
+                        <input type="text" class="form-control readonly-field"
+                               th:value="${storeDisplayInfo}" readonly>
+                    </div>
+                    
+                    <!-- 담당자 선택 (수정 가능) -->
+                    <div class="form-group">
+                        <label for="userId" class="form-label required">담당자 선택</label>
+                        <select id="userId" name="userId" class="form-select" required>
+                            <option value="">담당자를 선택하세요</option>
+                            <option th:each="user : ${users}" 
+                                    th:value="${user.userId}" 
+                                    th:text="${user.userName + ' (' + user.userPart + ')'}"
+                                    th:selected="${user.userId == ReturnShipmentDTO.userId}">
+                                홍길동 (영업부)
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <!-- 반품 상태 (수정 가능) -->
+                    <div class="form-group">
+                        <label for="returnShipmentStatus" class="form-label required">반품 상태</label>
+                        <select id="returnShipmentStatus" name="returnShipmentStatus" class="form-select" required>
+                            <option value="RETURN_WAITING" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_WAITING'}">반품 대기</option>
+                            <option value="RETURN_APPROVED" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_APPROVED'}">반품 승인</option>
+                            <option value="RETURN_REJECTED" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_REJECTED'}">반품 거절</option>
+                            <option value="RETURN_COMPLETED" th:selected="${ReturnShipmentDTO.returnShipmentStatus.name() == 'RETURN_COMPLETED'}">반품 완료</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 등록일 표시 (읽기 전용) -->
+                    <div class="form-group">
+                        <label class="form-label">등록일</label>
+                        <input type="text" class="form-control readonly-field" 
+                               th:value="${#temporals.format(ReturnShipmentDTO.returnShipmentCreatedAt, 'yyyy-MM-dd HH:mm')}" 
+                               readonly>
+                    </div>
+                    
+                    <!-- 반품 항목 표시 섹션 (읽기 전용) -->
+                    <div class="items-container">
+                        <h3>반품 항목 정보</h3>
+                        <p class="text-muted">반품 항목 정보는 수정할 수 없습니다.</p>
+                        
+                        <div id="items-wrapper">
+                            <!-- 기존 항목들 읽기전용으로 표시 -->
+                            <div th:if="${ReturnShipmentDTO.lotNumber != null and !ReturnShipmentDTO.lotNumber.empty}"
+                                 th:each="lot, idx : ${ReturnShipmentDTO.lotNumber}" class="item-row">
+                                <!-- 히든 필드로 데이터 유지 -->
+                                <input type="hidden" name="lotNumber" th:value="${lot}">
+                                <input type="hidden" name="returnShipmentQuantity" 
+                                       th:value="${ReturnShipmentDTO.returnShipmentQuantity != null and ReturnShipmentDTO.returnShipmentQuantity.size() > idx.index ? ReturnShipmentDTO.returnShipmentQuantity[idx.index] : 1}">
+                                <input type="hidden" name="returnShipmentContent" 
+                                       th:value="${ReturnShipmentDTO.returnShipmentContent != null and ReturnShipmentDTO.returnShipmentContent.size() > idx.index ? ReturnShipmentDTO.returnShipmentContent[idx.index].name() : 'DAMAGED_OR_DEFECTIVE'}">
+                                
+                                <div class="form-group">
+                                    <label class="form-label">로트 번호</label>
+                                    <input type="text" class="form-control readonly-field" 
+                                           th:value="${lot}" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">수량</label>
+                                    <input type="text" class="form-control readonly-field" 
+                                           th:value="${ReturnShipmentDTO.returnShipmentQuantity != null and ReturnShipmentDTO.returnShipmentQuantity.size() > idx.index ? ReturnShipmentDTO.returnShipmentQuantity[idx.index] : 1}" 
+                                           readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">반품 사유</label>
+                                    <input type="text" class="form-control readonly-field"
+                                           th:value="${ReturnShipmentDTO.returnShipmentContent != null and ReturnShipmentDTO.returnShipmentContent.size() > idx.index ? 
+                                                    (ReturnShipmentDTO.returnShipmentContent[idx.index].name() == 'EXPIRED' ? '유통기한 만료' : '손상 또는 결함') : '손상 또는 결함'}"
+                                           readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="text-muted" style="padding: 10px;">자동 등록 항목</div>
+                                </div>
+                            </div>
+                            
+                            <!-- 항목이 없는 경우 메시지 표시 -->
+                            <div th:if="${ReturnShipmentDTO.lotNumber == null or ReturnShipmentDTO.lotNumber.empty}" class="text-center p-3">
+                                등록된 반품 항목이 없습니다.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-submit">
+                        <button type="submit" class="btn btn-primary">변경사항 저장</button>
+                        <a th:href="@{/returns/outbound/detail/{id}(id=${ReturnShipmentDTO.returnShipmentId})}" class="btn btn-secondary">취소</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="scripts">
+        <script>
+            // 페이지 로드 시 실행
+            document.addEventListener('DOMContentLoaded', function() {
+                // 필요한 초기화 로직
+                console.log('반품 수정 페이지 로드됨');
+            });
+        </script>
+    </th:block>
+</body>
+</html>

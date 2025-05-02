@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default-layout}">
+<head>
+    <title>출고반품 목록</title>
+    <th:block layout:fragment="css">
+        <style>
+            .return-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .return-table th, .return-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            .return-table th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+            }
+            .return-table tr:hover {
+                background-color: #f1f1f1;
+            }
+            .btn-create {
+                background-color: #007bff;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                text-decoration: none;
+                float: right;
+                margin-bottom: 20px;
+            }
+            .btn-create:hover {
+                background-color: #0056b3;
+            }
+            .badge {
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+            .badge-waiting {
+                background-color: #ffc107;
+                color: #212529;
+            }
+            .badge-approved {
+                background-color: #28a745;
+                color: white;
+            }
+            .badge-rejected {
+                background-color: #dc3545;
+                color: white;
+            }
+            .badge-completed {
+                background-color: #17a2b8;
+                color: white;
+            }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            .pagination a {
+                padding: 8px 12px;
+                margin: 0 5px;
+                border: 1px solid #ddd;
+                text-decoration: none;
+                color: #007bff;
+            }
+            .pagination a.active {
+                background-color: #007bff;
+                color: white;
+                border: 1px solid #007bff;
+            }
+            .pagination a:hover:not(.active) {
+                background-color: #f1f1f1;
+            }
+            .no-returns {
+                text-align: center;
+                padding: 40px;
+                color: #6c757d;
+                font-style: italic;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <h2 class="mb-4">출고반품 목록</h2>
+            <p class="text-muted">출고된 상품의 반품 목록을 관리합니다.</p>
+            
+            <a th:href="@{/returns/outbound/create}" class="btn-create">
+                <i class="fas fa-plus"></i> 반품서 등록
+            </a>
+            
+            <div class="clearfix"></div>
+            
+            <!-- 반품 목록 테이블 -->
+            <table class="return-table">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>매장 ID</th>
+                        <th>담당자 ID</th>
+                        <th>출고 ID</th>
+                        <th>상태</th>
+                        <th>등록일</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 반품 데이터가 있는 경우 -->
+                    <tr th:if="${returnLists != null and !returnLists.empty}" th:each="return : ${returnLists}">
+                        <td th:text="${return.returnShipmentId}">1</td>
+                        <td th:text="${return.storeId}">100</td>
+                        <td th:text="${return.userId}">USER123</td>
+                        <td th:text="${return.shipmentId}">SHP001</td>
+                        <td>
+                            <span th:class="${'badge ' + 
+                                (return.returnShipmentStatus.name() == 'RETURN_WAITING' ? 'badge-waiting' : 
+                                (return.returnShipmentStatus.name() == 'RETURN_APPROVED' ? 'badge-approved' : 
+                                (return.returnShipmentStatus.name() == 'RETURN_REJECTED' ? 'badge-rejected' : 'badge-completed')))}"
+                                  th:text="${return.returnShipmentStatus.returnShipmentStatus}">
+                                상태
+                            </span>
+                        </td>
+                        <td th:text="${#temporals.format(return.returnShipmentCreatedAt, 'yyyy-MM-dd HH:mm')}">2023-09-15 14:30</td>
+                        <td>
+                            <a th:href="@{/returns/outbound/detail/{id}(id=${return.returnShipmentId})}" class="btn-detail" title="상세보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/returns/outbound/update/{id}(id=${return.returnShipmentId})}" class="btn-edit" title="수정하기">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{/returns/outbound/delete/{id}(id=${return.returnShipmentId})}" 
+                               class="btn-delete" title="삭제하기"
+                               onclick="return confirm('정말로 이 반품 데이터를 삭제하시겠습니까?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <!-- 반품 데이터가 없는 경우 -->
+                    <tr th:if="${returnLists == null or returnLists.empty}">
+                        <td colspan="7" class="no-returns">등록된 반품 데이터가 없습니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 페이지네이션 (필요시 구현) -->
+            <div class="pagination" th:if="${returnLists != null and !returnLists.empty}">
+                <a href="#">&laquo;</a>
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">&raquo;</a>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="scripts">
+        <script>
+            // 필요한 자바스크립트 코드
+            document.addEventListener('DOMContentLoaded', function() {
+                // 상태 필터링 또는 다른 추가 기능 구현 가능
+            });
+        </script>
+    </th:block>
+</body>
+</html>

@@ -13,6 +13,9 @@ import com.ohgiraffers.warehousemanagement.wms.shipment.model.dto.ShipmentCreate
 import com.ohgiraffers.warehousemanagement.wms.shipment.model.dto.ShipmentPageResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.shipment.model.dto.ShipmentResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.shipment.service.ShipmentService;
+import com.ohgiraffers.warehousemanagement.wms.store.model.entity.Store;
+import com.ohgiraffers.warehousemanagement.wms.store.repository.StoreRepository;
+import com.ohgiraffers.warehousemanagement.wms.store.service.StoreService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +46,14 @@ public class ShipmentController {
     private final SalesService salesService;
     private final InventoryService inventoryService;
     private final ProductService productService;
+    private final StoreRepository storeRepository;
 
-    public ShipmentController(ShipmentService shipmentService, SalesService salesService, InventoryService inventoryService, ProductService productService) {
+    public ShipmentController(ShipmentService shipmentService, SalesService salesService, InventoryService inventoryService, ProductService productService, StoreRepository storeRepository) {
         this.shipmentService = shipmentService;
         this.salesService = salesService;
         this.inventoryService = inventoryService;
         this.productService = productService;
+        this.storeRepository = storeRepository;
         log.info("ShipmentController 초기화 - shipmentService: {}, salesService: {}, inventoryService: {}, productService: {}",
                 shipmentService, salesService, inventoryService, productService);
     }
@@ -299,5 +304,71 @@ public class ShipmentController {
             model.addAttribute("error", "출고 업데이트 중 오류가 발생했습니다: " + e.getMessage());
             return "shipments/shipment";
         }
+    }
+
+    @GetMapping("/api/shipment-info/{shipmentId}")
+    @ResponseBody
+    public Map<String, Object> getShipmentInfo(@PathVariable Integer shipmentId) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 1. 출고 기본 정보 조회 (items는 여기서 가져오지 않음)
+            // ShipmentResponseDTO shipment = shipmentService.getShipmentById(shipmentId); // 이 DTO는 items가 null임
+
+            // 대신 shipmentId로 필요한 SaleId를 직접 조회
+            Integer salesId = shipmentService.getSaleIdByShipmentId(shipmentId); // 이 메소드가 ShipmentService에 있어야 함
+
+            if (salesId != null) {
+                // 2. 수주 ID를 통해 매장 정보 조회
+                Integer storeId = salesService.getStoreIdBySalesId(salesId);
+                Store store = storeRepository.findById(storeId)
+                        .orElseThrow(() -> new IllegalArgumentException("매장 정보를 찾을 수 없습니다. ID: " + storeId));
+
+                // 3. 수주 ID를 통해 Sales 및 SalesItem 정보 조회
+                Sales sales = salesService.getSalesBySalesId(salesId); // SalesService에 해당 메소드 필요
+                if (sales == null || sales.getSalesItems() == null || sales.getSalesItems().isEmpty()) {
+                    throw new IllegalArgumentException("수주 항목 정보를 찾을 수 없습니다. 수주 ID: " + salesId);
+                }
+
+                // 4. 로트 번호와 수량 정보 추출 (SalesItem에서)
+                List<String> lotNumbers = new ArrayList<>();
+                List<Integer> quantities = new ArrayList<>();
+
+                for (SalesItem item : sales.getSalesItems()) {
+                    // SalesItem에서 lotNumber 추출 (리플렉션 또는 getter 필요)
+                    try {
+                        Field lotNumberField = SalesItem.class.getDeclaredField("lotNumber");
+                        lotNumberField.setAccessible(true);
+                        String lotNumber = (String) lotNumberField.get(item);
+                        lotNumbers.add(lotNumber);
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        // 로트 번호 필드가 없거나 접근 불가 시 예외 처리 또는 기본값 설정
+                        lotNumbers.add("N/A"); // 예시: 로트 번호 없음을 표시
+                        System.err.println("SalesItem에서 lotNumber 필드 접근 오류: " + e.getMessage()); // 로그 기록
+                    }
+                    quantities.add(item.getSalesItemsQuantity()); // SalesItem의 수량 getter 사용
+                }
+
+                // 5. 결과 저장
+                result.put("status", "success");
+                result.put("storeId", storeId);
+                result.put("storeName", store.getStoreName());
+                result.put("lotNumbers", lotNumbers);
+                result.put("quantities", quantities);
+            } else {
+                result.put("status", "error");
+                result.put("message", "출고 정보 또는 연결된 수주 정보를 찾을 수 없습니다.");
+            }
+        } catch (IllegalArgumentException e) { // 구체적인 예외 처리
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+        } catch (Exception e) { // 그 외 예외 처리
+            result.put("status", "error");
+            result.put("message", "정보 조회 중 오류 발생: " + e.getMessage());
+            // 실제 운영 환경에서는 로깅 필요 (e.g., log.error("Error fetching shipment info", e);)
+            System.err.println("Error fetching shipment info: " + e); // 개발/디버깅용 로그
+        }
+
+        return result;
     }
 }
