@@ -12,7 +12,7 @@ public class ReturnShipmentItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "return_shipment_item_id") //출고 반품id, PK
-    private Integer returnShipmentItemId;
+    private Long returnShipmentItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "return_shipment_id",nullable = false) //반품번호, FK
@@ -38,11 +38,11 @@ public class ReturnShipmentItem {
         this.returnShipmentContent = returnShipmentContent;
     }
 
-    public Integer getReturnShipmentItemId() {
+    public Long getReturnShipmentItemId() {
         return returnShipmentItemId;
     }
 
-    public void setReturnShipmentItemId(Integer returnShipmentItemId) {
+    public void setReturnShipmentItemId(Long returnShipmentItemId) {
         this.returnShipmentItemId = returnShipmentItemId;
     }
 

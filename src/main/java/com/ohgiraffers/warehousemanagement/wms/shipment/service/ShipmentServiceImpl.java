@@ -136,6 +136,8 @@ public class ShipmentServiceImpl implements ShipmentService {
             updateInventoryForPending(updatedShipment);
         } else if ("출고완료".equals(newStatus) && !newStatus.equals(previousStatus)) {
             updateInventoryForCompleted(updatedShipment);
+        } else if ("출고취소".equals(newStatus) && !newStatus.equals(previousStatus)) {
+            updateInventoryForCancelled(updatedShipment);
         }
 
         return convertToResponseDTO(updatedShipment);
@@ -241,6 +243,45 @@ public class ShipmentServiceImpl implements ShipmentService {
             inventoryRepository.save(inventory);
             log.info("할당재고 제거 성공 - 상품 ID: {}, 로트 번호: {}, 할당재고: {}",
                     productId, lotNumber, inventory.getAllocatedStock());
+        }
+    }
+
+    /**
+     * 출고 취소 상태일 때 재고 업데이트 (할당재고 → 가용재고)
+     */
+
+    private void updateInventoryForCancelled(Shipment shipment) {
+        log.info("출고 취소 상태로 재고 업데이트 - 출고 ID: {}", shipment.getShipmentId());
+        Sales sales = salesService.getSalesBySalesId(shipment.getSaleId());
+        if (sales == null) {
+            throw new RuntimeException("수주 ID에 해당하는 데이터를 찾을 수 없습니다: " + shipment.getSaleId());
+        }
+        List<SalesItem> saleItems = sales.getSalesItems();
+        if (saleItems == null || saleItems.isEmpty()) {
+            throw new RuntimeException("수주 ID에 대한 상품 목록이 없습니다: " + shipment.getSaleId());
+        }
+
+        for (SalesItem item : saleItems) {
+            Integer productId = item.getProductId();
+            String lotNumber = getLotNumberFromSalesItem(item);
+            Integer quantity = item.getSalesItemsQuantity();
+
+            // findByProductProductIdAndLotNumber로 재go 조회
+            Inventory inventory = inventoryRepository.findByProductProductIdAndLotNumber(productId, lotNumber)
+                    .orElseThrow(() -> new RuntimeException(
+                            "해당 상품과 로트 번호에 대한 재고를 찾을 수 없습니다 - 상품 ID: " + productId + ", 로트 번호: " + lotNumber));
+
+            long allocatedStock = inventory.getAllocatedStock();
+            if (allocatedStock < quantity) {
+                throw new RuntimeException(
+                        "할당재고가 부족합니다 - 상품 ID: " + productId + ", 로트 번호: " + lotNumber +
+                                ", 할당재고: " + allocatedStock + ", 요청 수량: " + quantity);
+            }
+            inventory.setAllocatedStock(allocatedStock - quantity);
+            inventory.setAvailableStock(inventory.getAvailableStock() + quantity);
+            inventoryRepository.save(inventory);
+            log.info("재고 업데이트 성공 (출고 취소) - 상품 ID: {}, 로트 번호: {}, 가용재고: {}, 할당재고: {}",
+                    productId, lotNumber, inventory.getAvailableStock(), inventory.getAllocatedStock());
         }
     }
 
