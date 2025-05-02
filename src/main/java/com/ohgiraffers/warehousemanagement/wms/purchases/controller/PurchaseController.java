@@ -172,6 +172,7 @@ public class PurchaseController {
                 item.setPurchaseId(savedPurchase.getPurchaseId());
                 purchasesItemService.createPurchaseItem(item);
             }
+
             rdtat.addFlashAttribute("message", "발주가 등록되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -334,7 +335,7 @@ public class PurchaseController {
     @ResponseBody
     public ResponseEntity<?> getSupplierId(@PathVariable Integer supplierId) {
         try {
-            Integer verifiedSupplierId = purchaseService.getSupplierid(supplierId);
+            Integer verifiedSupplierId = purchaseService.getSupplierId(supplierId);
             return ResponseEntity.ok(verifiedSupplierId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
