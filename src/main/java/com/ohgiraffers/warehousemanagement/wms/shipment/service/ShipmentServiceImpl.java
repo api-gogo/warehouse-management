@@ -1,5 +1,7 @@
 package com.ohgiraffers.warehousemanagement.wms.shipment.service;
 
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.InventoryLogTransactionType;
+import com.ohgiraffers.warehousemanagement.wms.inventory.model.entity.InventoryLog;
 import com.ohgiraffers.warehousemanagement.wms.inventory.model.repository.InventoryRepository;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.Sales;
 import com.ohgiraffers.warehousemanagement.wms.sales.model.entity.SalesItem;
@@ -17,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -204,7 +208,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             inventory.setAvailableStock(availableStock - quantity);
             inventory.setAllocatedStock(inventory.getAllocatedStock() + quantity);
             inventoryRepository.save(inventory);
-            log.info("재고 업데이트 성공 - 상품 ID: {}, 로트 번호: {}, 가용재고: {}, 할당재고: {}",
+            log.info("재고 업데이트 성공 - 상품 ID: {}, 로트 번호: {}, 가용재고: {}, 할  당재고: {}",
                     productId, lotNumber, inventory.getAvailableStock(), inventory.getAllocatedStock());
         }
     }
@@ -239,8 +243,24 @@ public class ShipmentServiceImpl implements ShipmentService {
                         "할당재고가 부족합니다 - 상품 ID: " + productId + ", 로트 번호: " + lotNumber +
                                 ", 할당재고: " + allocatedStock + ", 요청 수량: " + quantity);
             }
-            inventory.setAllocatedStock(allocatedStock - quantity);
-            inventoryRepository.save(inventory);
+
+            // 변경 전 할당재고 저장
+            long beforeAllocatedStock = inventory.getAllocatedStock();
+
+            // 재고 업데이트
+            inventory.setAllocatedStock(beforeAllocatedStock - quantity);
+            Inventory savedInventory = inventoryRepository.save(inventory);
+
+            // 변경 후 할당재고와 차이 계산
+            long afterAllocatedStock = savedInventory.getAllocatedStock();
+            long difference = beforeAllocatedStock - afterAllocatedStock;
+
+            // 출고 상태가 "출고완료" 일 때 재고 이력 트리거 호출
+            if (shipment.getShipmentStatus().equals("출고완료")) {
+                inventoryService.notifyShipmentCompleted(savedInventory, shipment.getUserId(), difference);
+            }
+            // 아래 부분을 수정해야 합니다 - 끝 //
+
             log.info("할당재고 제거 성공 - 상품 ID: {}, 로트 번호: {}, 할당재고: {}",
                     productId, lotNumber, inventory.getAllocatedStock());
         }

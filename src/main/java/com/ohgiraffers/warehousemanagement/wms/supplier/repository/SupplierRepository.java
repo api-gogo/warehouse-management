@@ -37,4 +37,6 @@ public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
     Page<Supplier> findByStatusAndSearch(@Param("status") boolean status,
                                      @Param("search") String search,
                                      Pageable pageable);
+
+    Optional<Supplier> findBysupplierIdAndIsDeletedFalse(Integer supplierId);
 }

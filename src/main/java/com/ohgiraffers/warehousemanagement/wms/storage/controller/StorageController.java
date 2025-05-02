@@ -1,5 +1,6 @@
 package com.ohgiraffers.warehousemanagement.wms.storage.controller;
 
+import com.ohgiraffers.warehousemanagement.wms.auth.model.AuthDetails;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.request.StorageRequestDTO;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.response.StorageResponseDTO;
 import com.ohgiraffers.warehousemanagement.wms.storage.model.DTO.response.PurchaseInfoResponseDTO;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +87,10 @@ public class StorageController {
     // 입고 수정 처리
     @PostMapping("/update/{id}")
     public String updateStorage(@PathVariable int id, @ModelAttribute("storage") StorageRequestDTO storageRequestDTO) {
-        storageService.updateStorage(id, storageRequestDTO);
+        AuthDetails authDetails = (AuthDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = authDetails.getUsername().toString();
+
+        storageService.updateStorage(id, storageRequestDTO, userId);
         return "redirect:/storages";
     }
 

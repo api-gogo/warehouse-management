@@ -259,9 +259,23 @@ public class InventoryServicelmpl implements InventoryService {
     }
 
     @Override
+    public void notifyShipmentCompleted(Inventory inventory, Integer userId, Long difference) {
+        // 재고 로그 생성
+        InventoryLog log = new InventoryLog();
+        log.setInventory(inventory);
+        log.setQuantityChanged(Math.abs(difference));
+        log.setTransactionType(InventoryLogTransactionType.SHIPMENT);
+        log.setUser_id(String.valueOf(userId));
+        log.setInventoryLogContent("출고 완료에 따른 재고 등록");
+        log.setInventoryLogCreated(LocalDateTime.now());
+
+        inventoryLogRepository.save(log);
+
+    }
+
+    @Override
     @Transactional
-    public void notifyStorageCompleted(Integer purchaseId) {
-        System.out.println("입고 완료된 발주 ID: " + purchaseId + " 에 대한 재고 등록 작업을 수행합니다.");
+    public void notifyStorageCompleted(Integer purchaseId, Integer userId) {
 
         // 1. 해당 발주 ID에 대한 발주 아이템 리스트 가져오기
         List<PurchaseItem> purchaseItems = purchaseItemRepository.findByPurchasePurchaseId(purchaseId);
@@ -300,9 +314,9 @@ public class InventoryServicelmpl implements InventoryService {
                 // 3. 재고 로그 생성
                 InventoryLog log = new InventoryLog();
                 log.setInventory(savedInventory);
-                log.setQuantityChanged(purchaseItem.getProductQuantity());
+                log.setQuantityChanged(Math.abs(purchaseItem.getProductQuantity()));
                 log.setTransactionType(InventoryLogTransactionType.STORAGE);
-                log.setUser_id(String.valueOf(purchaseId));
+                log.setUser_id(String.valueOf(userId));
                 log.setInventoryLogContent("입고 완료에 따른 재고 등록");
                 log.setInventoryLogCreated(LocalDateTime.now());
 
